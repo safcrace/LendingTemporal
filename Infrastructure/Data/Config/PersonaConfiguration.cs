@@ -9,9 +9,9 @@ namespace Infrastructure.Data.Config
         public void Configure(EntityTypeBuilder<Persona> builder)
         {
 
-            builder.HasOne(c => c.Pais).WithMany()
-                 .HasForeignKey(c => c.PaisId)
-                 .OnDelete(DeleteBehavior.Restrict);
+            //builder.HasOne(c => c.Pais).WithMany()
+            //     .HasForeignKey(c => c.PaisId)
+            //     .OnDelete(DeleteBehavior.Restrict);
             
 
             builder.Property(x => x.NIT).IsRequired().HasMaxLength(10);

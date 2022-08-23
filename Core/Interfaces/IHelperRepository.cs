@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Core.Entities;
 
 namespace Core.Interfaces
 {
     public interface IHelperRepository
     {
-        /** Contactos **/
-        Task<bool> VerifyRelationship(byte linkTypeId, int parentContacId, int childContactId);
+        /** Contactos **/       
+        Task<IEnumerable<DetallePlanPagoTemporal>> GetDetailPaymentPlan(decimal principalAmount, decimal interestRate, decimal administrativeExpensesRate,
+                                                                        decimal taxRate, int term, DateTime payDay);
     }
 }

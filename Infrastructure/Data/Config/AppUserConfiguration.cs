@@ -9,8 +9,7 @@ namespace Infrastructure.Data.Config
     {
         public void Configure(EntityTypeBuilder<AppUser> builder)
         {
-            builder.HasOne(u => u.Person).WithOne()
-                .HasForeignKey<Persona>(p => p.AppUserId);
+            
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using API.Dtos;
 using Core.Entities;
 using Core.Entities.Functions;
+using Core.Interfaces;
 using Infrastructure.Data.DBContext;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,13 +11,34 @@ namespace API.Controllers
     public class LendingController : BaseApiController
     {
         private readonly ApplicationDbContext _dbContext;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public LendingController(ApplicationDbContext dbContext)
+        public LendingController(ApplicationDbContext dbContext, IUnitOfWork unitOfWork)
         {
             _dbContext = dbContext;
+            _unitOfWork = unitOfWork;
         }
-        [HttpPost()]
-        public async Task<ActionResult<object>> CreatePaymentPlan(CreatePaymentPlanDto createPaymentPlanDto)
+
+
+        [HttpGet()]
+        public async Task<IEnumerable<object>> GetLendings()
+        {
+            var lendings = await _dbContext.Prestamos.Select(p => new {PrestamoId = p.Id, p.MontoCapital, PersonaId = p.Persona.Id, p.Persona.Nombres, p.Persona.Apellidos}).ToListAsync();
+
+            return lendings;
+        }
+
+        [HttpGet("{id:int}")]
+        public async Task<ActionResult<Prestamo>> GetLendingById(int id)
+        {
+            var lending = await _dbContext.Prestamos.FirstOrDefaultAsync(p => p.Id == id);
+
+            return lending;
+        }
+
+
+        [HttpPost("plan-pago")]
+        public async Task<ActionResult<IEnumerable<object>>> CreatePaymentPlan(CreatePaymentPlanDto createPaymentPlanDto)
         {
             decimal
                 principalAmount = createPaymentPlanDto.PrincipalAmount,
@@ -29,7 +51,7 @@ namespace API.Controllers
 
             var fechaPago = /*new DateTime(createPaymentPlanDto.StartDate.Year, createPaymentPlanDto.StartDate.Month, 2)*/createPaymentPlanDto.StartDate.AddMonths(1);//.AddDays(-1);
 
-            DetallePlanPagoTemporal projection = new DetallePlanPagoTemporal();
+            IEnumerable<DetallePlanPagoTemporal> projection = new List<DetallePlanPagoTemporal>();
 
 
             if (interestRate == 0)
@@ -91,7 +113,7 @@ namespace API.Controllers
                     fechaPago = fechaPago.AddMonths(1).AddDays(1);
                 }
 
-                projection = await _dbContext.DetallePlanPagoTemporales.Where(p => p.PlanPagoId == code.ToString()).FirstOrDefaultAsync();
+                projection = await _dbContext.DetallePlanPagoTemporales.Where(p => p.PlanPagoId == code.ToString()).ToListAsync();
             }
 
 
