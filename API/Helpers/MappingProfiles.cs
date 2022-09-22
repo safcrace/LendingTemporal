@@ -1,5 +1,4 @@
 ﻿using API.Dtos;
-using API.DTOs;
 using AutoMapper;
 using Core.Entities;
 
@@ -9,7 +8,14 @@ namespace API.Helpers
     {
         public MappingProfiles()
         {   
-            //CreateMap<CreatePersonDto, Person>();
+            CreateMap<CreatePaymentPlanDto, PlanPago>();
+            CreateMap<CreatePaymentPlanDetailsDto, DetallePlanPago>();
+            CreateMap<CreateLendingDto, Prestamo>();
+            CreateMap<CreatePersonDto, Persona>();
+            CreateMap<EstadoCivil, EstadoCivilDto>();
+            CreateMap<TipoPrestamo, TipoPrestamoDto>();
+            CreateMap<DestinoPrestamo, DestinoPrestamoDto>();
+            CreateMap<Gestor, GestorDto>();
         }
     }
 }

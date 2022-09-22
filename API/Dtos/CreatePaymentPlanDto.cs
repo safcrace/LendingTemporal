@@ -1,18 +1,26 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Core.Entities;
+using System.ComponentModel.DataAnnotations;
 
 namespace API.Dtos
 {
     public class CreatePaymentPlanDto
     {
         [Required]
-        public decimal PrincipalAmount { get; set; }
+        public string AppUserId { get; set; }        
+        public int EstadoPlanId { get; set; } = 1;
         [Required]
-        public decimal InterestRate { get; set; }
+        public int PrestamoId { get; set; }
+        public DateTime FechaPlan { get; set; } = DateTime.Now;
         [Required]
-        public int Term { get; set; }
-        public decimal AdministrativeExpesesRate { get; set; } 
-        public decimal TaxRate { get; set; }
+        public decimal MontoPlan { get; set; }
         [Required]
-        public DateTime StartDate { get; set; }
+        public decimal Plazo { get; set; }
+        [Required]
+        public decimal TasaInteres { get; set; }
+        [Required]
+        public decimal TasaIva { get; set; }
+        public decimal TasaGastosAdministrativos { get; set; } = 0.0m;
+        public decimal TasaMora { get; set; } = 0.0m;
+        public ICollection<CreatePaymentPlanDetailsDto> PlanPagos { get; set; } = new List<CreatePaymentPlanDetailsDto>();
     }
 }

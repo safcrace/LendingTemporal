@@ -4,13 +4,13 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.Data.Config
 {
-    public class PaisConfiguration : IEntityTypeConfiguration<Pais>
+    public class GestorConfiguration : IEntityTypeConfiguration<Gestor>
     {
-        public void Configure(EntityTypeBuilder<Pais> builder)
+        public void Configure(EntityTypeBuilder<Gestor> builder)
         {
-            builder.Property(x => x.Id).IsRequired();
             builder.Property(x => x.Nombre).IsRequired().HasMaxLength(100);
-            builder.Property(x => x.Nacionalidad).HasMaxLength(100);
+            builder.Property(x => x.Telefono).HasMaxLength(30);
+            builder.Property(x => x.Email).HasMaxLength(50);
         }
     }
 }

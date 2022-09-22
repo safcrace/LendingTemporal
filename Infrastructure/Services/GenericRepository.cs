@@ -49,6 +49,26 @@ namespace Infrastructure.Data
             return await _dbContext.Set<T>().ToListAsync();
         }
 
+        public async Task<IReadOnlyList<object>> ListAllAsyncByPrestamoId(int id)
+        {
+            return await _dbContext.PlanPagos.Join(_dbContext.DetallePlanPagos,
+                                                   plan => plan.Id,
+                                                   detalle => detalle.PlanPagoId,
+                                                   (plan, detalle) => new
+                                                   {
+                                                       planId = plan.Id,
+                                                       detalle.Mes,
+                                                       detalle.CuotaCapital,
+                                                       detalle.CuotaIntereses,
+                                                       detalle.CuotaGastosAdministrativos,
+                                                       detalle.CuotaIva,
+                                                       detalle.TotalCuota,
+                                                       detalle.Saldo,
+                                                       detalle.FechaPago,
+                                                       detalle.Aplicado
+                                                   }).Where(p => p.planId == id).ToListAsync();
+        }
+
         public async Task<IReadOnlyList<T>> ListAsync(ISpecification<T> spec)
         {
             return await ApplySpecification(spec).ToListAsync();

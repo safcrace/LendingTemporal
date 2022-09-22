@@ -8,8 +8,7 @@
         public decimal CuotaCapital { get; set; }
         public decimal CuotaIntereses { get; set; }
         public decimal CuotaGastosAdministrativos { get; set; }
-        public decimal CuotaIva { get; set; }
-        public decimal SubTotalCuota { get; set; }
+        public decimal CuotaIva { get; set; }        
         public decimal TotalCuota { get; set; }
         public decimal Saldo { get; set; }
         public DateTime FechaPago { get; set; }

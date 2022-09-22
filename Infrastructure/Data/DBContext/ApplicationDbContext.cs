@@ -18,10 +18,13 @@ namespace Infrastructure.Data.DBContext
         public DbSet<DestinoPrestamo>? DestinoPrestamos { get; set; }
         public DbSet<DetallePlanPago>? DetallePlanPagos { get; set; }
         public DbSet<DetallePlanPagoTemporal>? DetallePlanPagoTemporales { get; set; }
+        public DbSet<Empresa>? Empresas { get; set; }
         public DbSet<EstadoCivil>? EstadoCivil { get; set; }
+        public DbSet<EstadoCuenta>? EstadoCuentas { get; set; }
         public DbSet<EstadoPlan>? EstadoPlanes { get; set; }
         public DbSet<EstadoPrestamo>? EstadoPrestamos { get; set; }
         public DbSet<Genero> Generos { get; set; } = null!;        
+        public DbSet<Gestor> Gestores { get; set; } = null!;        
         public DbSet<Municipio>? Municipios { get; set; }       
         public DbSet<Pais>? Paises { get; set; }
         public DbSet<Persona>? Personas { get; set; }        

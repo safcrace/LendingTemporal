@@ -12,7 +12,7 @@ namespace Infrastructure.Data.Config
     internal class PrestamoConfiguration : IEntityTypeConfiguration<Prestamo>
     {
         public void Configure(EntityTypeBuilder<Prestamo> builder)
-        {
+        {            
             builder.Property(x => x.FechaAprobacion).HasColumnType("Date");
             builder.Property(x => x.MontoCapital).IsRequired().HasColumnType("decimal(18,2)");
             builder.Property(x => x.SaldoCapital).IsRequired().HasColumnType("decimal(18,2)");

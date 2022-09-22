@@ -4,11 +4,11 @@ namespace Core.Entities
 {
     public class PlanPago : BaseEntity
     {
-        public AppUser AppUser { get; set; } = new();
-        public string AppUserId { get; set; } = null!;
-        public EstadoPlan EstadoPlan { get; set; } = new();
+        public AppUser AppUser { get; set; } 
+        public string AppUserId { get; set; } 
+        public EstadoPlan EstadoPlan { get; set; } 
         public int EstadoPlanId { get; set; }
-        public Prestamo Prestamo { get; set; } = new();
+        public Prestamo Prestamo { get; set; } 
         public int PrestamoId { get; set; }
         public DateTime FechaPlan { get; set; }
         public decimal MontoPlan { get; set; }

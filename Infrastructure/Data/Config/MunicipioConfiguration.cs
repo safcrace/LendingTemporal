@@ -8,6 +8,7 @@ namespace Infrastructure.Data.Config
     {
         public void Configure(EntityTypeBuilder<Municipio> builder)
         {
+            builder.Property(x => x.Id).IsRequired();
             builder.Property(x => x.Nombre).IsRequired().HasMaxLength(100);
             builder.Property(x => x.Descripcion).HasMaxLength(100);
         }

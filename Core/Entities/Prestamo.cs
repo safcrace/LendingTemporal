@@ -9,16 +9,18 @@ namespace Core.Entities
 {
     public class Prestamo : BaseEntity
     {
-        public AppUser AppUser { get; set; } = new ();
+        public AppUser? AppUser { get; set; }
         public string AppUserId { get; set; } = null!;
-        public Persona Persona { get; set; } = new ();
+        public Persona? Persona { get; set; }
         public int PersonaId { get; set; }
-        public EstadoPrestamo EstadoPresamo { get; set; } = new ();
+        public EstadoPrestamo? EstadoPresamo { get; set; }
         public int EstadoPrestamoId { get; set; }
-        public DestinoPrestamo DestinoPrestamo { get; set; } = new ();
+        public DestinoPrestamo? DestinoPrestamo { get; set; }
         public int DestinoPrestamoId { get; set; }
-        public TipoPrestamo TipoPrestamo { get; set; } = new ();
+        public TipoPrestamo? TipoPrestamo { get; set; }
         public int TipoPrestamoId { get; set; }
+        public Gestor? Gestor { get; set; }
+        public int GestorId { get; set; }
         public DateTime FechaAprobacion { get; set; }
         public decimal MontoCapital { get; set; }
         public decimal SaldoCapital { get; set; }
