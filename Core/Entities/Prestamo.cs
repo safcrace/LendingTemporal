@@ -9,25 +9,33 @@ namespace Core.Entities
 {
     public class Prestamo : BaseEntity
     {
+        public string? ReferenciaMigracion { get; set; }
         public AppUser? AppUser { get; set; }
         public string AppUserId { get; set; } = null!;
-        public Persona? Persona { get; set; }
-        public int PersonaId { get; set; }
-        public EstadoPrestamo? EstadoPresamo { get; set; }
+        public Entidad? EntidadPrestamo { get; set; }
+        public int? EntidadPrestamoId { get; set; }
+        public EstadoPrestamo? EstadoPrestamo { get; set; }
         public int EstadoPrestamoId { get; set; }
         public DestinoPrestamo? DestinoPrestamo { get; set; }
         public int DestinoPrestamoId { get; set; }
         public TipoPrestamo? TipoPrestamo { get; set; }
         public int TipoPrestamoId { get; set; }
-        public Gestor? Gestor { get; set; }
-        public int GestorId { get; set; }
-        public DateTime FechaAprobacion { get; set; }
-        public decimal MontoCapital { get; set; }
-        public decimal SaldoCapital { get; set; }
-        public decimal SaldoIntereses { get; set; }
-        public decimal SaldoIva { get; set; }
-        public decimal SaldoGastosAdministrativos { get; set; }
-        public decimal SaldoMora { get; set; }
-        public decimal InteresesAcumulados { get; set; }
+        public Entidad? GestorPrestamo { get; set; }
+        public int? GestorPrestamoId { get; set; }
+        public Entidad? EmpresaPrestamo { get; set; }
+        public int? EmpresaPrestamoId { get; set; }
+        public DateTime? FechaAprobacion { get; set; }
+        public DateTime? FechaDesembolso { get; set; }        
+        public decimal MontoOtorgado { get; set; }
+        public decimal InteresProyectado { get; set; }
+        public decimal IvaProyectado { get; set; }
+        public decimal GastosProyectados { get; set; }
+        public decimal MontoTotalProyectado { get; set; }
+        public byte Plazo { get; set; }
+        public decimal TasaInteres { get; set; }
+        public decimal TasaIva { get; set; }
+        public decimal TasaMora { get; set; }
+        public decimal TasaGastos { get; set; }
+        public DateTime? FechaPlan { get; set; }
     }
 }

@@ -17,9 +17,9 @@ namespace Infrastructure.Data.Config
             builder.Property(x => x.CuotaCapital).IsRequired().HasColumnType("decimal(18,2)");
             builder.Property(x => x.CuotaIntereses).IsRequired().HasColumnType("decimal(18,2)");
             builder.Property(x => x.CuotaGastosAdministrativos).IsRequired().HasColumnType("decimal(18,2)");
-            builder.Property(x => x.CuotaIva).IsRequired().HasColumnType("decimal(18,2)");           
+            builder.Property(x => x.CuotaIvaIntereses).IsRequired().HasColumnType("decimal(18,2)");           
             builder.Property(x => x.TotalCuota).IsRequired().HasColumnType("decimal(18,2)");
-            builder.Property(x => x.Saldo).IsRequired().HasColumnType("decimal(18,2)");
+            builder.Property(x => x.SaldoCapital).IsRequired().HasColumnType("decimal(18,2)");
             builder.Property(x => x.FechaPago).HasColumnType("Date");
         }
     }

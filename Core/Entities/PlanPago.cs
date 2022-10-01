@@ -4,24 +4,27 @@ namespace Core.Entities
 {
     public class PlanPago : BaseEntity
     {
-        public AppUser AppUser { get; set; } 
-        public string AppUserId { get; set; } 
-        public EstadoPlan EstadoPlan { get; set; } 
-        public int EstadoPlanId { get; set; }
-        public Prestamo Prestamo { get; set; } 
-        public int PrestamoId { get; set; }
-        public DateTime FechaPlan { get; set; }
-        public decimal MontoPlan { get; set; }
-        public decimal MontoCapital { get; set; }
-        public byte Plazo { get; set; }
-        public decimal TasaInteres { get; set; }
-        public decimal TasaIva { get; set; }
-        public decimal TasaGastosAdministrativos { get; set; }
-        public decimal TasaMora { get; set; }
+        public Prestamo? Prestamo { get; set; }
+        public int PrestamoId { get; set; }        
+        public int Periodo { get; set; }
+        public decimal CuotaCapital { get; set; }
+        public decimal CuotaIntereses { get; set; }
+        public decimal CuotaIvaIntereses { get; set; }
+        public decimal CuotaMora { get; set; }
+        public decimal CuotaIvaMora { get; set; }
+        public decimal CuotaGastos { get; set; }
+        public decimal CuotaIvaGastos { get; set; }
+        public decimal SaldoCapital { get; set; }
         public decimal SaldoIntereses { get; set; }
-        public decimal SaldoGastosAdministrativos { get; set; }
-        public decimal SaldoIva { get; set; }
-
-
+        public decimal SaldoIvaIntereses { get; set; }
+        public decimal SaldoMora { get; set; }
+        public decimal SaldoIvaMora { get; set; }
+        public decimal SaldoGastos { get; set; }
+        public decimal SaldoIvaGastos { get; set; }
+        public decimal TotalCuota { get; set; }        
+        public decimal SaldoTotal { get; set; }        
+        public DateTime FechaPago { get; set; }
+        public bool Aplicado { get; set; }
+        public ICollection<AbonoPlan> AbonoPlanes { get; set; } = new List<AbonoPlan>();
     }
 }

@@ -2,12 +2,12 @@
 {
     public class Empresa : BaseEntity
     {
-        public Gestor? Gestor { get; set; }
-        public int GestorId { get; set; }
-        public string Nombre { get; set; }
-        public string Direccion { get; set; }
-        public string? Telefono { get; set; }
-        public string? Email { get; set; }
+        public Entidad? Entidad { get; set; }
+        public int? EntidadId { get; set; }        
+        public string Nombre { get; set; } = string.Empty;
+        public string Direccion { get; set; } = string.Empty;
+        public string Telefono { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
         public string Nit { get; set; } = null!;
     }
 }

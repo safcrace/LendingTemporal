@@ -1,26 +1,23 @@
 ﻿using Core.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Infrastructure.Data.Config
 {
     internal class PrestamoConfiguration : IEntityTypeConfiguration<Prestamo>
     {
         public void Configure(EntityTypeBuilder<Prestamo> builder)
-        {            
-            builder.Property(x => x.FechaAprobacion).HasColumnType("Date");
-            builder.Property(x => x.MontoCapital).IsRequired().HasColumnType("decimal(18,2)");
-            builder.Property(x => x.SaldoCapital).IsRequired().HasColumnType("decimal(18,2)");
-            builder.Property(x => x.SaldoIntereses).IsRequired().HasColumnType("decimal(18,2)");
-            builder.Property(x => x.SaldoIva).IsRequired().HasColumnType("decimal(18,2)");
-            builder.Property(x => x.SaldoGastosAdministrativos).IsRequired().HasColumnType("decimal(18,2)");
-            builder.Property(x => x.SaldoMora).IsRequired().HasColumnType("decimal(18,2)");
-            builder.Property(x => x.InteresesAcumulados).IsRequired().HasColumnType("decimal(18,2)");            
+        {   
+            builder.Property(x => x.ReferenciaMigracion).HasMaxLength(125);
+            builder.Property(x => x.MontoOtorgado).HasColumnType("decimal(18,2)");
+            builder.Property(x => x.InteresProyectado).HasColumnType("decimal(18,2)");
+            builder.Property(x => x.IvaProyectado).HasColumnType("decimal(18,2)");
+            builder.Property(x => x.GastosProyectados).HasColumnType("decimal(18,2)");                        
+            builder.Property(x => x.MontoTotalProyectado).HasColumnType("decimal(18,2)");                        
+            builder.Property(x => x.TasaInteres).HasColumnType("decimal(18,2)");                        
+            builder.Property(x => x.TasaIva).HasColumnType("decimal(18,2)");                        
+            builder.Property(x => x.TasaMora).HasColumnType("decimal(18,2)");                        
+            builder.Property(x => x.TasaGastos).HasColumnType("decimal(18,2)");
         }
     }
 }

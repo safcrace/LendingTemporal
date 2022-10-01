@@ -4,20 +4,30 @@ namespace API.Dtos
 {
     public class CreatePaymentPlanDetailsDto
     {        
-        public int PlanPagoId { get; set; }
+        public int PrestamoId { get; set; }
         [Required]
-        public decimal Mes { get; set; }
+        public int Periodo { get; set; }
         [Required]
         public decimal CuotaCapital { get; set; }
         [Required]
         public decimal CuotaIntereses { get; set; }
-        public decimal CuotaGastosAdministrativos { get; set; }
         [Required]
-        public decimal CuotaIva { get; set; }
+        public decimal CuotaIvaIntereses { get; set; }
+        public decimal CuotaMora { get; set; }
+        public decimal CuotaIvaMora { get; set; }
+        public decimal CuotaGastos { get; set; }
+        public decimal CuotaIvaGastos { get; set; }
+        public decimal SaldoCapital { get; set; }
+        public decimal SaldoIntereses { get; set; }
+        public decimal SaldoIvaIntereses { get; set; }
+        public decimal SaldoMora { get; set; }
+        public decimal SaldoIvaMora { get; set; }
+        public decimal SaldoGastos { get; set; }
+        public decimal SaldoIvaGastos { get; set; }
         [Required]
         public decimal TotalCuota { get; set; }
         [Required]
-        public decimal Saldo { get; set; }
+        public decimal SaldoTotal { get; set; }
         [Required]
         public DateTime FechaPago { get; set; }
         public bool Aplicado { get; set; } = false;

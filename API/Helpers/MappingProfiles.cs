@@ -7,15 +7,19 @@ namespace API.Helpers
     public class MappingProfiles : Profile
     {
         public MappingProfiles()
-        {   
-            CreateMap<CreatePaymentPlanDto, PlanPago>();
-            CreateMap<CreatePaymentPlanDetailsDto, DetallePlanPago>();
+        {               
+            CreateMap<CreatePaymentPlanDetailsDto, PlanPago>();
             CreateMap<CreateLendingDto, Prestamo>();
             CreateMap<CreatePersonDto, Persona>();
+            CreateMap<CreateEmpresaDto, Empresa>();
+            CreateMap<CreateRegistroCajaDto, RegistroCaja>();
+            CreateMap<Banco, BancoDto>();
+            CreateMap<Caja, CajaDto>();
+            CreateMap<FormaPago, FormaPagoDto>();
             CreateMap<EstadoCivil, EstadoCivilDto>();
             CreateMap<TipoPrestamo, TipoPrestamoDto>();
             CreateMap<DestinoPrestamo, DestinoPrestamoDto>();
-            CreateMap<Gestor, GestorDto>();
+            //CreateMap<Gestor, GestorDto>();
         }
     }
 }

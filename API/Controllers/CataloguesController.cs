@@ -2,8 +2,11 @@
 using API.Dtos;
 using AutoMapper;
 using Core.Entities;
+using Core.Entities.Views;
 using Core.Interfaces;
+using Infrastructure.Data.DBContext;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 
 namespace API.Controllers
@@ -12,12 +15,31 @@ namespace API.Controllers
     {        
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly ApplicationDbContext _dbContext;
 
-        public CataloguesController(IUnitOfWork unitOfWork, IMapper mapper)
+        public CataloguesController(IUnitOfWork unitOfWork, IMapper mapper, ApplicationDbContext dbContext)
         {            
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _dbContext = dbContext;
         }
+
+        [HttpGet("bancos")]
+        public async Task<ActionResult<IReadOnlyList<BancoDto>>> GetBancos()
+        {
+            var bancos = await _unitOfWork.Repository<Banco>().ListAllAsync();
+
+            return Ok(_mapper.Map<IReadOnlyList<BancoDto>>(bancos));
+        }
+
+        [HttpGet("cajas")]
+        public async Task<ActionResult<IReadOnlyList<CajaDto>>> GetCajas()
+        {
+            var cajas = await _unitOfWork.Repository<Caja>().ListAllAsync();
+
+            return Ok(_mapper.Map<IReadOnlyList<CajaDto>>(cajas));
+        }
+
 
         [HttpGet("estado-civil")]
         public async Task<ActionResult<IReadOnlyList<EstadoCivilDto>>> GetEstadoCivil()
@@ -25,6 +47,14 @@ namespace API.Controllers
             var estadoCivil = await _unitOfWork.Repository<EstadoCivil>().ListAllAsync();
 
             return Ok(_mapper.Map<IReadOnlyList<EstadoCivilDto>>(estadoCivil));           
+        }
+
+        [HttpGet("forma_pago")]
+        public async Task<ActionResult<IReadOnlyList<FormaPagoDto>>> GetFormaPago()
+        {
+            var formaPago = await _unitOfWork.Repository<FormaPago>().ListAllAsync();
+
+            return Ok(_mapper.Map<IReadOnlyList<FormaPagoDto>>(formaPago));
         }
 
         [HttpGet("tipo-prestamo")]
@@ -44,11 +74,9 @@ namespace API.Controllers
         }
 
         [HttpGet("gestores")]
-        public async Task<ActionResult<IReadOnlyList<GestorDto>>> GetGestores()
+        public async Task<ActionResult<IReadOnlyList<ListadoAsesor>>> GetGestores()
         {
-            var gestores = await _unitOfWork.Repository<Gestor>().ListAllAsync();
-
-            return Ok(_mapper.Map<IReadOnlyList<GestorDto>>(gestores));
+            return await _dbContext.Set<ListadoAsesor>().ToListAsync();            
         }
 
 

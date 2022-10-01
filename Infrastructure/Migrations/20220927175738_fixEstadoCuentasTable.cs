@@ -4,7 +4,7 @@
 
 namespace Infrastructure.Migrations
 {
-    public partial class FixedBugsEstadoCuentaTable : Migration
+    public partial class fixEstadoCuentasTable : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

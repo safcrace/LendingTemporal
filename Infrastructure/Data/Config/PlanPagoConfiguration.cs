@@ -8,17 +8,24 @@ namespace Infrastructure.Data.Config
     {
         public void Configure(EntityTypeBuilder<PlanPago> builder)
         {
-            builder.Property(x => x.FechaPlan).IsRequired().HasColumnType("Date");
-            builder.Property(x => x.MontoPlan).IsRequired().HasColumnType("decimal(18,2)");
-            builder.Property(x => x.MontoCapital).IsRequired().HasColumnType("decimal(18,2)");
-            builder.Property(x => x.Plazo).IsRequired();
-            builder.Property(x => x.TasaInteres).IsRequired().HasColumnType("decimal(18,2)");
-            builder.Property(x => x.TasaIva).IsRequired().HasColumnType("decimal(18,2)");
-            builder.Property(x => x.TasaGastosAdministrativos).IsRequired().HasColumnType("decimal(18,2)");
-            builder.Property(x => x.TasaMora).IsRequired().HasColumnType("decimal(18,2)");
-            builder.Property(x => x.SaldoIntereses).IsRequired().HasColumnType("decimal(18,2)");
-            builder.Property(x => x.SaldoGastosAdministrativos).IsRequired().HasColumnType("decimal(18,2)");
-            builder.Property(x => x.SaldoIva).IsRequired().HasColumnType("decimal(18,2)");            
+            builder.Property(x => x.Periodo).IsRequired();
+            builder.Property(x => x.CuotaCapital).IsRequired().HasColumnType("decimal(18,2)");
+            builder.Property(x => x.CuotaIntereses).IsRequired().HasColumnType("decimal(18,2)");
+            builder.Property(x => x.CuotaIvaIntereses).IsRequired().HasColumnType("decimal(18,2)");
+            builder.Property(x => x.CuotaMora).HasColumnType("decimal(18,2)");
+            builder.Property(x => x.CuotaIvaMora).HasColumnType("decimal(18,2)");
+            builder.Property(x => x.CuotaGastos).HasColumnType("decimal(18,2)");
+            builder.Property(x => x.CuotaIvaGastos).HasColumnType("decimal(18,2)");
+            builder.Property(x => x.SaldoCapital).HasColumnType("decimal(18,2)");
+            builder.Property(x => x.SaldoIntereses).HasColumnType("decimal(18,2)");
+            builder.Property(x => x.SaldoIvaIntereses).HasColumnType("decimal(18,2)");
+            builder.Property(x => x.SaldoMora).HasColumnType("decimal(18,2)");
+            builder.Property(x => x.SaldoIvaMora).HasColumnType("decimal(18,2)");
+            builder.Property(x => x.SaldoGastos).HasColumnType("decimal(18,2)");
+            builder.Property(x => x.SaldoIvaGastos).HasColumnType("decimal(18,2)");
+            builder.Property(x => x.TotalCuota).IsRequired().HasColumnType("decimal(18,2)");
+            builder.Property(x => x.SaldoTotal).IsRequired().HasColumnType("decimal(18,2)");
+            builder.Property(x => x.FechaPago).HasColumnType("Date");            
         }
     }
 }

@@ -5,19 +5,28 @@ namespace API.Dtos
     public class CreateLendingDto
     {
         [Required]
-        public string AppUserId { get; set; }
-        public int PersonaId { get; set; }
-        public int GestorId { get; set; }
-        public int EstadoPrestamoId { get; set; }
+        public string AppUserId { get; set; } = string.Empty;
+        [Required]
+        public byte TipoEntidad { get; set; }
+        public int EntidadPrestamoId { get; set; }
+        public int EstadoPrestamoId { get; set; } = 2;
         public int DestinoPrestamoId { get; set; }
         public int TipoPrestamoId { get; set; }
-        public DateTime FechaAprobacion { get; set; }
-        public decimal MontoCapital { get; set; }
-        public decimal SaldoCapital { get; set; }
-        public decimal SaldoIntereses { get; set; }
-        public decimal SaldoIva { get; set; }
-        public decimal SaldoGastosAdministrativos { get; set; }
-        public decimal SaldoMora { get; set; }
-        public CreatePersonDto CreatePersonDto { get; set; } = new CreatePersonDto();
+        public int GestorPrestamoId { get; set; }
+        public DateTime? FechaAprobacion { get; set; } = DateTime.Now;
+        public DateTime? FechaDesembolso { get; set; }
+        public decimal MontoOtorgado { get; set; }
+        public decimal InteresProyectado { get; set; } = 0;
+        public decimal IvaProyectado { get; set; } = 0;
+        public decimal GastosProyectados { get; set; } = 0;
+        public decimal MontoTotalProyectado { get; set; } = 0;
+        public int  Plazo { get; set; }
+        public decimal TasaInteres { get; set; } = 0;
+        public decimal TasaIva { get; set; } = 0;
+        public decimal TasaMora { get; set; } = 0;
+        public decimal TasaGastos { get; set; } = 0;
+        public DateTime FechaPlan { get; set; }
+        public CreatePersonDto? CreatePersonDto { get; set; }
+        public CreateEmpresaDto? CreateCompanyDto { get; set; }
     }
 }
