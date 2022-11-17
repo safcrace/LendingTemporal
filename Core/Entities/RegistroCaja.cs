@@ -16,7 +16,7 @@ namespace Core.Entities
         public int PrestamoId { get; set; }        
         public DateTime? FechaTransaccion { get; set; } = DateTime.Now;
         public DateTime? FechaDocumento { get; set; }
-        public string NumeroDocumento { get; set; } = string.Empty;
+        public string? NumeroDocumento { get; set; } = string.Empty;
         public int DiasMora { get; set; }
         public decimal MontoPago { get; set; }
         public decimal MontoCapital { get; set; }
@@ -30,7 +30,9 @@ namespace Core.Entities
         public byte CuotasAdelantadas { get; set; }        
         public byte CuotasVencidas { get; set; }
         public decimal TotalCuotasVencidas { get; set; }        
-        public string Observaciones { get; set; } = null!;
-        public string MotivoAnulacion { get; set; } = null!;
+        public string? Observaciones { get; set; } = null!;
+        public string? MotivoAnulacion { get; set; } = null!;
+        public string? BatchKey { get; set; }
+        public DateTime BatchDate { get; set; }
     }
 }

@@ -16,6 +16,7 @@ namespace Infrastructure.Data.DBContext
         }
 
         public DbSet<AbonoPlan>? AbonoPlanes { get; set; }
+        public DbSet<AplicacionPagos>? AplicacionPagos { get; set; }
         public DbSet<Banco>? Bancos { get; set; }
         public DbSet<Caja>? Cajas { get; set; }        
         public DbSet<Departamento>? Departamentos { get; set; }
@@ -25,6 +26,7 @@ namespace Infrastructure.Data.DBContext
         public DbSet<Empresa>? Empresas { get; set; }
         public DbSet<EstadoCivil>? EstadoCivil { get; set; }
         public DbSet<EstadoCuenta>? EstadoCuentas { get; set; }        
+        public DbSet<EstadoOrigen>? EstadosOrigen { get; set; }
         public DbSet<EstadoPrestamo>? EstadoPrestamos { get; set; }
         public DbSet<FormaPago>? FormaPagos { get; set; }
         public DbSet<Genero> Generos { get; set; } = null!;                
@@ -37,7 +39,33 @@ namespace Infrastructure.Data.DBContext
         public DbSet<RelacionEntidad>? RelacionEntidades { get; set; }        
         public DbSet<Sesion>? Sesiones { get; set; }        
         public DbSet<TipoBitacora>? TipoBitacoras { get; set; }        
-        public DbSet<TipoPrestamo>? TipoPrestamos { get; set; }        
+        public DbSet<TipoPrestamo>? TipoPrestamos { get; set; }
+        public DbSet<TipoTransaccion>? TipoTransaccion { get; set; }
+
+        public IQueryable<SaldosMigracion> SaldosMigracion(int prestamoId)
+        {
+            return FromExpression(() => SaldosMigracion(prestamoId));
+        }
+
+        public IQueryable<Encabezado> fxBatchGetHeader(string batchKey, DateTime batchDate)
+        {
+            return FromExpression(() => fxBatchGetHeader(batchKey, batchDate));
+        }
+
+        public IQueryable<Detalle> fxBatchGetDetail(string batchKey, DateTime batchDate)
+        {
+            return FromExpression(() => fxBatchGetDetail(batchKey, batchDate));
+        }
+
+        public IQueryable<TotalImpuestos> fxBatchGetTotalTaxes(string batchKey, DateTime batchDate)
+        {
+            return FromExpression(() => fxBatchGetTotalTaxes(batchKey, batchDate));
+        }
+
+        public IQueryable<Frases> fxBatchGetPhrases(string batchKey, DateTime batchDate)
+        {
+            return FromExpression(() => fxBatchGetPhrases(batchKey, batchDate));
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -48,6 +76,123 @@ namespace Infrastructure.Data.DBContext
 
             modelBuilder.Entity<ListadoGeneral>().HasNoKey().ToView("v_sct_listadogeneral");
             modelBuilder.Entity<ListadoAsesor>().HasNoKey().ToView("v_mdi_lista__asesores");
+            modelBuilder.Entity<ListadoEmpresaPlanilla>().HasNoKey().ToView("v_mdi_lista__empresas_con_planilla");
+            modelBuilder.Entity<AplicacionPagos>().HasNoKey().ToView(null);
+            modelBuilder.Entity<ReporteGeneralCreditos>().ToSqlQuery(@"Exec ReporteGeneralCreditos");            
+            //modelBuilder.Entity<AplicacionPagos>().ToSqlQuery(@"Exec ReporteContabilidad '2022-11-01', '2022-11-16'  ");            
+            modelBuilder.Entity<BatchFile>().ToSqlQuery(@"Exec sp_batchfile_generator");            
+            modelBuilder.Entity<ReporteCasosBTS>().ToSqlQuery(@"declare @tAcum table (
+							Id int,
+							ReferenciaMigracion nvarchar(125) null,
+							DeudaTotal decimal(18, 2) default 0 null,
+							CapitalPrestado decimal(18, 2) default 0 null,
+							SaldoCapital decimal(18, 2) default 0 null,
+							InteresProyectado decimal(18, 2) default 0 null,
+							IvaProyectado decimal(18, 2) default 0 null,
+							GastosProyectados decimal(18, 2) default 0 null,
+							SaldoInteres decimal(18, 2) default 0 null,
+							SaldoIvaInteres decimal(18, 2) default 0 null,
+							Mora decimal(18, 2) default 0 null,
+							SaldoMora decimal(18, 2) default 0 null,
+							IvaMora decimal(18, 2) default 0 null,
+							SaldoIvaMora decimal(18, 2) default 0 null,
+							Gastos decimal(18, 2) default 0 null,
+							SaldoGastos decimal(18, 2) default 0 null,
+							IvaGastos decimal(18, 2) default 0 null,
+							SaldoIvaGastos decimal(18, 2) default 0 null
+						);
+							
+declare @tPrestamo table (ROWID int identity (1, 1) not null, PrestamoId int);
+declare @i int, @n int;
+	set nocount on;
+	insert into @tPrestamo (PrestamoID) select a.Id from Prestamos a;
+	set @n = @@ROWCOUNT;
+
+	set @i = 1;
+	while (@i <= @n)
+	begin
+		insert into @tAcum select * from SaldosMigracion( (select PrestamoId from @tPrestamo where ROWID = @i) );
+		set @i = @i + 1;
+	end;
+	
+	--if not object_id('test_al_aire') is null drop table test_al_aire;
+	
+	-- set nocount off;
+
+	select 
+		pre.Id as IdPrestamo,
+		pre.ReferenciaMigracion as Referencia
+		, mdi.Nombre,
+		pre.MontoOtorgado,
+		pre.TasaInteres,
+		pre.Plazo,
+		
+		acum.DeudaTotal,
+		pre.InteresProyectado,
+		pre.IvaProyectado,
+		pre.DiasMora,
+		
+		acum.SaldoCapital
+		, acum.SaldoInteres as SaldoIntereses
+		, acum.SaldoIvaInteres as SaldoIvaIntereses
+		, acum.SaldoMora
+		, acum.SaldoIvaMora		
+		, estados.Nombre as Estado
+		,  case when pre.Plazo = 0 then 0 else convert(decimal(16, 2), pre.MontoTotalProyectado / pre.Plazo) end as CuotaCalculada
+		, convert(date, pre.FechaAprobacion) as FechaAprobacion
+		, IsNull(convert(date, pre.FechaAprobacion), convert(date, pre.FechaDesembolso)) as FechaDesembolso
+		, IsNull(ppl.PROXIMO_PAGO, '0001-01-01') as ProximoPago
+		, IsNull(ppl2.PRIMER_PAGO, '0001-01-01') as FechaPrimerPago
+		, IsNull(ppl2.ULTIMO_PAGO, '0001-01-01') as FechaVencimiento
+		, IsNull(pagadu.Nombre, ' ') as [Pagaduría]
+		, tp.Nombre as TipoPrestamo
+	--into test_al_aire
+	
+	from 
+		Prestamos as pre
+	Inner Join
+		v_mdi_general_full as mdi
+	on
+		mdi.EntidadId = pre.EntidadPrestamoId
+	Inner Join
+		EstadoPrestamos as estados
+	on
+		estados.Id = pre.EstadoPrestamoId
+
+	left outer join @tAcum acum on acum.Id = pre.Id
+
+	left outer join (
+						select PrestamoId, min(FechaPago) as PROXIMO_PAGO
+						from PlanPagos
+						where Aplicado = 0
+						group by PrestamoId
+					) ppl on ppl.PrestamoId = pre.ID
+
+	left outer join (
+						select PrestamoId,  min(FechaPago) as PRIMER_PAGO, max(FechaPago) as ULTIMO_PAGO
+						from PlanPagos						
+						group by PrestamoId
+					) ppl2 on ppl2.PrestamoId = pre.ID
+	
+	left outer join v_mdi_general_simple pagadu on pagadu.EntidadId = pre.EmpresaPrestamoId
+	inner join TipoPrestamos tp on tp.Id = pre.TipoPrestamoId
+	where
+		pre.EstadoPrestamoId = 1
+	order by pre.Id;
+	
+	set nocount off;");
+
+            modelBuilder.Entity<SaldosMigracion>().HasNoKey().ToTable(name: null);
+			modelBuilder.Entity<Encabezado>().HasNoKey().ToView(null);
+			modelBuilder.Entity<Detalle>().HasNoKey().ToView(null);
+			modelBuilder.Entity<TotalImpuestos>().HasNoKey().ToView(null);
+			modelBuilder.Entity<Frases>().HasNoKey().ToView(null);
+
+            modelBuilder.HasDbFunction(() => SaldosMigracion(0));
+            modelBuilder.HasDbFunction(() => fxBatchGetHeader("",DateTime.Now));
+            modelBuilder.HasDbFunction(() => fxBatchGetDetail("",DateTime.Now));
+            modelBuilder.HasDbFunction(() => fxBatchGetTotalTaxes("",DateTime.Now));
+            modelBuilder.HasDbFunction(() => fxBatchGetPhrases("",DateTime.Now));
 
             modelBuilder.Entity<AbonoPlan>().HasKey(pp => new { pp.EstadoCuentaId, pp.PlanPagoId });
             modelBuilder.Entity<AbonoPlan>().

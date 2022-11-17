@@ -14,5 +14,7 @@ namespace API.Dtos
         public decimal TaxRate { get; set; }
         [Required]
         public DateTime StartDate { get; set; } = DateTime.Now;
+        [Required]
+        public DateTime PayDate { get; set; }
     }
 }

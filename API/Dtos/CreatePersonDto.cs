@@ -10,7 +10,7 @@
         public DateTime? FechaNacimiento { get; set; }
         public string? Email { get; set; }
         public string? Direccion { get; set; }
-        public int Nit { get; set; }
+        public string? Nit { get; set; }
         public string? NumeroTelefono { get; set; }
         public string? NumeroDocumento { get; set; }
     }

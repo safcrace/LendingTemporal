@@ -15,6 +15,14 @@ namespace API
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddHostedService<CalcularMora>();
+
+            services.AddHttpClient
+                ("BackEnd", client =>
+            {
+                client.BaseAddress = new Uri("https://sinfin-backend.octtopro.com/");
+            });
+
             services.AddAutoMapper(typeof(MappingProfiles));
 
             services.AddControllers();

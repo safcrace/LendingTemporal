@@ -16,6 +16,8 @@ namespace Core.Entities
         public int? EntidadPrestamoId { get; set; }
         public EstadoPrestamo? EstadoPrestamo { get; set; }
         public int EstadoPrestamoId { get; set; }
+        public EstadoOrigen? EstadoOrigen { get; set; }
+        public int? EstadoOrigenId { get; set; }
         public DestinoPrestamo? DestinoPrestamo { get; set; }
         public int DestinoPrestamoId { get; set; }
         public TipoPrestamo? TipoPrestamo { get; set; }
@@ -36,6 +38,7 @@ namespace Core.Entities
         public decimal TasaIva { get; set; }
         public decimal TasaMora { get; set; }
         public decimal TasaGastos { get; set; }
+        public int DiasMora { get; set; }
         public DateTime? FechaPlan { get; set; }
     }
 }
