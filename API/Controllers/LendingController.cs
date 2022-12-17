@@ -113,9 +113,9 @@ namespace API.Controllers
                                           MontoTotal = pre.MontoOtorgado,
                                           MontoTotalProyectado = pre.MontoTotalProyectado,
                                           Plazo = pre.Plazo,
-                                          TasaInteres = pre.TasaInteres,
-                                          TasaMora = pre.TasaMora,
-                                          TasaIva = pre.TasaIva,
+                                          TasaInteres = (pre.Id <= 878) ? pre.TasaInteres * 100 : pre.TasaInteres,
+                                          TasaMora = (pre.Id <= 878) ? pre.TasaMora * 100 : pre.TasaMora,
+                                          TasaIva = (pre.Id <= 878) ? pre.TasaIva * 100 : pre.TasaIva,
                                           FechaPlan = pre.FechaPlan,
                                           FechaAprobacion = pre.FechaAprobacion,
                                           DiasMora = pre.DiasMora
@@ -246,6 +246,7 @@ namespace API.Controllers
         [HttpGet("saldos/{prestamoId:int}")]
         public async Task<ObtenerSaldosDto> GetSaldos(int prestamoId)
         {
+            /** Aplicación de Mora **/
             var saldosPrestamo =await _dbContext.Prestamos.Where(p => p.Id == prestamoId).FirstOrDefaultAsync();
 
             var saldoCapital = saldosPrestamo.MontoOtorgado;
@@ -417,12 +418,12 @@ namespace API.Controllers
             decimal saldoMonto = montoPago;
             int diasMora = 0;
             decimal montoMora = 0.0m, montoIvaMora = 0.0m, montoIntereses = 0.0m, montoIvaIntereses = 0.0m , montoCapital = 0.0m, montoExcedente = 0.0m, capitalVencido = 0.0m,
-                    cargoMontoMora = 0.0m, cargoMontoIvaMora = 0.0m;
-
+                    cargoMontoMora = 0.0m, cargoMontoIvaMora = 0.0m;            
+            
             /** Plan de Pago Couta Vigente **/
 
             var planPago = await _dbContext.PlanPagos.Where(p => p.PrestamoId == prestamoId && p.Aplicado == false).FirstOrDefaultAsync();
-            
+                        
             /** Se Calcula Mora si Existe **/
             var tasaMora = await _dbContext.Prestamos.Where(p => p.Id == prestamoId).Select(p => p.TasaMora).FirstOrDefaultAsync();
 
@@ -445,18 +446,26 @@ namespace API.Controllers
 
             var planesPago = await _dbContext.PlanPagos.Where(p => p.PrestamoId == prestamoId && p.Aplicado == false).ToListAsync();
             
+
             foreach (var plan in planesPago)
             {
+                var fechaReferencia = DateTime.Now.Date;
 
-                if (plan.FechaPago <= DateTime.Now)
+                if (!aplicaMora)
+                {
+                    fechaReferencia = plan.FechaCreacion.Date;
+                }
+
+                if (plan.FechaPago <= DateTime.Now && plan.FechaModificacion.Date != fechaReferencia)
                 {
                     capitalVencido += plan.SaldoCapital; //* tasaMora;                
                     cargoMontoMora += capitalVencido * tasaMora / 365 * diasMora;
                     cargoMontoIvaMora += cargoMontoMora * 0.12m;
-                    plan.CuotaMora = cargoMontoMora;
-                    plan.SaldoMora = cargoMontoMora;
-                    plan.CuotaIvaMora = cargoMontoIvaMora;
-                    plan.SaldoIvaMora = cargoMontoIvaMora;
+                    if (!aplicaMora) { plan.CuotaMora = 0; } else { plan.CuotaMora += cargoMontoMora; }
+                    if (!aplicaMora) { plan.SaldoMora = 0; } else { plan.SaldoMora += cargoMontoMora; }
+                    if (!aplicaMora) { plan.CuotaIvaMora = 0; } else { plan.CuotaIvaMora += cargoMontoIvaMora; }
+                    if (!aplicaMora) { plan.SaldoIvaMora = 0; } else { plan.SaldoIvaMora += cargoMontoIvaMora; }
+                    if (!aplicaMora) { plan.FechaModificacion = plan.FechaCreacion; } else { plan.FechaModificacion = DateTime.Now; }
                     plan.TotalCuota = plan.CuotaCapital + plan.CuotaIntereses + plan.CuotaIvaIntereses + plan.CuotaMora + plan.CuotaIvaMora; 
                     _dbContext.Update(plan);
                     await _dbContext.SaveChangesAsync();
@@ -922,8 +931,8 @@ namespace API.Controllers
                     montoIvaGastos = 0;
                 }                
 
-                if (plan.SaldoCapital < 1 && plan.SaldoIntereses < 1  && plan.SaldoIvaIntereses < 1
-                    && plan.SaldoMora < 1 && plan.SaldoIvaMora < 1 && plan.SaldoGastos < 1 && plan.SaldoIvaGastos <1 )
+                if (plan.SaldoCapital < 0.01m && plan.SaldoIntereses < 0.01m  && plan.SaldoIvaIntereses < 0.01m
+                    && plan.SaldoMora < 0.01m && plan.SaldoIvaMora < 0.01m && plan.SaldoGastos < 0.01m && plan.SaldoIvaGastos < 0.01m )
                 {
                     plan.Aplicado = true;
                 }

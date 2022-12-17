@@ -53,7 +53,10 @@ namespace API.Controllers
         [HttpGet("forma_pago")]
         public async Task<ActionResult<IReadOnlyList<FormaPagoDto>>> GetFormaPago()
         {
-            var formaPago = await _unitOfWork.Repository<FormaPago>().ListAllAsync();
+            //var formaPago = await _unitOfWork.Repository<FormaPago>().ListAllAsync();
+            var formaPago = await _dbContext.FormaPagos.Where(x => x.Habilitado == true).OrderBy(x => x.Nombre).ToListAsync();
+
+
 
             return Ok(_mapper.Map<IReadOnlyList<FormaPagoDto>>(formaPago));
         }
