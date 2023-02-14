@@ -25,6 +25,36 @@ namespace API.Controllers
             _dbContext = dbContext;
         }
 
+        [HttpGet("paises")]
+        public async Task<ActionResult<IEnumerable<PaisDto>>> GetCountries()
+        {
+            var paises = await _dbContext.Paises.ToListAsync();
+
+            if (paises == null) return NotFound();
+
+            return Ok(_mapper.Map<List<PaisDto>>(paises));
+        }
+
+        [HttpGet("departmentos")]
+        public async Task<ActionResult<IEnumerable<DepartamentoDto>>> GetDepartments()
+        {
+            var departamentos = await _unitOfWork.Repository<Departamento>().ListAllAsync();
+
+            if (departamentos == null) return NotFound();
+
+            return Ok(_mapper.Map<List<DepartamentoDto>>(departamentos));
+        }
+
+        [HttpGet("municipios/{departamentoId}")]
+        public async Task<ActionResult<IEnumerable<MunicipioDto>>> GetTownships(int departamentoId)
+        {
+            var municipios = await _dbContext.Municipios.Where(x => x.DepartamentoId == departamentoId).ToListAsync();
+
+            if (municipios == null) return NotFound();
+
+            return Ok(_mapper.Map<List<MunicipioDto>>(municipios));
+        }
+
         [HttpGet("bancos")]
         public async Task<ActionResult<IReadOnlyList<BancoDto>>> GetBancos()
         {
@@ -77,6 +107,26 @@ namespace API.Controllers
             return Ok(_mapper.Map<IReadOnlyList<DestinoPrestamoDto>>(destinoPrestamo));
         }
 
+        [HttpGet("ocupaciones")]
+        public async Task<ActionResult<IEnumerable<OcupacionDto>>> GetOcupaciones()
+        {
+            var ocupaciones = await _unitOfWork.Repository<Ocupacion>().ListAllAsync();
+
+            if (ocupaciones == null) return NotFound();
+
+            return Ok(_mapper.Map<List<OcupacionDto>>(ocupaciones));
+        }
+
+        [HttpGet("tipos_vivienda")]
+        public async Task<ActionResult<IEnumerable<TipoViviendaDto>>> GetTiposVivienda()
+        {
+            var tiposVivienda = await _unitOfWork.Repository<TipoVivienda>().ListAllAsync();
+
+            if (tiposVivienda == null) return NotFound();
+
+            return Ok(_mapper.Map<List<TipoViviendaDto>>(tiposVivienda));
+        }
+
         [HttpGet("gestores")]
         public async Task<ActionResult<IReadOnlyList<ListadoAsesor>>> GetGestores()
         {
@@ -99,29 +149,93 @@ namespace API.Controllers
             }).ToListAsync();
         }
 
+        [HttpGet("actualiza_mora")]
+        public async Task<ActionResult<IReadOnlyList<object>>> GetActualizaMora()
+        {
+            await _dbContext.Database.ExecuteSqlRawAsync("Exec sp_job_calcularMora");
+            return Ok(new { message = "Acción realizada Satisfactoriamente" });
+        }
+
+
         [HttpGet("actualiza_dias_mora")]
         public async Task<ActionResult<IReadOnlyList<object>>> GetDiasMora()
         {
-            var prestamos = await _dbContext.Prestamos.Where(p => p.EstadoPrestamoId != 5).ToListAsync();
+            DateTime fechaActual = DateTime.Now, fechaReferencia = DateTime.Now.Date;
+            decimal cargoMontoMora = 0.0m, cargoMontoIvaMora = 0.0m, capitalVencido = 0.0m;
+
+            var prestamos = await _dbContext.Prestamos.Where(p => p.EstadoPrestamoId == 1 || p.EstadoPrestamoId == 7).ToListAsync();
 
             foreach (var prestamo in prestamos)
             {
-                var fechaPago = await _dbContext.PlanPagos.Where(p => p.PrestamoId == prestamo.Id && p.Aplicado == false).Select(p => p.FechaPago).FirstOrDefaultAsync();
+                capitalVencido = 0.0m;
+                cargoMontoMora = 0.0m;
+                cargoMontoIvaMora = 0.0m;
 
-                var fechaInicio = new DateTime(2020 - 01 - 01);
+                //var fechaPago = await _dbContext.PlanPagos.Where(p => p.PrestamoId == prestamo.Id && p.Aplicado == false).Select(p => p.FechaPago).FirstOrDefaultAsync();
+                var planPago = await _dbContext.PlanPagos.Where(p => p.PrestamoId == prestamo.Id && p.Aplicado == false).FirstOrDefaultAsync();
+                var tasaMora = prestamo.TasaMora;
 
-                if (fechaPago >= fechaInicio && fechaPago <= DateTime.Now)
+                if (planPago is not null)
                 {
-                    var diasMora = (int)(DateTime.Now - fechaPago).TotalDays;
-                    prestamo.DiasMora = diasMora;
+                    //var fechaInicio = new DateTime(2020 - 01 - 01);
+                    if (planPago.FechaPago < fechaActual)
+                    {
+                        //var diasMora = (int)(DateTime.Now - fechaPago).TotalDays;
+                        var diasMora = (int)(fechaActual - planPago.FechaPago).TotalDays;
+                        prestamo.DiasMora = diasMora;
 
-                }
-                else
-                {
-                    prestamo.DiasMora = 0;
-                }
+                    }
+                    else
+                    {
+                        prestamo.DiasMora = 0;
+                    }
 
-                _unitOfWork.Repository<Prestamo>().Update(prestamo);
+
+                    //var cuotasPendientesPlanPago = await _dbContext.PlanPagos.Where(p => p.PrestamoId == prestamo.Id && p.Aplicado == false).ToListAsync();
+
+                    //foreach (var plan in cuotasPendientesPlanPago)
+                    //{
+                        //if (fechaReferencia.Date < plan.FechaModificacion)
+                        //{
+                        //    plan.CuotaMora = 0;
+                        //    plan.SaldoMora = 0;
+                        //    plan.CuotaIvaMora = 0;
+                        //    plan.SaldoIvaMora = 0;
+                        //    //plan.TotalCuota = plan.CuotaCapital + plan.CuotaIntereses + plan.CuotaIvaIntereses + plan.CuotaMora + plan.CuotaIvaMora;
+                        //    _dbContext.Update(plan);
+                        //    await _dbContext.SaveChangesAsync();
+                        //}
+                        //if (fechaReferencia > plan.FechaModificacion)
+                        //{
+                        //    plan.CuotaMora = 0;
+                        //    plan.SaldoMora = 0;
+                        //    plan.CuotaIvaMora = 0;
+                        //    plan.SaldoIvaMora = 0;
+                        //    //plan.TotalCuota = plan.CuotaCapital + plan.CuotaIntereses + plan.CuotaIvaIntereses + plan.CuotaMora + plan.CuotaIvaMora;
+                        //    _dbContext.Update(plan);
+                        //    await _dbContext.SaveChangesAsync();
+                        //}
+
+
+                    //    if (plan.FechaPago <= fechaActual && plan.FechaModificacion.Date != fechaReferencia)
+                    //    {
+                    //        capitalVencido += plan.SaldoCapital;
+                    //    }
+                    //}
+
+                    //cargoMontoMora = capitalVencido * tasaMora / 365 * prestamo.DiasMora;
+                    //cargoMontoIvaMora = cargoMontoMora * 0.12m;
+                    //planPago.CuotaMora = cargoMontoMora;
+                    //planPago.SaldoMora = cargoMontoMora;
+                    //planPago.CuotaIvaMora = cargoMontoIvaMora;
+                    //planPago.SaldoIvaMora = cargoMontoIvaMora;
+                    //planPago.FechaModificacion = fechaActual.Date;
+                    ////_dbContext.Update(planPago);
+                    ////await _dbContext.SaveChangesAsync();
+
+                    //_unitOfWork.Repository<PlanPago>().Update(planPago);
+                    _unitOfWork.Repository<Prestamo>().Update(prestamo);
+                }
 
             }
 
@@ -130,7 +244,7 @@ namespace API.Controllers
             if (result < 0) return null!;
 
 
-            return Ok(new { message = "Acción realizada Satisfactoriamente" });
+            return Ok(new { message = "Acción realizada Satisfactoriamente", fechaActual });
         }
 
         [HttpGet("reporte_general")]
@@ -176,6 +290,24 @@ namespace API.Controllers
             }
 
             return Ok(new { message = "Acción realizada Satisfactoriamente", encabezado, detalle, totalImpuestos, frases });
+        }
+
+        [HttpGet("generacion_reporte_transunion")]
+        public async Task<ActionResult<object>> GetBatchFileTrans()
+        {
+            var reporte = await _dbContext.Set<ReporteTransUnion>().ToListAsync();
+
+            //List<Core.Entities.Views.ReporteTransUnion> reporteTransUnion = new();           
+
+            //foreach (var reporte in reportes)
+            //{
+            //    encabezado = await _dbContext.fxBatchGetHeader(reporte.BatchKey, reporte.BatchDate).ToListAsync();
+            //    detalle = await _dbContext.fxBatchGetDetail(reporte.BatchKey, reporte.BatchDate).ToListAsync();
+            //    totalImpuestos = await _dbContext.fxBatchGetTotalTaxes(reporte.BatchKey, reporte.BatchDate).ToListAsync();
+            //    frases = await _dbContext.fxBatchGetPhrases(reporte.BatchKey, reporte.BatchDate).ToListAsync();
+            //}
+
+            return Ok(new { message = "Acción realizada Satisfactoriamente", reporte });
         }
     }
 }

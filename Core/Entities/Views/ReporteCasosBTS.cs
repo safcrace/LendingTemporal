@@ -14,6 +14,7 @@ namespace Core.Entities.Views
         public int IdPrestamo { get; set; }
         public string? Referencia { get; set; }
         public string? Nombre { get; set; }
+        public string? Gestor { get; set; }
         public decimal MontoOtorgado { get; set; }
         public decimal TasaInteres { get; set; }
         public byte Plazo { get; set; }

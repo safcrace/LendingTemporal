@@ -22,7 +22,6 @@ namespace API.Controllers
             _mapper = mapper;
         }
 
-
         [HttpPost()]
         public async Task<ActionResult<IEnumerable<object>>> CreateLending(CreateLendingDto createLendingDto)
         {
@@ -75,7 +74,6 @@ namespace API.Controllers
             return Ok(new { message = "Acción realizada Satisfactoriamente" });
         }
 
-
         [HttpGet()]
         public async Task<ActionResult<IEnumerable<ListadoGeneral>>> GetLendings()
         {
@@ -100,8 +98,8 @@ namespace API.Controllers
                                           PrestamoId = pre.Id,
                                           PrestamoReferencia = pre.ReferenciaMigracion,
                                           PersonaId = per.Id,
-                                          Nombres = per.Nombres, 
-                                          Apellidos = per.Apellidos,
+                                          Nombres = $"{per.PrimerNombre} {per.SegundoNombre}",
+                                          Apellidos = $"{per.PrimerApellido} {per.SegundoApellido}",
                                           DPI = per.NumeroDocumento,
                                           per.Direccion,
                                           per.NumeroTelefono,
@@ -113,9 +111,9 @@ namespace API.Controllers
                                           MontoTotal = pre.MontoOtorgado,
                                           MontoTotalProyectado = pre.MontoTotalProyectado,
                                           Plazo = pre.Plazo,
-                                          TasaInteres = (pre.Id <= 878) ? pre.TasaInteres * 100 : pre.TasaInteres,
-                                          TasaMora = (pre.Id <= 878) ? pre.TasaMora * 100 : pre.TasaMora,
-                                          TasaIva = (pre.Id <= 878) ? pre.TasaIva * 100 : pre.TasaIva,
+                                          TasaInteres = pre.TasaInteres,
+                                          TasaMora = pre.TasaMora,
+                                          TasaIva = pre.TasaIva,
                                           FechaPlan = pre.FechaPlan,
                                           FechaAprobacion = pre.FechaAprobacion,
                                           DiasMora = pre.DiasMora
@@ -127,7 +125,7 @@ namespace API.Controllers
                                      where pre.Id == id
                                      select new
                                      {
-                                         Nombre = per.Nombres + " " + per.Apellidos,
+                                         Nombre = per.PrimerNombre + " " + per.SegundoApellido,
 
                                      }).FirstOrDefaultAsync();
                 
@@ -172,7 +170,7 @@ namespace API.Controllers
                                  where pre.Id == id
                                  select new
                                  {
-                                     Nombre = per.Nombres + " " + per.Apellidos,
+                                     Nombre = per.PrimerNombre + " " + per.SegundoApellido,
 
                                  }).FirstOrDefaultAsync();
 
@@ -190,16 +188,31 @@ namespace API.Controllers
                                   select new
                                   {                                      
                                       PersonaId = per.Id,
-                                      Nombres = per.Nombres,
-                                      Apellidos = per.Apellidos,
+                                      per.PrimerNombre,
+                                      per.SegundoNombre,
+                                      per.PrimerApellido,
+                                      per.SegundoApellido,
+                                      per.ApellidoCasada,
+                                      per.FechaNacimiento,
+                                      per.GeneroId,
+                                      per.Email,
                                       DPI = per.NumeroDocumento,
                                       per.Direccion,
-                                      NumeroTelefono = per.NumeroTelefono,
+                                      per.Colonia,
+                                      per.NumeroTelefono,
+                                      per.NumeroCelular,
+                                      per.NumeroTelefonoLaboral,
                                       per.NIT,
-                                      EstadoCivilId = per.EstadoCivilId,
+                                      per.PaisNacimientoId,
+                                      per.DepartamentoId,
+                                      per.MunicipioId,
+                                      per.EstadoCivilId,
                                       EstadoPrestamo = pre.EstadoPrestamo.Nombre,
                                       AsesorId = pre.GestorPrestamoId,
                                       EmpresaPlanillaId = pre.EmpresaPrestamoId,
+                                      per.DireccionLaboral,
+                                      per.OcupacionId,
+                                      per.Comentarios,
                                       TipoPrestamo = pre.TipoPrestamoId
                                   }).ToListAsync();
 
@@ -223,13 +236,30 @@ namespace API.Controllers
 
             var persona = await _dbContext.Personas.Where(p => p.Id == updatePersonLendingDto.personId).FirstOrDefaultAsync();
 
-            persona.Nombres = updatePersonLendingDto.Nombres;
-            persona.Apellidos = updatePersonLendingDto.Apellidos;
+            persona.PrimerNombre = updatePersonLendingDto.PrimerNombre;
+            persona.SegundoNombre = updatePersonLendingDto.SegundoNombre;
+            persona.PrimerApellido = updatePersonLendingDto.PrimerApellido;
+            persona.SegundoApellido = updatePersonLendingDto.SegundoApellido;
+            persona.ApellidoCasada = updatePersonLendingDto.ApellidoCasada;
+            persona.FechaNacimiento = updatePersonLendingDto.FechaNacimiento;
+            persona.GeneroId = updatePersonLendingDto.GeneroId;
+            persona.Email = updatePersonLendingDto.Email;
             persona.NumeroDocumento = updatePersonLendingDto.NumeroDocumento;
             persona.Direccion = updatePersonLendingDto.Direccion;
+            persona.Colonia = updatePersonLendingDto.Colonia;
+            persona.TipoViviendaId = updatePersonLendingDto.TipoViviendaId;
             persona.NumeroTelefono = updatePersonLendingDto.NumeroTelefono;
+            persona.NumeroCelular = updatePersonLendingDto.NumeroCelular;
+            persona.NumeroTelefonoLaboral = updatePersonLendingDto.NumeroTelefonoLaboral;
             persona.NIT = updatePersonLendingDto.NIT;
             persona.EstadoCivilId = updatePersonLendingDto.EstadoCivilId;
+            persona.PaisNacimientoId = updatePersonLendingDto.PaisNacimientoId;
+            persona.DepartamentoId = updatePersonLendingDto.DepartamentoId;
+            persona.MunicipioId = updatePersonLendingDto.MunicipioId;
+            persona.OcupacionId = updatePersonLendingDto.OcupacionId;
+            persona.DireccionLaboral = updatePersonLendingDto.DireccionLaboral;
+            persona.Comentarios = updatePersonLendingDto.Comentarios;
+
 
             _unitOfWork.Repository<Persona>().Update(persona);
 
@@ -240,9 +270,7 @@ namespace API.Controllers
             return Ok(new { message = "Acción realizada Satisfactoriamente" });
 
         }
-           
-
-
+        
         [HttpGet("saldos/{prestamoId:int}")]
         public async Task<ObtenerSaldosDto> GetSaldos(int prestamoId)
         {
@@ -321,22 +349,11 @@ namespace API.Controllers
 
         }
         
-
         [HttpGet("estado_cuenta/{prestamoId:int}")]
         public async Task<ActionResult<object>> GetEstadoCuenta(int prestamoId)
         {
-            return await _dbContext.EstadoCuentas.Where(x => x.PrestamoId == prestamoId).Select(x => new
-            {
-                x.TipoTransaccionId,
-                x.Cargo,
-                x.Abono,
-                x.SaldoAnterior,
-                x.SaldoActual,
-                x.Concepto,
-                x.FechaCreacion
-            }).ToListAsync();
+            return await _dbContext.EstadoCuentaPrestamos.Where(x => x.PrestamoId == prestamoId).ToListAsync();            
         }       
-
 
         [HttpGet("historial_pago/{prestamoId:int}")]
         public async Task<ActionResult<object>> GetHIstorialPago(int prestamoId, string appUserId)
@@ -356,7 +373,7 @@ namespace API.Controllers
                                      where pre.Id == prestamoId
                                      select new
                                                    {
-                                                       Nombre = per.Nombres + " " + per.Apellidos,
+                                                       Nombre = per.PrimerNombre + " " + per.PrimerApellido,
                                                    }).FirstOrDefaultAsync();
                 deudor = deudorPersona.Nombre;
             }
@@ -378,7 +395,7 @@ namespace API.Controllers
                                  where user.Id == appUserId
                                  select new
                                  {
-                                     Nombre = per.Nombres + " " + per.Apellidos,
+                                     Nombre = per.PrimerNombre + " " + per.PrimerApellido,
                                  }).FirstOrDefaultAsync();
 
             var gestor = await (from pre in _dbContext.Prestamos
@@ -387,7 +404,7 @@ namespace API.Controllers
                                 where pre.Id == prestamoId
                                 select new
                                 {
-                                    Nombre = per.Nombres + " " + per.Apellidos,
+                                    Nombre = per.PrimerNombre + " " + per.PrimerApellido,
                                 }).FirstOrDefaultAsync();
 
             return await _dbContext.RegistroCajas.Where(x => x.PrestamoId == prestamoId).Select(x => new
@@ -398,22 +415,29 @@ namespace API.Controllers
                 NombreGestor = gestor.Nombre,
                 FechaRecibo = DateTime.Now,
                 Caja = x.Caja.Nombre,
-                x.FechaTransaccion,
+                FechaTransaccion = x.FechaPago,
                 TipoTranCapital = 8, 
                 Capital = x.MontoCapital,
                 TipoTranIntereses = 9,
                 Intereses =x.MontoInteres,
                 TipoTranIvaIntereses = 10,
                 Iva = x.MontoIvaIntereses,
+                TipoTransaccionMora = 11,
+                Mora = x.MontoMora,
+                TipoTransaccionIvaMora = 12,
+                IvaMora = x.MontoIvaMora,
+                TipoTransaccionGastos = 13,
+                Gastos = x.MontoGastos,
+                TipoTransaccionIvaGastos = 14,
+                IvaGastos = x.MontoIvaGastos,
                 MontoPago = x.MontoPago,
                 FormaPago = x.FormaPago.Nombre,
                 NombreBanco = x.Banco.Nombre
             }).ToListAsync();
         }
 
-
         [HttpGet("distribuye_pago/{prestamoId:int}")]
-        public async Task<DistribuyePagoDto> GetDistribuyePago(int prestamoId, decimal montoPago, bool aplicaMora = true)
+        public async Task<DistribuyePagoDto> GetDistribuyePago(int prestamoId, decimal montoPago, DateTime fechaPago, bool aplicaMora = true)
         {
             decimal saldoMonto = montoPago;
             int diasMora = 0;
@@ -429,13 +453,9 @@ namespace API.Controllers
 
             if (aplicaMora == true)
             {
+                //tasaMora = tasaMora / 100.00m;                
 
-                if (tasaMora > 1)
-                {
-                    tasaMora = tasaMora / 100.00m;
-                }
-
-                diasMora = (int)(DateTime.Now - planPago.FechaPago).TotalDays;
+                diasMora = (int)(fechaPago - planPago.FechaPago).TotalDays;
 
                 if (diasMora <= 0)
                 {
@@ -449,29 +469,60 @@ namespace API.Controllers
 
             foreach (var plan in planesPago)
             {
-                var fechaReferencia = DateTime.Now.Date;
+                var fechaReferencia = fechaPago.Date; //DateTime.Now.Date;
 
                 if (!aplicaMora)
                 {
-                    fechaReferencia = plan.FechaCreacion.Date;
+                    fechaReferencia = (plan.FechaCreacion == plan.FechaModificacion) ? plan.FechaCreacion.Date.AddDays(1) : plan.FechaCreacion.Date;
                 }
 
-                if (plan.FechaPago <= DateTime.Now && plan.FechaModificacion.Date != fechaReferencia)
+                if (fechaReferencia.Date < plan.FechaModificacion )
                 {
-                    capitalVencido += plan.SaldoCapital; //* tasaMora;                
-                    cargoMontoMora += capitalVencido * tasaMora / 365 * diasMora;
-                    cargoMontoIvaMora += cargoMontoMora * 0.12m;
-                    if (!aplicaMora) { plan.CuotaMora = 0; } else { plan.CuotaMora += cargoMontoMora; }
-                    if (!aplicaMora) { plan.SaldoMora = 0; } else { plan.SaldoMora += cargoMontoMora; }
-                    if (!aplicaMora) { plan.CuotaIvaMora = 0; } else { plan.CuotaIvaMora += cargoMontoIvaMora; }
-                    if (!aplicaMora) { plan.SaldoIvaMora = 0; } else { plan.SaldoIvaMora += cargoMontoIvaMora; }
-                    if (!aplicaMora) { plan.FechaModificacion = plan.FechaCreacion; } else { plan.FechaModificacion = DateTime.Now; }
-                    plan.TotalCuota = plan.CuotaCapital + plan.CuotaIntereses + plan.CuotaIvaIntereses + plan.CuotaMora + plan.CuotaIvaMora; 
+                    plan.CuotaMora = 0;
+                    plan.SaldoMora = 0;
+                    plan.CuotaIvaMora = 0;
+                    plan.SaldoIvaMora = 0;
+                    //plan.FechaModificacion = plan.FechaCreacion;
+                    plan.TotalCuota = plan.CuotaCapital + plan.CuotaIntereses + plan.CuotaIvaIntereses + plan.CuotaMora + plan.CuotaIvaMora;
                     _dbContext.Update(plan);
                     await _dbContext.SaveChangesAsync();
                 }
-            }            
+                if (fechaReferencia > plan.FechaModificacion)
+                {
+                    plan.CuotaMora = 0;
+                    plan.SaldoMora = 0;
+                    plan.CuotaIvaMora = 0;
+                    plan.SaldoIvaMora = 0;
+                    plan.TotalCuota = plan.CuotaCapital + plan.CuotaIntereses + plan.CuotaIvaIntereses + plan.CuotaMora + plan.CuotaIvaMora;
+                    _dbContext.Update(plan);
+                    await _dbContext.SaveChangesAsync();
+                }
+                
 
+                 if (plan.FechaPago <= DateTime.Now && plan.FechaModificacion.Date != fechaReferencia)
+                {
+                    capitalVencido += plan.SaldoCapital; //* tasaMora;                
+                    //cargoMontoMora += capitalVencido * tasaMora / 365 * diasMora;
+                    //cargoMontoIvaMora += cargoMontoMora * 0.12m;
+                    //if (!aplicaMora) { plan.CuotaMora = 0; } else { plan.CuotaMora += cargoMontoMora; }
+                    //if (!aplicaMora) { plan.SaldoMora = 0; } else { plan.SaldoMora += cargoMontoMora; }
+                    //if (!aplicaMora) { plan.CuotaIvaMora = 0; } else { plan.CuotaIvaMora += cargoMontoIvaMora; }
+                    //if (!aplicaMora) { plan.SaldoIvaMora = 0; } else { plan.SaldoIvaMora += cargoMontoIvaMora; }
+                    //if (!aplicaMora) { plan.FechaModificacion = plan.FechaCreacion; } else { plan.FechaModificacion = fechaPago.Date; /*DateTime.Now;*/ }
+                    //plan.TotalCuota = plan.CuotaCapital + plan.CuotaIntereses + plan.CuotaIvaIntereses + plan.CuotaMora + plan.CuotaIvaMora; 
+                    //_dbContext.Update(plan);
+                    //await _dbContext.SaveChangesAsync();
+                }
+            }
+            cargoMontoMora += capitalVencido * tasaMora / 365 * diasMora;
+            cargoMontoIvaMora += cargoMontoMora * 0.12m;
+            if (!aplicaMora) { planPago.CuotaMora = 0; } else { planPago.CuotaMora += cargoMontoMora; }
+            if (!aplicaMora) { planPago.SaldoMora = 0; } else { planPago.SaldoMora += cargoMontoMora; }
+            if (!aplicaMora) { planPago.CuotaIvaMora = 0; } else { planPago.CuotaIvaMora += cargoMontoIvaMora; }
+            if (!aplicaMora) { planPago.SaldoIvaMora = 0; } else { planPago.SaldoIvaMora += cargoMontoIvaMora; }
+            if (!aplicaMora) { planPago.FechaModificacion = planPago.FechaCreacion; } else { planPago.FechaModificacion = fechaPago.Date; }
+            _dbContext.Update(planPago);
+            await _dbContext.SaveChangesAsync();
 
             /** Pago Mora  **/
             if (planPago.SaldoMora > 0 && saldoMonto < planPago.SaldoMora)
@@ -512,9 +563,7 @@ namespace API.Controllers
                         AbonarExcedente(plan.SaldoIvaIntereses, plan.SaldoIntereses, plan.SaldoCapital, ref montoExcedente, ref montoIvaIntereses, ref montoIntereses, ref montoCapital);
                     }
                 }                
-            }
-
-            //return Ok(new { montoExcedente, saldoMonto, montoIvaIntereses, montoIntereses, montoCapital });            
+            }                      
 
 
             if (planPago.SaldoIntereses > 0.00m || planPago.SaldoIvaIntereses > 0.00m)
@@ -522,8 +571,10 @@ namespace API.Controllers
                 /** Pago Intereses **/
                 if (planPago.SaldoIntereses > 0 && saldoMonto < planPago.SaldoIntereses)
                 {
-                    montoIntereses += saldoMonto;
-                    saldoMonto = 0.0m;
+                    /** Se calcula IVA correspondiente **/
+                    var ivaMontoIntereses = saldoMonto * 0.12m;
+                    montoIntereses += saldoMonto - ivaMontoIntereses;
+                    saldoMonto = ivaMontoIntereses;
                 }
 
                 if (saldoMonto >= planPago.SaldoIntereses)
@@ -799,6 +850,8 @@ namespace API.Controllers
 
             if (result < 0) return null!;
 
+            var planPagos = await _dbContext.PlanPagos.Where(p => p.PrestamoId == createRegistroCajaDto.PrestamoId && p.Aplicado == false).ToListAsync();
+
             var planPago = await _dbContext.PlanPagos.Where(p => p.PrestamoId == createRegistroCajaDto.PrestamoId && p.Aplicado == false).FirstOrDefaultAsync();
 
             if (planPago != null)
@@ -811,30 +864,30 @@ namespace API.Controllers
                     saldoActual = await CargoEstadoCuenta(createRegistroCajaDto.PrestamoId, 5, registroPago.Id, planPago.Id, createRegistroCajaDto.MontoIvaMora, "Cargo Iva Mora", createRegistroCajaDto.AppUserId, saldoActual);
 
                     /** Abono Iva Mora **/
-                    saldoActual = await AbonoEstadoCuenta(createRegistroCajaDto.PrestamoId, 12, registroPago.Id, planPago.Id, createRegistroCajaDto.MontoIvaMora, "Abono Iva Mora", createRegistroCajaDto.AppUserId, saldoActual);
+                    saldoActual = await AbonoEstadoCuenta(createRegistroCajaDto.PrestamoId, 12, registroPago.Id, planPago.Id, createRegistroCajaDto.MontoIvaMora, "Abono Iva Mora", createRegistroCajaDto.AppUserId, saldoActual, planPagos);
 
                     saldoActual = await CargoEstadoCuenta(createRegistroCajaDto.PrestamoId, 4, registroPago.Id, planPago.Id, createRegistroCajaDto.MontoMora, "Cargo Mora", createRegistroCajaDto.AppUserId, saldoActual);
 
                     /** Abono Mora **/
-                    saldoActual = await AbonoEstadoCuenta(createRegistroCajaDto.PrestamoId, 11, registroPago.Id, planPago.Id, createRegistroCajaDto.MontoMora, "Abono Mora", createRegistroCajaDto.AppUserId, saldoActual);
+                    saldoActual = await AbonoEstadoCuenta(createRegistroCajaDto.PrestamoId, 11, registroPago.Id, planPago.Id, createRegistroCajaDto.MontoMora, "Abono Mora", createRegistroCajaDto.AppUserId, saldoActual, planPagos);
                 }
 
                 if (createRegistroCajaDto.MontoIvaIntereses > 0)
                 {
                     /** Abono Iva Intereses **/
-                    saldoActual = await AbonoEstadoCuenta(createRegistroCajaDto.PrestamoId, 10, registroPago.Id, planPago.Id, createRegistroCajaDto.MontoIvaIntereses, "Abono Iva Intereses", createRegistroCajaDto.AppUserId, saldoActual);
+                    saldoActual = await AbonoEstadoCuenta(createRegistroCajaDto.PrestamoId, 10, registroPago.Id, planPago.Id, createRegistroCajaDto.MontoIvaIntereses, "Abono Iva Intereses", createRegistroCajaDto.AppUserId, saldoActual, planPagos);
                 }
 
                 if (createRegistroCajaDto.MontoInteres > 0)
                 {
                     /** Abono Intereses **/
-                    saldoActual = await AbonoEstadoCuenta(createRegistroCajaDto.PrestamoId, 9, registroPago.Id, planPago.Id, createRegistroCajaDto.MontoInteres, "Abono Intereses", createRegistroCajaDto.AppUserId, saldoActual);
+                    saldoActual = await AbonoEstadoCuenta(createRegistroCajaDto.PrestamoId, 9, registroPago.Id, planPago.Id, createRegistroCajaDto.MontoInteres, "Abono Intereses", createRegistroCajaDto.AppUserId, saldoActual, planPagos);
                 }
 
                 if (createRegistroCajaDto.MontoCapital > 0)
                 {
                     /** Abono Capital **/
-                    saldoActual = await AbonoEstadoCuenta(createRegistroCajaDto.PrestamoId, 8, registroPago.Id, planPago.Id, createRegistroCajaDto.MontoCapital, "Abono Capital", createRegistroCajaDto.AppUserId, saldoActual);
+                    saldoActual = await AbonoEstadoCuenta(createRegistroCajaDto.PrestamoId, 8, registroPago.Id, planPago.Id, createRegistroCajaDto.MontoCapital, "Abono Capital", createRegistroCajaDto.AppUserId, saldoActual, planPagos);
                 }
 
                 await _dbContext.SaveChangesAsync();
@@ -940,8 +993,30 @@ namespace API.Controllers
 
             }
 
-            
             await _unitOfWork.Complete();
+            
+            /** Actualización de Días de Mora **/                    
+
+            var diasMora = (int)(DateTime.Now - planPago.FechaPago).TotalDays;
+
+            if (diasMora < 0) diasMora = 0; 
+
+            var prestamo = await _dbContext.Prestamos.FirstOrDefaultAsync(x => x.Id == createRegistroCajaDto.PrestamoId);
+
+            prestamo.DiasMora = diasMora;
+
+            /** Verificación de Saldo Total **/
+            var saldos = await GetSaldos(prestamo.Id);
+
+            if (saldos.TotalSaldo < 1)
+            {
+                prestamo.EstadoPrestamoId = 4;
+            }
+
+            _unitOfWork.Repository<Prestamo>().Update(prestamo);
+
+                await _unitOfWork.Complete();           
+
             
             return Ok(new { Mensaje = "Accion Realizada Satisfactoriamente" });
         }
@@ -960,6 +1035,8 @@ namespace API.Controllers
 
             if (result < 0) return null!;
 
+            var planPagos = await _dbContext.PlanPagos.Where(p => p.Id == createRegistroCajaDto.PlanPagoId).ToListAsync();
+
             var planPago = await _dbContext.PlanPagos.Where(p => p.Id == createRegistroCajaDto.PlanPagoId).FirstOrDefaultAsync();
 
             if (planPago != null)
@@ -970,25 +1047,25 @@ namespace API.Controllers
                 if (createRegistroCajaDto.TipoTransaccionId == 17)
                 {
                     /** Abono Ajuste Iva Intereses **/
-                    saldoActual = await AbonoEstadoCuenta(createRegistroCajaDto.PrestamoId, 17, registroPago.Id, planPago.Id, createRegistroCajaDto.MontoPago, "Exoneración de Iva Intereses", createRegistroCajaDto.AppUserId, saldoActual);
+                    saldoActual = await AbonoEstadoCuenta(createRegistroCajaDto.PrestamoId, 17, registroPago.Id, planPago.Id, createRegistroCajaDto.MontoPago, "Exoneración de Iva Intereses", createRegistroCajaDto.AppUserId, saldoActual, planPagos);
                 }
 
                 if (createRegistroCajaDto.TipoTransaccionId == 20)
                 {
                     /** Abono Ajuste Intereses **/
-                    saldoActual = await AbonoEstadoCuenta(createRegistroCajaDto.PrestamoId, 20, registroPago.Id, planPago.Id, createRegistroCajaDto.MontoPago, "Exoneración de Intereses", createRegistroCajaDto.AppUserId, saldoActual);
+                    saldoActual = await AbonoEstadoCuenta(createRegistroCajaDto.PrestamoId, 20, registroPago.Id, planPago.Id, createRegistroCajaDto.MontoPago, "Exoneración de Intereses", createRegistroCajaDto.AppUserId, saldoActual, planPagos);
                 }
 
                 if (createRegistroCajaDto.TipoTransaccionId == 21)
                 {
                     /** Abono Ajuste Iva Mora **/
-                    saldoActual = await AbonoEstadoCuenta(createRegistroCajaDto.PrestamoId, 21, registroPago.Id, planPago.Id, createRegistroCajaDto.MontoPago, "Exoneración de Iva Mora", createRegistroCajaDto.AppUserId, saldoActual);
+                    saldoActual = await AbonoEstadoCuenta(createRegistroCajaDto.PrestamoId, 21, registroPago.Id, planPago.Id, createRegistroCajaDto.MontoPago, "Exoneración de Iva Mora", createRegistroCajaDto.AppUserId, saldoActual, planPagos);
                 }
 
                 if (createRegistroCajaDto.TipoTransaccionId == 22)
                 {
                     /** Abono Ajuste Mora **/
-                    saldoActual = await AbonoEstadoCuenta(createRegistroCajaDto.PrestamoId, 22, registroPago.Id, planPago.Id, createRegistroCajaDto.MontoPago, "Exoneración de Mora", createRegistroCajaDto.AppUserId, saldoActual);
+                    saldoActual = await AbonoEstadoCuenta(createRegistroCajaDto.PrestamoId, 22, registroPago.Id, planPago.Id, createRegistroCajaDto.MontoPago, "Exoneración de Mora", createRegistroCajaDto.AppUserId, saldoActual, planPagos);
                 }
 
                 if (createRegistroCajaDto.TipoTransaccionId == 23)
@@ -1102,7 +1179,7 @@ namespace API.Controllers
 
         [HttpGet]
 
-        private async Task<decimal> AbonoEstadoCuenta(int prestamoId, int tipoTransaccionId, int registroCajaId, int planPagoId, decimal monto, string concepto, string appUserId, decimal saldoActual)
+        private async Task<decimal> AbonoEstadoCuenta(int prestamoId, int tipoTransaccionId, int registroCajaId, int planPagoId, decimal monto, string concepto, string appUserId, decimal saldoActual, List<PlanPago> planPago)
         {  
             var estadoCuenta = new EstadoCuenta
             {
@@ -1124,7 +1201,7 @@ namespace API.Controllers
             //await _dbContext.EstadoCuentas.AddAsync(estadoCuenta);
             //await _dbContext.SaveChangesAsync();
 
-            CuotaAbonoPlan(estadoCuenta.Id, planPagoId, tipoTransaccionId, monto);
+            CuotaAbonoPlan(estadoCuenta.Id, planPagoId, tipoTransaccionId, monto, planPago);
 
 
             return estadoCuenta.SaldoActual;
@@ -1159,30 +1236,99 @@ namespace API.Controllers
             //CuotaAbonoPlan(estadoCuenta.Id, planPagoId, tipoTransaccionId, monto);
         }
 
-        private async void CuotaAbonoPlan(int estadoCuentaId, int planPagoId, int tipoTransaccionId, decimal monto)
+        private async void CuotaAbonoPlan(int estadoCuentaId, int planPagoId, int tipoTransaccionId, decimal monto, List<PlanPago> planPago)
         {
-            decimal cuotaCapital = 0, cuotaIntereses = 0, cuotaIvaIntereses = 0, cuotaMora = 0, cuotaIvaMora = 0, cuotaGastos = 0, cuotaIvaGastos = 0;
-
+            decimal cuotaCapital = 0, abonoCapital = 0, cuotaIntereses = 0, abonoIntereses = 0, cuotaIvaIntereses = 0, abonoIvaIntereses = 0, 
+                    cuotaMora = 0, abonoMora = 0, cuotaIvaMora = 0, abonoIvaMora = 0, cuotaGastos = 0, cuotaIvaGastos = 0;
+            
             if (tipoTransaccionId == 8) cuotaCapital = monto;
             if (tipoTransaccionId == 9 || tipoTransaccionId == 20 ||tipoTransaccionId == 24) cuotaIntereses = monto;
             if (tipoTransaccionId == 10 || tipoTransaccionId == 17 || tipoTransaccionId == 23) cuotaIvaIntereses = monto;
             if (tipoTransaccionId == 11) cuotaMora = monto;
             if (tipoTransaccionId == 12) cuotaIvaMora = monto;
 
-            var cuotaAbono = new AbonoPlan
-            {
-                EstadoCuentaId = estadoCuentaId,
-                PlanPagoId = planPagoId,
-                CuotaCapital = cuotaCapital,
-                CuotaIntereses = cuotaIntereses,
-                CuotaIvaIntereses = cuotaIvaIntereses,
-                CuotaMora = cuotaMora,
-                CuotaIvaMora = cuotaIvaMora,
-                CuotaGastos = cuotaGastos,
-                CuotaIvaGastos = cuotaIvaGastos
-            };
 
-            await _dbContext.AbonoPlanes.AddAsync(cuotaAbono);           
+            //var planPago = await _dbContext.PlanPagos.Where(p => p.Id == planPagoId).ToListAsync();
+
+            foreach (var plan in planPago)
+            {
+
+                if (cuotaCapital > 0 && cuotaCapital >= plan.SaldoCapital)
+                {
+                    cuotaCapital -= plan.SaldoCapital;
+                    abonoCapital = plan.SaldoCapital;                    
+                }
+                else
+                {
+                    abonoCapital = cuotaCapital;
+                    cuotaCapital = 0;                    
+                }
+                
+
+                if (cuotaIntereses > 0 && cuotaIntereses >= plan.SaldoIntereses)
+                {
+                    cuotaIntereses -= plan.SaldoIntereses;
+                    abonoIntereses = plan.SaldoIntereses;                    
+                }
+                else
+                {
+                    abonoIntereses = cuotaIntereses;
+                    cuotaIntereses = 0;                    
+                }
+
+                if (cuotaIvaIntereses > 0 && cuotaIvaIntereses >= plan.SaldoIvaIntereses)
+                {
+                    cuotaIvaIntereses -= plan.SaldoIvaIntereses;
+                    abonoIvaIntereses = plan.SaldoIvaIntereses;                    
+                }
+                else
+                {
+                    abonoIvaIntereses = cuotaIvaIntereses;
+                    cuotaIvaIntereses = 0;                    
+                }
+
+                if (cuotaMora > 0 && cuotaMora >= plan.SaldoMora)
+                {
+                    cuotaMora -= plan.SaldoMora;
+                    abonoMora = plan.SaldoMora;                    
+                }
+                else
+                {
+                    abonoMora = cuotaMora;
+                    cuotaMora = 0;                    
+                }
+
+                if (cuotaIvaMora > 0 && cuotaIvaMora >= plan.SaldoIvaMora)
+                {
+                    cuotaIvaMora -= plan.SaldoIvaMora;
+                    abonoIvaMora = plan.SaldoIvaMora;                    
+                }
+                else
+                {
+                    abonoIvaMora = cuotaIvaMora;
+                    cuotaIvaMora = 0;                    
+                }
+
+                if (abonoCapital > 0 || abonoIntereses > 0 || abonoIvaIntereses > 0 || abonoMora > 0 || abonoIvaMora > 0)                
+                {
+                    var cuotaAbono = new AbonoPlan
+                    {
+                        EstadoCuentaId = estadoCuentaId,
+                        PlanPagoId = plan.Id,
+                        CuotaCapital = abonoCapital,
+                        CuotaIntereses = abonoIntereses,
+                        CuotaIvaIntereses = abonoIvaIntereses,
+                        CuotaMora = abonoMora,
+                        CuotaIvaMora = abonoIvaMora,
+                        CuotaGastos = cuotaGastos,
+                        CuotaIvaGastos = cuotaIvaGastos
+                    };
+
+                    await _dbContext.AbonoPlanes.AddAsync(cuotaAbono);                    
+                }
+
+            }
+
         }
 
         [HttpGet("liquidar_credito/{creditoId}")]

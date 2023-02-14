@@ -4,6 +4,7 @@ using Infrastructure.Data.DBContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221221035405_PaisRelationshipWithDepartamento")]
+    partial class PaisRelationshipWithDepartamento
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -607,14 +609,14 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<bool>("Enabled")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime>("FechaCreacion")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("FechaModificacion")
+                    b.Property<DateTime>("FechaUltimaModificacion")
                         .HasColumnType("datetime2");
-
-                    b.Property<bool>("Habilitado")
-                        .HasColumnType("bit");
 
                     b.Property<string>("Nombre")
                         .IsRequired()
@@ -667,7 +669,7 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime>("FechaCreacion")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("FechaModificacion")
+                    b.Property<DateTime>("FechaUltimaModificacion")
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("Habilitado")
@@ -792,9 +794,6 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<int?>("TipoViviendaId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("DepartamentoId");
@@ -810,8 +809,6 @@ namespace Infrastructure.Migrations
                     b.HasIndex("OcupacionId");
 
                     b.HasIndex("PaisNacimientoId");
-
-                    b.HasIndex("TipoViviendaId");
 
                     b.ToTable("Personas");
                 });
@@ -866,9 +863,6 @@ namespace Infrastructure.Migrations
                     b.Property<int>("PrestamoId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("RegistroCajaId")
-                        .HasColumnType("int");
-
                     b.Property<decimal>("SaldoCapital")
                         .HasColumnType("decimal(18,2)");
 
@@ -899,8 +893,6 @@ namespace Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("PrestamoId");
-
-                    b.HasIndex("RegistroCajaId");
 
                     b.ToTable("PlanPagos");
                 });
@@ -1051,10 +1043,10 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime>("FechaCreacion")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("FechaModificacion")
+                    b.Property<DateTime?>("FechaDocumento")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("FechaPago")
+                    b.Property<DateTime>("FechaModificacion")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("FechaTransaccion")
@@ -1750,9 +1742,6 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime>("FechaVencimiento")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Gestor")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("IdPrestamo")
                         .HasColumnType("int");
 
@@ -1801,7 +1790,7 @@ namespace Infrastructure.Migrations
                     b.Property<string>("TipoPrestamo")
                         .HasColumnType("nvarchar(max)");
 
-                    b.ToSqlQuery("declare @tAcum table (\r\n							Id int,\r\n							ReferenciaMigracion nvarchar(125) null,\r\n							DeudaTotal decimal(18, 2) default 0 null,\r\n							CapitalPrestado decimal(18, 2) default 0 null,\r\n							SaldoCapital decimal(18, 2) default 0 null,\r\n							InteresProyectado decimal(18, 2) default 0 null,\r\n							IvaProyectado decimal(18, 2) default 0 null,\r\n							GastosProyectados decimal(18, 2) default 0 null,\r\n							SaldoInteres decimal(18, 2) default 0 null,\r\n							SaldoIvaInteres decimal(18, 2) default 0 null,\r\n							Mora decimal(18, 2) default 0 null,\r\n							SaldoMora decimal(18, 2) default 0 null,\r\n							IvaMora decimal(18, 2) default 0 null,\r\n							SaldoIvaMora decimal(18, 2) default 0 null,\r\n							Gastos decimal(18, 2) default 0 null,\r\n							SaldoGastos decimal(18, 2) default 0 null,\r\n							IvaGastos decimal(18, 2) default 0 null,\r\n							SaldoIvaGastos decimal(18, 2) default 0 null\r\n						);\r\n							\r\ndeclare @tPrestamo table (ROWID int identity (1, 1) not null, PrestamoId int);\r\ndeclare @i int, @n int;\r\n	set nocount on;\r\n	insert into @tPrestamo (PrestamoID) select a.Id from Prestamos a;\r\n	set @n = @@ROWCOUNT;\r\n\r\n	set @i = 1;\r\n	while (@i <= @n)\r\n	begin\r\n		insert into @tAcum select * from SaldosMigracion( (select PrestamoId from @tPrestamo where ROWID = @i) );\r\n		set @i = @i + 1;\r\n	end;\r\n	\r\n	--if not object_id('test_al_aire') is null drop table test_al_aire;\r\n	\r\n	-- set nocount off;\r\n\r\n	select \r\n		pre.Id as IdPrestamo,\r\n		pre.ReferenciaMigracion as Referencia\r\n		, mdi.Nombre,\r\n		mdig.Nombre as Gestor,\r\n		pre.MontoOtorgado,\r\n		pre.TasaInteres,\r\n		pre.Plazo,\r\n		\r\n		acum.DeudaTotal,\r\n		pre.InteresProyectado,\r\n		pre.IvaProyectado,\r\n		pre.DiasMora,\r\n		\r\n		acum.SaldoCapital\r\n		, acum.SaldoInteres as SaldoIntereses\r\n		, acum.SaldoIvaInteres as SaldoIvaIntereses\r\n		, acum.SaldoMora\r\n		, acum.SaldoIvaMora		\r\n		, estados.Nombre as Estado\r\n		, ppl3.CuotaCalculada as CuotaCalculada -- Ajuste relizado por SAFC el 24/12/2022 :: case when pre.Plazo = 0 then 0 else convert(decimal(16, 2), pre.MontoTotalProyectado / pre.Plazo) end as CuotaCalculada\r\n		, convert(date, pre.FechaAprobacion) as FechaAprobacion\r\n		, IsNull(convert(date, pre.FechaAprobacion), convert(date, pre.FechaDesembolso)) as FechaDesembolso\r\n		, IsNull(ppl.PROXIMO_PAGO, '0001-01-01') as ProximoPago\r\n		, IsNull(ppl2.PRIMER_PAGO, '0001-01-01') as FechaPrimerPago\r\n		, IsNull(ppl2.ULTIMO_PAGO, '0001-01-01') as FechaVencimiento\r\n		, IsNull(pagadu.Nombre, ' ') as [Pagaduría]\r\n		, tp.Nombre as TipoPrestamo\r\n	--into test_al_aire\r\n	\r\n	from \r\n		Prestamos as pre\r\n	Inner Join\r\n		v_mdi_general_full as mdi\r\n	on\r\n		mdi.EntidadId = pre.EntidadPrestamoId\r\n	Inner Join\r\n		v_mdi_general_full as mdig\r\n	on\r\n		mdig.EntidadId = pre.GestorPrestamoId\r\n	Inner Join\r\n		EstadoPrestamos as estados\r\n	on\r\n		estados.Id = pre.EstadoPrestamoId\r\n\r\n	left outer join @tAcum acum on acum.Id = pre.Id\r\n\r\n	left outer join (\r\n						select PrestamoId, min(FechaPago) as PROXIMO_PAGO\r\n						from PlanPagos\r\n						where Aplicado = 0\r\n						group by PrestamoId\r\n					) ppl on ppl.PrestamoId = pre.ID\r\n\r\n	left outer join (\r\n						select PrestamoId,  min(FechaPago) as PRIMER_PAGO, max(FechaPago) as ULTIMO_PAGO\r\n						from PlanPagos						\r\n						group by PrestamoId\r\n					) ppl2 on ppl2.PrestamoId = pre.ID\r\n\r\n	left outer join (\r\n						select PrestamoId, max(CuotaCapital + CuotaIntereses + CuotaIvaIntereses) as CuotaCalculada -- Ajuste relizado por SAFC el 24/12/2022\r\n						from PlanPagos\r\n						--where Aplicado = 0\r\n						group by PrestamoId\r\n					) ppl3 on ppl3.PrestamoId = pre.ID\r\n	\r\n	left outer join v_mdi_general_simple pagadu on pagadu.EntidadId = pre.EmpresaPrestamoId\r\n	inner join TipoPrestamos tp on tp.Id = pre.TipoPrestamoId\r\n	where\r\n		pre.EstadoPrestamoId = 1\r\n	order by pre.Id;\r\n	\r\n	set nocount off;");
+                    b.ToSqlQuery("declare @tAcum table (\r\n							Id int,\r\n							ReferenciaMigracion nvarchar(125) null,\r\n							DeudaTotal decimal(18, 2) default 0 null,\r\n							CapitalPrestado decimal(18, 2) default 0 null,\r\n							SaldoCapital decimal(18, 2) default 0 null,\r\n							InteresProyectado decimal(18, 2) default 0 null,\r\n							IvaProyectado decimal(18, 2) default 0 null,\r\n							GastosProyectados decimal(18, 2) default 0 null,\r\n							SaldoInteres decimal(18, 2) default 0 null,\r\n							SaldoIvaInteres decimal(18, 2) default 0 null,\r\n							Mora decimal(18, 2) default 0 null,\r\n							SaldoMora decimal(18, 2) default 0 null,\r\n							IvaMora decimal(18, 2) default 0 null,\r\n							SaldoIvaMora decimal(18, 2) default 0 null,\r\n							Gastos decimal(18, 2) default 0 null,\r\n							SaldoGastos decimal(18, 2) default 0 null,\r\n							IvaGastos decimal(18, 2) default 0 null,\r\n							SaldoIvaGastos decimal(18, 2) default 0 null\r\n						);\r\n							\r\ndeclare @tPrestamo table (ROWID int identity (1, 1) not null, PrestamoId int);\r\ndeclare @i int, @n int;\r\n	set nocount on;\r\n	insert into @tPrestamo (PrestamoID) select a.Id from Prestamos a;\r\n	set @n = @@ROWCOUNT;\r\n\r\n	set @i = 1;\r\n	while (@i <= @n)\r\n	begin\r\n		insert into @tAcum select * from SaldosMigracion( (select PrestamoId from @tPrestamo where ROWID = @i) );\r\n		set @i = @i + 1;\r\n	end;\r\n	\r\n	--if not object_id('test_al_aire') is null drop table test_al_aire;\r\n	\r\n	-- set nocount off;\r\n\r\n	select \r\n		pre.Id as IdPrestamo,\r\n		pre.ReferenciaMigracion as Referencia\r\n		, mdi.Nombre,\r\n		pre.MontoOtorgado,\r\n		pre.TasaInteres,\r\n		pre.Plazo,\r\n		\r\n		acum.DeudaTotal,\r\n		pre.InteresProyectado,\r\n		pre.IvaProyectado,\r\n		pre.DiasMora,\r\n		\r\n		acum.SaldoCapital\r\n		, acum.SaldoInteres as SaldoIntereses\r\n		, acum.SaldoIvaInteres as SaldoIvaIntereses\r\n		, acum.SaldoMora\r\n		, acum.SaldoIvaMora		\r\n		, estados.Nombre as Estado\r\n		,  case when pre.Plazo = 0 then 0 else convert(decimal(16, 2), pre.MontoTotalProyectado / pre.Plazo) end as CuotaCalculada\r\n		, convert(date, pre.FechaAprobacion) as FechaAprobacion\r\n		, IsNull(convert(date, pre.FechaAprobacion), convert(date, pre.FechaDesembolso)) as FechaDesembolso\r\n		, IsNull(ppl.PROXIMO_PAGO, '0001-01-01') as ProximoPago\r\n		, IsNull(ppl2.PRIMER_PAGO, '0001-01-01') as FechaPrimerPago\r\n		, IsNull(ppl2.ULTIMO_PAGO, '0001-01-01') as FechaVencimiento\r\n		, IsNull(pagadu.Nombre, ' ') as [Pagaduría]\r\n		, tp.Nombre as TipoPrestamo\r\n	--into test_al_aire\r\n	\r\n	from \r\n		Prestamos as pre\r\n	Inner Join\r\n		v_mdi_general_full as mdi\r\n	on\r\n		mdi.EntidadId = pre.EntidadPrestamoId\r\n	Inner Join\r\n		EstadoPrestamos as estados\r\n	on\r\n		estados.Id = pre.EstadoPrestamoId\r\n\r\n	left outer join @tAcum acum on acum.Id = pre.Id\r\n\r\n	left outer join (\r\n						select PrestamoId, min(FechaPago) as PROXIMO_PAGO\r\n						from PlanPagos\r\n						where Aplicado = 0\r\n						group by PrestamoId\r\n					) ppl on ppl.PrestamoId = pre.ID\r\n\r\n	left outer join (\r\n						select PrestamoId,  min(FechaPago) as PRIMER_PAGO, max(FechaPago) as ULTIMO_PAGO\r\n						from PlanPagos						\r\n						group by PrestamoId\r\n					) ppl2 on ppl2.PrestamoId = pre.ID\r\n	\r\n	left outer join v_mdi_general_simple pagadu on pagadu.EntidadId = pre.EmpresaPrestamoId\r\n	inner join TipoPrestamos tp on tp.Id = pre.TipoPrestamoId\r\n	where\r\n		pre.EstadoPrestamoId = 1\r\n	order by pre.Id;\r\n	\r\n	set nocount off;");
                 });
 
             modelBuilder.Entity("Core.Entities.Views.ReporteGeneralCreditos", b =>
@@ -1813,9 +1802,6 @@ namespace Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Estado")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Gestor")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("IdPrestamo")
@@ -1858,164 +1844,6 @@ namespace Infrastructure.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.ToSqlQuery("Exec ReporteGeneralCreditos");
-                });
-
-            modelBuilder.Entity("Core.Entities.Views.ReporteTransUnion", b =>
-                {
-                    b.Property<string>("ApellidoDeCasada")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Calificacion")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Correlativo")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Descripcion")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Dias_Mora")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("DirLabDivGeo1")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("DirLabDivGeo2")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("DirResDivGeo1")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("DirResDivGeo2")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("Direccion_Email")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Direccion_Laboral")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Estado")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("Fecha_De_Apertura")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Fecha_De_Castigo")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("Fecha_De_Vencimiento")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("Fecha_Nacimiento")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Identificacion1")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Identificacion2")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Identificacion3")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Identificacion4")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Identificacion5")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Identificador_TipoCuenta")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Moneda")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Monto_Pagado")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Monto_Vencido")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Nacionalidad")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Nombre_Completo")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Nuevo_Limite")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Numero_Garantia")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Numero_Obligacion")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Periodo_Pago")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PrimerApellido")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PrimerNombre")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SegundoApellido")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Sexo")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Sub_Estado")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Tasa_Cambio")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Telefono_Celular")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Telefono_Laboral")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Telefono_Residencial")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Tipo_Deudor")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Tipo_Garantia")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Tipo_Obligacion")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Tipo_Registro")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Tipo_Sujeto")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(1)");
-
-                    b.Property<decimal>("Valor_Cuota")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("Valor_Garantia")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("Valor_Limite")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("Valor_Saldo_Mora")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("Valor_Saldo_Total")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.ToSqlQuery("Exec sp_transunion__batchfile_generator");
                 });
 
             modelBuilder.Entity("Core.Entities.Views.SaldosMigracion", b =>
@@ -2352,10 +2180,6 @@ namespace Infrastructure.Migrations
                         .WithMany()
                         .HasForeignKey("PaisNacimientoId");
 
-                    b.HasOne("Core.Entities.TipoVivienda", "TipoVivienda")
-                        .WithMany("Personas")
-                        .HasForeignKey("TipoViviendaId");
-
                     b.Navigation("Departamento");
 
                     b.Navigation("Entidad");
@@ -2369,8 +2193,6 @@ namespace Infrastructure.Migrations
                     b.Navigation("Ocupacion");
 
                     b.Navigation("PaisNacimiento");
-
-                    b.Navigation("TipoVivienda");
                 });
 
             modelBuilder.Entity("Core.Entities.PlanPago", b =>
@@ -2381,13 +2203,7 @@ namespace Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Core.Entities.RegistroCaja", "RegistroCaja")
-                        .WithMany()
-                        .HasForeignKey("RegistroCajaId");
-
                     b.Navigation("Prestamo");
-
-                    b.Navigation("RegistroCaja");
                 });
 
             modelBuilder.Entity("Core.Entities.Prestamo", b =>
@@ -2634,11 +2450,6 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Core.Entities.TipoRelacion", b =>
                 {
                     b.Navigation("Entidades");
-                });
-
-            modelBuilder.Entity("Core.Entities.TipoVivienda", b =>
-                {
-                    b.Navigation("Personas");
                 });
 #pragma warning restore 612, 618
         }

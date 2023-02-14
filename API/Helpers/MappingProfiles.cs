@@ -13,12 +13,17 @@ namespace API.Helpers
             CreateMap<CreatePersonDto, Persona>();
             CreateMap<CreateEmpresaDto, Empresa>();
             CreateMap<CreateRegistroCajaDto, RegistroCaja>();
+            CreateMap<Pais, PaisDto>();
+            CreateMap<Departamento, DepartamentoDto>();
+            CreateMap<Municipio, MunicipioDto>();
             CreateMap<Banco, BancoDto>();
             CreateMap<Caja, CajaDto>();
             CreateMap<FormaPago, FormaPagoDto>();
             CreateMap<EstadoCivil, EstadoCivilDto>();
             CreateMap<TipoPrestamo, TipoPrestamoDto>();
             CreateMap<DestinoPrestamo, DestinoPrestamoDto>();
+            CreateMap<Ocupacion, OcupacionDto>();
+            CreateMap<TipoVivienda, TipoViviendaDto>();
             //CreateMap<Gestor, GestorDto>();
         }
     }

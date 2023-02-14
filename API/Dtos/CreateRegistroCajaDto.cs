@@ -10,7 +10,7 @@
         public int TipoTransaccionId { get; set; }
         public int PlanPagoId { get; set; }
         public DateTime? FechaTransaccion { get; set; } = DateTime.Now;
-        public DateTime? FechaDocumento { get; set; } = null;
+        public DateTime? FechaPago { get; set; } = null;
         public string? NumeroDocumento { get; set; }
         public int DiasMora { get; set; }
         public decimal MontoPago { get; set; }

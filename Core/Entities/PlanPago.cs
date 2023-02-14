@@ -5,7 +5,9 @@ namespace Core.Entities
     public class PlanPago : BaseEntity
     {
         public Prestamo? Prestamo { get; set; }
-        public int PrestamoId { get; set; }        
+        public int PrestamoId { get; set; }
+        public RegistroCaja? RegistroCaja { get; set; }
+        public int? RegistroCajaId { get; set; }
         public int Periodo { get; set; }
         public decimal CuotaCapital { get; set; }
         public decimal CuotaIntereses { get; set; }
@@ -24,7 +26,7 @@ namespace Core.Entities
         public decimal TotalCuota { get; set; }        
         public decimal SaldoTotal { get; set; }        
         public DateTime FechaPago { get; set; }
-        public bool Aplicado { get; set; }
+        public bool Aplicado { get; set; }        
         public ICollection<AbonoPlan> AbonoPlanes { get; set; } = new List<AbonoPlan>();
     }
 }

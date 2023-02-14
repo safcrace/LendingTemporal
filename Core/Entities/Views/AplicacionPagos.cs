@@ -13,8 +13,11 @@ namespace Core.Entities.Views
         public string? TipoCredito { get; set; }
         public string? NIT { get; set; }
         public string? Nombre { get; set; }
-        public string? MotivoTransaccion { get; set; }
-        public byte Plazo { get; set; }
+        //public string? MotivoTransaccion { get; set; }
+        //public byte Plazo { get; set; }
+        public string? Banco { get; set; }
+        public DateTime FechaBoleta { get; set; }
+        public string? NumeroDocumento { get; set; }
         public DateTime FechaTransaccion { get; set; }
         public string? Ejecutivo { get; set; }
         public decimal TotalTransaccion { get; set; }

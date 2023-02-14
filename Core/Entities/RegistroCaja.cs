@@ -15,7 +15,7 @@ namespace Core.Entities
         public Prestamo? Prestamo { get; set; }
         public int PrestamoId { get; set; }        
         public DateTime? FechaTransaccion { get; set; } = DateTime.Now;
-        public DateTime? FechaDocumento { get; set; }
+        public DateTime? FechaPago { get; set; }
         public string? NumeroDocumento { get; set; } = string.Empty;
         public int DiasMora { get; set; }
         public decimal MontoPago { get; set; }

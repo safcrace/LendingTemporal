@@ -26,11 +26,13 @@ namespace Infrastructure.Data.DBContext
         public DbSet<Empresa>? Empresas { get; set; }
         public DbSet<EstadoCivil>? EstadoCivil { get; set; }
         public DbSet<EstadoCuenta>? EstadoCuentas { get; set; }        
+        public DbSet<EstadoCuentaPrestamo>? EstadoCuentaPrestamos { get; set; }        
         public DbSet<EstadoOrigen>? EstadosOrigen { get; set; }
         public DbSet<EstadoPrestamo>? EstadoPrestamos { get; set; }
         public DbSet<FormaPago>? FormaPagos { get; set; }
         public DbSet<Genero> Generos { get; set; } = null!;                
         public DbSet<Municipio>? Municipios { get; set; }                   
+        public DbSet<Ocupacion>? Ocupaciones { get; set; }                   
         public DbSet<Pais>? Paises { get; set; }
         public DbSet<Persona>? Personas { get; set; }        
         public DbSet<PlanPago>? PlanPagos { get; set; }        
@@ -41,6 +43,7 @@ namespace Infrastructure.Data.DBContext
         public DbSet<TipoBitacora>? TipoBitacoras { get; set; }        
         public DbSet<TipoPrestamo>? TipoPrestamos { get; set; }
         public DbSet<TipoTransaccion>? TipoTransaccion { get; set; }
+        public DbSet<TipoVivienda>? TiposVivienda { get; set; }
 
         public IQueryable<SaldosMigracion> SaldosMigracion(int prestamoId)
         {
@@ -78,9 +81,11 @@ namespace Infrastructure.Data.DBContext
             modelBuilder.Entity<ListadoAsesor>().HasNoKey().ToView("v_mdi_lista__asesores");
             modelBuilder.Entity<ListadoEmpresaPlanilla>().HasNoKey().ToView("v_mdi_lista__empresas_con_planilla");
             modelBuilder.Entity<AplicacionPagos>().HasNoKey().ToView(null);
+            modelBuilder.Entity<EstadoCuentaPrestamo>().HasNoKey().ToView("VEstadoCuenta");
             modelBuilder.Entity<ReporteGeneralCreditos>().ToSqlQuery(@"Exec ReporteGeneralCreditos");            
             //modelBuilder.Entity<AplicacionPagos>().ToSqlQuery(@"Exec ReporteContabilidad '2022-11-01', '2022-11-16'  ");            
             modelBuilder.Entity<BatchFile>().ToSqlQuery(@"Exec sp_batchfile_generator");            
+            modelBuilder.Entity<ReporteTransUnion>().ToSqlQuery(@"Exec sp_transunion__batchfile_generator");            
             modelBuilder.Entity<ReporteCasosBTS>().ToSqlQuery(@"declare @tAcum table (
 							Id int,
 							ReferenciaMigracion nvarchar(125) null,
@@ -123,6 +128,7 @@ declare @i int, @n int;
 		pre.Id as IdPrestamo,
 		pre.ReferenciaMigracion as Referencia
 		, mdi.Nombre,
+		mdig.Nombre as Gestor,
 		pre.MontoOtorgado,
 		pre.TasaInteres,
 		pre.Plazo,
@@ -138,7 +144,7 @@ declare @i int, @n int;
 		, acum.SaldoMora
 		, acum.SaldoIvaMora		
 		, estados.Nombre as Estado
-		,  case when pre.Plazo = 0 then 0 else convert(decimal(16, 2), pre.MontoTotalProyectado / pre.Plazo) end as CuotaCalculada
+		, ppl3.CuotaCalculada as CuotaCalculada -- Ajuste relizado por SAFC el 24/12/2022 :: case when pre.Plazo = 0 then 0 else convert(decimal(16, 2), pre.MontoTotalProyectado / pre.Plazo) end as CuotaCalculada
 		, convert(date, pre.FechaAprobacion) as FechaAprobacion
 		, IsNull(convert(date, pre.FechaAprobacion), convert(date, pre.FechaDesembolso)) as FechaDesembolso
 		, IsNull(ppl.PROXIMO_PAGO, '0001-01-01') as ProximoPago
@@ -154,6 +160,10 @@ declare @i int, @n int;
 		v_mdi_general_full as mdi
 	on
 		mdi.EntidadId = pre.EntidadPrestamoId
+	Inner Join
+		v_mdi_general_full as mdig
+	on
+		mdig.EntidadId = pre.GestorPrestamoId
 	Inner Join
 		EstadoPrestamos as estados
 	on
@@ -173,6 +183,13 @@ declare @i int, @n int;
 						from PlanPagos						
 						group by PrestamoId
 					) ppl2 on ppl2.PrestamoId = pre.ID
+
+	left outer join (
+						select PrestamoId, max(CuotaCapital + CuotaIntereses + CuotaIvaIntereses) as CuotaCalculada -- Ajuste relizado por SAFC el 24/12/2022
+						from PlanPagos
+						--where Aplicado = 0
+						group by PrestamoId
+					) ppl3 on ppl3.PrestamoId = pre.ID
 	
 	left outer join v_mdi_general_simple pagadu on pagadu.EntidadId = pre.EmpresaPrestamoId
 	inner join TipoPrestamos tp on tp.Id = pre.TipoPrestamoId
