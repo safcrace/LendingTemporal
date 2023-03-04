@@ -133,7 +133,7 @@ declare @i int, @n int;
 		pre.TasaInteres,
 		pre.Plazo,
 		
-		acum.DeudaTotal,
+		pre.MontoTotalProyectado as DeudaTotal,
 		pre.InteresProyectado,
 		pre.IvaProyectado,
 		pre.DiasMora,
@@ -144,7 +144,7 @@ declare @i int, @n int;
 		, acum.SaldoMora
 		, acum.SaldoIvaMora		
 		, estados.Nombre as Estado
-		, ppl3.CuotaCalculada as CuotaCalculada -- Ajuste relizado por SAFC el 24/12/2022 :: case when pre.Plazo = 0 then 0 else convert(decimal(16, 2), pre.MontoTotalProyectado / pre.Plazo) end as CuotaCalculada
+		,(Select Top 1 TotalCuota from PlanPagos where PrestamoId = pre.Id and Aplicado = 0) as CuotaCalculada --Ajuste relizado por SAFC el 17/02/2023		
 		, convert(date, pre.FechaAprobacion) as FechaAprobacion
 		, IsNull(convert(date, pre.FechaAprobacion), convert(date, pre.FechaDesembolso)) as FechaDesembolso
 		, IsNull(ppl.PROXIMO_PAGO, '0001-01-01') as ProximoPago
@@ -184,17 +184,10 @@ declare @i int, @n int;
 						group by PrestamoId
 					) ppl2 on ppl2.PrestamoId = pre.ID
 
-	left outer join (
-						select PrestamoId, max(CuotaCapital + CuotaIntereses + CuotaIvaIntereses) as CuotaCalculada -- Ajuste relizado por SAFC el 24/12/2022
-						from PlanPagos
-						--where Aplicado = 0
-						group by PrestamoId
-					) ppl3 on ppl3.PrestamoId = pre.ID
-	
 	left outer join v_mdi_general_simple pagadu on pagadu.EntidadId = pre.EmpresaPrestamoId
 	inner join TipoPrestamos tp on tp.Id = pre.TipoPrestamoId
 	where
-		pre.EstadoPrestamoId = 1
+		pre.EstadoPrestamoId = 1 or pre.EstadoPrestamoId = 7 or pre.EstadoPrestamoId = 8
 	order by pre.Id;
 	
 	set nocount off;");

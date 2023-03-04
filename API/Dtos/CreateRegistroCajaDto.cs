@@ -1,11 +1,15 @@
-﻿namespace API.Dtos
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace API.Dtos
 {
     public class CreateRegistroCajaDto
     {
         public string AppUserId { get; set; } = string.Empty;
-        public int BancoId { get; set; } = 1;
+        [Required]
+        public int BancoId { get; set; }
         public int CajaId { get; set; } = 1;
-        public int FormaPagoId { get; set; } = 2;
+        [Required]
+        public int FormaPagoId { get; set; }
         public int PrestamoId { get; set; }
         public int TipoTransaccionId { get; set; }
         public int PlanPagoId { get; set; }

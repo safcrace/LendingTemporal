@@ -30,7 +30,7 @@ namespace API.Controllers
             var entidad = new Entidad
             {
                 TipoEntidadId = createLendingDto.TipoEntidad
-            };
+            };            
 
             _unitOfWork.Repository<Entidad>().Add(entidad);
             result = await _unitOfWork.Complete();
@@ -62,6 +62,10 @@ namespace API.Controllers
             _unitOfWork.Repository<RelacionEntidad>().Add(relacionEntidades);
 
             createLendingDto.EntidadPrestamoId = entidad.Id;
+
+            createLendingDto.TasaInteres = createLendingDto.TasaInteres / 100.0m;
+            createLendingDto.TasaMora = createLendingDto.TasaMora / 100.0m;
+            createLendingDto.TasaIva = createLendingDto.TasaIva / 100.0m;
 
             var prestamo = _mapper.Map<Prestamo>(createLendingDto);
 
@@ -161,7 +165,10 @@ namespace API.Controllers
                                       Plazo = pre.Plazo,
                                       TasaInteres = pre.TasaInteres,
                                       TasaMora = pre.TasaMora,
-                                      TasaIva = pre.TasaIva
+                                      TasaIva = pre.TasaIva,
+                                      FechaPlan = pre.FechaPlan,
+                                      FechaAprobacion = pre.FechaAprobacion,
+                                      DiasMora = pre.DiasMora
                                   }).ToListAsync();
 
             var agenteE = await (from pre in _dbContext.Prestamos
@@ -470,6 +477,7 @@ namespace API.Controllers
             foreach (var plan in planesPago)
             {
                 var fechaReferencia = fechaPago.Date; //DateTime.Now.Date;
+                int iteracion = 0;
 
                 if (!aplicaMora)
                 {
@@ -483,7 +491,7 @@ namespace API.Controllers
                     plan.CuotaIvaMora = 0;
                     plan.SaldoIvaMora = 0;
                     //plan.FechaModificacion = plan.FechaCreacion;
-                    plan.TotalCuota = plan.CuotaCapital + plan.CuotaIntereses + plan.CuotaIvaIntereses + plan.CuotaMora + plan.CuotaIvaMora;
+                    //plan.TotalCuota = plan.CuotaCapital + plan.CuotaIntereses + plan.CuotaIvaIntereses + plan.CuotaMora + plan.CuotaIvaMora;
                     _dbContext.Update(plan);
                     await _dbContext.SaveChangesAsync();
                 }
@@ -493,7 +501,7 @@ namespace API.Controllers
                     plan.SaldoMora = 0;
                     plan.CuotaIvaMora = 0;
                     plan.SaldoIvaMora = 0;
-                    plan.TotalCuota = plan.CuotaCapital + plan.CuotaIntereses + plan.CuotaIvaIntereses + plan.CuotaMora + plan.CuotaIvaMora;
+                    //plan.TotalCuota = plan.CuotaCapital + plan.CuotaIntereses + plan.CuotaIvaIntereses + plan.CuotaMora + plan.CuotaIvaMora;
                     _dbContext.Update(plan);
                     await _dbContext.SaveChangesAsync();
                 }
@@ -508,19 +516,19 @@ namespace API.Controllers
                     //if (!aplicaMora) { plan.SaldoMora = 0; } else { plan.SaldoMora += cargoMontoMora; }
                     //if (!aplicaMora) { plan.CuotaIvaMora = 0; } else { plan.CuotaIvaMora += cargoMontoIvaMora; }
                     //if (!aplicaMora) { plan.SaldoIvaMora = 0; } else { plan.SaldoIvaMora += cargoMontoIvaMora; }
-                    //if (!aplicaMora) { plan.FechaModificacion = plan.FechaCreacion; } else { plan.FechaModificacion = fechaPago.Date; /*DateTime.Now;*/ }
+                    if (!aplicaMora) { plan.FechaModificacion = plan.FechaCreacion; } else { plan.FechaModificacion = fechaPago.Date; /*DateTime.Now;*/ }
                     //plan.TotalCuota = plan.CuotaCapital + plan.CuotaIntereses + plan.CuotaIvaIntereses + plan.CuotaMora + plan.CuotaIvaMora; 
-                    //_dbContext.Update(plan);
-                    //await _dbContext.SaveChangesAsync();
+                    _dbContext.Update(plan);
+                    await _dbContext.SaveChangesAsync();
                 }
             }
-            cargoMontoMora += capitalVencido * tasaMora / 365 * diasMora;
-            cargoMontoIvaMora += cargoMontoMora * 0.12m;
+            cargoMontoMora = capitalVencido * tasaMora / 365 * diasMora;
+            cargoMontoIvaMora = cargoMontoMora * 0.12m;
             if (!aplicaMora) { planPago.CuotaMora = 0; } else { planPago.CuotaMora += cargoMontoMora; }
             if (!aplicaMora) { planPago.SaldoMora = 0; } else { planPago.SaldoMora += cargoMontoMora; }
             if (!aplicaMora) { planPago.CuotaIvaMora = 0; } else { planPago.CuotaIvaMora += cargoMontoIvaMora; }
             if (!aplicaMora) { planPago.SaldoIvaMora = 0; } else { planPago.SaldoIvaMora += cargoMontoIvaMora; }
-            if (!aplicaMora) { planPago.FechaModificacion = planPago.FechaCreacion; } else { planPago.FechaModificacion = fechaPago.Date; }
+            //if (!aplicaMora) { planPago.FechaModificacion = planPago.FechaCreacion; } else { planPago.FechaModificacion = fechaPago.Date; }
             _dbContext.Update(planPago);
             await _dbContext.SaveChangesAsync();
 
@@ -697,10 +705,10 @@ namespace API.Controllers
                 //                            p => Scalars.CalculateFee(createPaymentPlanDto.PrincipalAmount, createPaymentPlanDto.InterestRate, createPaymentPlanDto.Term))
                 //                    .FirstOrDefaultAsync();
 
-                interestFee = principalAmount * (interestRate * 0.01m) / 12;
+                interestFee = principalAmount * interestRate /*(interestRate * 0.01m)*/ / 12;
                 principalFee = principalAmount / term;
                 //administrativeExpensesFee = subTotalFee * (administrativeExpensesRate * 0.01m);
-                taxFee = interestFee * (taxRate * 0.01m);
+                taxFee = interestFee * taxRate; //(taxRate * 0.01m);
                 totalFee = principalFee + interestFee + taxFee; //+ administrativeExpensesFee;
                 balance = principalAmount - principalFee;
 
@@ -752,10 +760,10 @@ namespace API.Controllers
             var prestamo = await _unitOfWork.Repository<Prestamo>().GetByIdAsync(createPaymentPlanDto.PrestamoId);
 
             prestamo.Plazo = createPaymentPlanDto.Plazo;
-            prestamo.TasaInteres = createPaymentPlanDto.TasaInteres;
-            prestamo.TasaIva = createPaymentPlanDto.TasaIva;
-            prestamo.TasaMora = createPaymentPlanDto.TasaMora;
-            prestamo.TasaGastos = createPaymentPlanDto.TasaGastos;
+            //prestamo.TasaInteres = createPaymentPlanDto.TasaInteres / 100.0m;
+            //prestamo.TasaIva = createPaymentPlanDto.TasaIva / 100.0m;
+            //prestamo.TasaMora = createPaymentPlanDto.TasaMora / 100.0m;
+            //prestamo.TasaGastos = createPaymentPlanDto.TasaGastos / 100.0m;
             prestamo.FechaPlan = createPaymentPlanDto.FechaPlan;
 
             PlanPago planPago = new PlanPago();
@@ -1008,7 +1016,7 @@ namespace API.Controllers
             /** Verificación de Saldo Total **/
             var saldos = await GetSaldos(prestamo.Id);
 
-            if (saldos.TotalSaldo < 1)
+            if (saldos.TotalSaldo < 0.01m)
             {
                 prestamo.EstadoPrestamoId = 4;
             }
