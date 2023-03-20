@@ -2,7 +2,7 @@
 {
     public class CalcularMora : BackgroundService
     {
-        private readonly PeriodicTimer _timer = new(TimeSpan.FromHours(6));
+        private readonly PeriodicTimer _timer = new(TimeSpan.FromHours(12));
         private readonly IHttpClientFactory _httpClientFactory;        
 
         public CalcularMora(IHttpClientFactory httpClientFactory)
@@ -22,7 +22,7 @@
         {
             var client = _httpClientFactory.CreateClient("BackEndDeveloper");
             client.Timeout = TimeSpan.FromMinutes(3);
-            var result = await client.GetAsync($"api/Catalogues/actualiza_dias_mora");
+            var result = await client.GetAsync($"api/Catalogues/actualiza_mora");
             Console.WriteLine(DateTime.Now.ToString("O"));            
         }
     }

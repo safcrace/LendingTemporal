@@ -26,7 +26,7 @@ namespace API.Dtos
         public decimal TasaIva { get; set; } = 0;
         public decimal TasaMora { get; set; } = 0;
         public decimal TasaGastos { get; set; } = 0;
-        public DateTime FechaPlan { get; set; }
+        public DateTime FechaPlan { get; set; }        
         public CreatePersonDto? CreatePersonDto { get; set; }
         public CreateEmpresaDto? CreateCompanyDto { get; set; }
     }

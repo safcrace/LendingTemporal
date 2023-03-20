@@ -31,12 +31,9 @@ namespace API.Dtos
         public int EstadoCivilId { get; set; }
         public string PaisNacimientoId { get; set; }
         public int DepartamentoId { get; set; }
-        public string MunicipioId { get; set; }
-        public int AsesorId { get; set; }
-        public int OcupacionId { get; set; }
-        public int? EmpresaPlanillaId { get; set; }
-        public string? DireccionLaboral { get; set; }
-        public int TipoPrestamoId { get; set; }
+        public string MunicipioId { get; set; }        
+        public int OcupacionId { get; set; }        
+        public string? DireccionLaboral { get; set; }        
         public string? Comentarios { get; set; }
     }
 }

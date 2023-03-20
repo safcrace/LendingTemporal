@@ -309,5 +309,16 @@ namespace API.Controllers
 
             return Ok(new { message = "Acción realizada Satisfactoriamente", reporte });
         }
+
+        [HttpGet("busqueda_personas/{search}")]
+        public async Task<ActionResult<ListadoPersonas>> GetSearchPerson(string search)
+        {
+            List<Core.Entities.Views.ListadoPersonas> listado = new();            
+
+            listado = await _dbContext.fxMDI_PersonsQryFull(search).ToListAsync();                
+            
+
+            return Ok(listado);
+        }
     }
 }

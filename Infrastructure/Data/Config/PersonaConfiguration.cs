@@ -29,7 +29,8 @@ namespace Infrastructure.Data.Config
             builder.Property(x => x.NumeroCelular).HasMaxLength(20);
             builder.Property(x => x.NumeroTelefonoLaboral).HasMaxLength(20);
             builder.Property(x => x.DireccionLaboral).HasMaxLength(150);
-            builder.Property(x => x.NumeroDocumento).HasMaxLength(25);
+            builder.Property(x => x.NumeroDocumento).IsRequired().HasMaxLength(25);
+            builder.HasIndex(x => x.NumeroDocumento).IsUnique();
         }
     }
 }

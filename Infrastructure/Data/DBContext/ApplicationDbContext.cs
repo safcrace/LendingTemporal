@@ -31,6 +31,8 @@ namespace Infrastructure.Data.DBContext
         public DbSet<EstadoPrestamo>? EstadoPrestamos { get; set; }
         public DbSet<FormaPago>? FormaPagos { get; set; }
         public DbSet<Genero> Generos { get; set; } = null!;                
+        public DbSet<ListadoGeneral> ListadoGeneral { get; set; } = null!;                
+        public DbSet<ListadoDeudores> ListadoDeudores { get; set; } = null!;                
         public DbSet<Municipio>? Municipios { get; set; }                   
         public DbSet<Ocupacion>? Ocupaciones { get; set; }                   
         public DbSet<Pais>? Paises { get; set; }
@@ -70,6 +72,10 @@ namespace Infrastructure.Data.DBContext
             return FromExpression(() => fxBatchGetPhrases(batchKey, batchDate));
         }
 
+        public IQueryable<ListadoPersonas> fxMDI_PersonsQryFull(string search)
+        {
+            return FromExpression(() => fxMDI_PersonsQryFull(search));
+        }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -78,6 +84,7 @@ namespace Infrastructure.Data.DBContext
             Scalars.RegisterFunctions(modelBuilder);
 
             modelBuilder.Entity<ListadoGeneral>().HasNoKey().ToView("v_sct_listadogeneral");
+            modelBuilder.Entity<ListadoDeudores>().HasNoKey().ToView("v_sct_listadogeneral_deudores");
             modelBuilder.Entity<ListadoAsesor>().HasNoKey().ToView("v_mdi_lista__asesores");
             modelBuilder.Entity<ListadoEmpresaPlanilla>().HasNoKey().ToView("v_mdi_lista__empresas_con_planilla");
             modelBuilder.Entity<AplicacionPagos>().HasNoKey().ToView(null);
@@ -196,6 +203,7 @@ declare @i int, @n int;
 			modelBuilder.Entity<Encabezado>().HasNoKey().ToView(null);
 			modelBuilder.Entity<Detalle>().HasNoKey().ToView(null);
 			modelBuilder.Entity<TotalImpuestos>().HasNoKey().ToView(null);
+			modelBuilder.Entity<ListadoPersonas>().HasNoKey().ToView(null);
 			modelBuilder.Entity<Frases>().HasNoKey().ToView(null);
 
             modelBuilder.HasDbFunction(() => SaldosMigracion(0));
@@ -203,6 +211,7 @@ declare @i int, @n int;
             modelBuilder.HasDbFunction(() => fxBatchGetDetail("",DateTime.Now));
             modelBuilder.HasDbFunction(() => fxBatchGetTotalTaxes("",DateTime.Now));
             modelBuilder.HasDbFunction(() => fxBatchGetPhrases("",DateTime.Now));
+            modelBuilder.HasDbFunction(() => fxMDI_PersonsQryFull(""));
 
             modelBuilder.Entity<AbonoPlan>().HasKey(pp => new { pp.EstadoCuentaId, pp.PlanPagoId });
             modelBuilder.Entity<AbonoPlan>().

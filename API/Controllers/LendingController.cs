@@ -1,11 +1,13 @@
 ﻿using API.Dtos;
 using AutoMapper;
 using Core.Entities;
+using Core.Entities.Functions;
 using Core.Entities.Views;
 using Core.Interfaces;
 using Infrastructure.Data.DBContext;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.IO.Pipelines;
 
 namespace API.Controllers
 {
@@ -27,45 +29,51 @@ namespace API.Controllers
         {
             int result;
 
-            var entidad = new Entidad
+            if (createLendingDto.EntidadPrestamoId > 0)
             {
-                TipoEntidadId = createLendingDto.TipoEntidad
-            };            
+                var entidad = new Entidad
+                {
+                    TipoEntidadId = createLendingDto.TipoEntidad
+                };
 
-            _unitOfWork.Repository<Entidad>().Add(entidad);
-            result = await _unitOfWork.Complete();
-            if (result < 0) return null!;
+                _unitOfWork.Repository<Entidad>().Add(entidad);
+                result = await _unitOfWork.Complete();
+                if (result < 0) return null!;
 
-            if (createLendingDto.CreatePersonDto is not null)
-            {
-                var persona = _mapper.Map<Persona>(createLendingDto.CreatePersonDto);
-                persona.EntidadId = entidad.Id;
+                if (createLendingDto.CreatePersonDto is not null)
+                {
+                    var persona = _mapper.Map<Persona>(createLendingDto.CreatePersonDto);
+                    persona.EntidadId = entidad.Id;
 
-                _unitOfWork.Repository<Persona>().Add(persona);
+                    _unitOfWork.Repository<Persona>().Add(persona);
+                }
+
+                if (createLendingDto.CreateCompanyDto is not null)
+                {
+                    var empresa = _mapper.Map<Empresa>(createLendingDto.CreateCompanyDto);
+                    empresa.EntidadId = entidad.Id;
+
+                    _unitOfWork.Repository<Empresa>().Add(empresa);
+                }
+
+                var relacionEntidades = new RelacionEntidad
+                {
+                    TipoRelacionId = 1,
+                    EntidadPadreId = 1,
+                    EntidadHijaId = entidad.Id
+                };
+
+                _unitOfWork.Repository<RelacionEntidad>().Add(relacionEntidades);
+                createLendingDto.EntidadPrestamoId = entidad.Id;
             }
+            
 
-            if (createLendingDto.CreateCompanyDto is not null)
-            {
-                var empresa = _mapper.Map<Empresa>(createLendingDto.CreateCompanyDto);
-                empresa.EntidadId = entidad.Id;
+            
 
-                _unitOfWork.Repository<Empresa>().Add(empresa);
-            }
 
-            var relacionEntidades = new RelacionEntidad
-            {
-                TipoRelacionId = 1,
-                EntidadPadreId = 1,
-                EntidadHijaId = entidad.Id
-            };
-
-            _unitOfWork.Repository<RelacionEntidad>().Add(relacionEntidades);
-
-            createLendingDto.EntidadPrestamoId = entidad.Id;
-
-            createLendingDto.TasaInteres = createLendingDto.TasaInteres / 100.0m;
-            createLendingDto.TasaMora = createLendingDto.TasaMora / 100.0m;
-            createLendingDto.TasaIva = createLendingDto.TasaIva / 100.0m;
+            createLendingDto.TasaInteres = createLendingDto.TasaInteres;
+            createLendingDto.TasaMora = createLendingDto.TasaMora;
+            createLendingDto.TasaIva = createLendingDto.TasaIva;
 
             var prestamo = _mapper.Map<Prestamo>(createLendingDto);
 
@@ -79,9 +87,10 @@ namespace API.Controllers
         }
 
         [HttpGet()]
-        public async Task<ActionResult<IEnumerable<ListadoGeneral>>> GetLendings()
+        public async Task<ActionResult<IEnumerable<ListadoDeudores>>> GetLendings()
         {
-            return await _dbContext.Set<ListadoGeneral>().ToListAsync();
+            //return await _dbContext.Set<ListadoGeneral>().ToListAsync();
+            return await _dbContext.ListadoDeudores.OrderBy(x => x.EntidadId).ToListAsync();
         }
 
         [HttpGet("{id:int}")]
@@ -185,16 +194,120 @@ namespace API.Controllers
            
         }
 
-        [HttpGet("persona/{prestamoId}")]
-        public async Task<ActionResult<IReadOnlyList<object>>> GetPersonById(int prestamoId)
+
+        [HttpGet("entity/{entidadId:int}")]
+        public async Task<ActionResult<object>> GetEntityById(int entidadId)
         {
-            var lendingP = await (from pre in _dbContext.Prestamos
-                                  join ent in _dbContext.Entidades on pre.EntidadPrestamoId equals ent.Id
-                                  join per in _dbContext.Personas on ent.Id equals per.EntidadId
-                                  where pre.Id == prestamoId
+            var tipoEntidadId = await _dbContext.Entidades.Where(e => e.Id == entidadId).Select(e => e.TipoEntidadId).FirstOrDefaultAsync();
+
+            if (tipoEntidadId == 1)
+            {
+                var persona = await _dbContext.Personas.Where(x => x.EntidadId == entidadId)
+                                            .Select(x => new
+                                            {
+                                                x.Id,
+                                                Nombre = $"{x.PrimerNombre} {x.SegundoNombre} {x.PrimerApellido} {x.SegundoApellido}",
+                                                DPI = x.NumeroDocumento,
+                                                x.NIT,
+                                                x.NumeroTelefono,
+                                                x.NumeroCelular,
+                                                x.Direccion,
+                                                x.DireccionLaboral
+                                            }).FirstOrDefaultAsync();
+
+                //var agenteP = await (from pre in _dbContext.Prestamos
+                //                     join ent in _dbContext.Entidades on pre.GestorPrestamoId equals ent.Id
+                //                     join per in _dbContext.Personas on ent.Id equals per.EntidadId
+                //                     where pre.Id == id
+                //                     select new
+                //                     {
+                //                         Nombre = per.PrimerNombre + " " + per.SegundoApellido,
+
+                //                     }).FirstOrDefaultAsync();
+
+                //var empresaPlanilla = await (from pre in _dbContext.Prestamos
+                //                             join ent in _dbContext.Entidades on pre.EmpresaPrestamoId equals ent.Id
+                //                             join emp in _dbContext.Empresas on ent.Id equals emp.EntidadId
+                //                             where pre.Id == id
+                //                             select new
+                //                             {
+                //                                 Nombre = emp.Nombre
+                //                             }).FirstOrDefaultAsync();
+
+                //decimal Cargos = await _dbContext.EstadoCuentas.Where(x => x.PrestamoId == ).SumAsync(x => x.Cargo);
+
+                var prestamosPer = await (from pre in _dbContext.Prestamos
+                                       join ase in _dbContext.Personas on pre.GestorPrestamoId equals ase.EntidadId
+                                       join tc  in _dbContext.TipoPrestamos on pre.TipoPrestamoId equals tc.Id
+                                       join est in _dbContext.EstadoPrestamos on pre.EstadoPrestamoId equals est.Id 
+                                       join empres in _dbContext.Empresas on pre.EmpresaPrestamoId equals empres.EntidadId into emp
+                                       from empre in emp.DefaultIfEmpty()
+                                       where pre.EntidadPrestamoId == entidadId
+                                       select new
+                                       {
+                                           PrestamoId = pre.Id,
+                                           PrestamoReferencia = pre.ReferenciaMigracion,
+                                           pre.FechaAprobacion,
+                                           TipoCredito = tc.Nombre,
+                                           pre.MontoTotalProyectado,
+                                           Saldo = Scalars.FxSaldoPrestamoListado(pre.Id),
+                                           Estado = est.Nombre,
+                                           pre.DiasMora,
+                                           Gestor = $"{ase.PrimerNombre} {ase.SegundoNombre} {ase.PrimerApellido} {ase.SegundoApellido}",
+                                           EmpresaPlanilla = empre.Nombre 
+                                       }).OrderByDescending(x => x.PrestamoId).ToListAsync();
+
+
+                return Ok(new { persona, prestamosPer});
+            }
+
+            var empresa = await _dbContext.Empresas.Where(x => x.EntidadId == entidadId)
+                                            .Select(x => new
+                                            {
+                                                Nombre = x.Nombre,
+                                                x.Direccion,
+                                                x.Telefono                                                
+                                            }).FirstOrDefaultAsync();
+
+            //var agenteE = await (from pre in _dbContext.Prestamos
+            //                     join ent in _dbContext.Entidades on pre.GestorPrestamoId equals ent.Id
+            //                     join per in _dbContext.Personas on ent.Id equals per.EntidadId
+            //                     where pre.Id == id
+            //                     select new
+            //                     {
+            //                         Nombre = per.PrimerNombre + " " + per.SegundoApellido,
+
+            //                     }).FirstOrDefaultAsync();
+
+            var prestamosEmp = await (from pre in _dbContext.Prestamos
+                                   join ase in _dbContext.Personas on pre.GestorPrestamoId equals ase.EntidadId
+                                   join emp in _dbContext.Empresas on pre.EmpresaPrestamoId equals emp.EntidadId
+                                   join tc in _dbContext.TipoPrestamos on pre.TipoPrestamoId equals tc.Id
+                                   join est in _dbContext.EstadoPrestamos on pre.EstadoPrestamoId equals est.Id
+                                   where pre.EntidadPrestamoId == entidadId
+                                   select new
+                                   {
+                                       PrestamoId = pre.Id,
+                                       PrestamoReferencia = pre.ReferenciaMigracion,
+                                       pre.FechaAprobacion,
+                                       TipoCredito = tc.Nombre,
+                                       pre.MontoTotalProyectado,
+                                       Saldo = 0,
+                                       Estado = est.Nombre,
+                                       pre.DiasMora
+                                   }).OrderByDescending(x => x.PrestamoId).ToListAsync();
+
+            return Ok(new { empresa, prestamosEmp });
+
+        }
+
+        [HttpGet("persona/{personaId}")]
+        public async Task<ActionResult<IReadOnlyList<object>>> GetPersonById(int personaId)
+        {
+            var persona = await (from per in _dbContext.Personas 
+                                  where per.Id == personaId
                                   select new
-                                  {                                      
-                                      PersonaId = per.Id,
+                                  {   
                                       per.PrimerNombre,
                                       per.SegundoNombre,
                                       per.PrimerApellido,
@@ -213,35 +326,33 @@ namespace API.Controllers
                                       per.PaisNacimientoId,
                                       per.DepartamentoId,
                                       per.MunicipioId,
-                                      per.EstadoCivilId,
-                                      EstadoPrestamo = pre.EstadoPrestamo.Nombre,
-                                      AsesorId = pre.GestorPrestamoId,
-                                      EmpresaPlanillaId = pre.EmpresaPrestamoId,
+                                      per.EstadoCivilId,                                      
                                       per.DireccionLaboral,
                                       per.OcupacionId,
-                                      per.Comentarios,
-                                      TipoPrestamo = pre.TipoPrestamoId
+                                      per.Comentarios                                      
                                   }).ToListAsync();
 
-            return Ok(lendingP);
+            return Ok(persona);
         }
 
-        [HttpPut("persona/{prestamoId}")]
-        public async Task<ActionResult<object>> PutPersonaById(int prestamoId, UpdatePersonLendingDto updatePersonLendingDto)
+        
+
+        [HttpPut("persona/{personaId}")]
+        public async Task<ActionResult<object>> PutPersonaById(int personaId, UpdatePersonLendingDto updatePersonLendingDto)
         {
-            var prestamo = await _dbContext.Prestamos.Where(p => p.Id == prestamoId).FirstOrDefaultAsync();
+            //var prestamo = await _dbContext.Prestamos.Where(p => p.Id == prestamoId).FirstOrDefaultAsync();
 
-            prestamo.GestorPrestamoId = updatePersonLendingDto.AsesorId;
-            prestamo.EmpresaPrestamoId = updatePersonLendingDto.EmpresaPlanillaId;
-            prestamo.TipoPrestamoId = updatePersonLendingDto.TipoPrestamoId;
+            //prestamo.GestorPrestamoId = updatePersonLendingDto.AsesorId;
+            //prestamo.EmpresaPrestamoId = updatePersonLendingDto.EmpresaPlanillaId;
+            //prestamo.TipoPrestamoId = updatePersonLendingDto.TipoPrestamoId;
 
-            _unitOfWork.Repository<Prestamo>().Update(prestamo);
+            //_unitOfWork.Repository<Prestamo>().Update(prestamo);
 
-            var result = await _unitOfWork.Complete();
+            //var result = await _unitOfWork.Complete();
 
-            if (result < 0) return null!;
+            //if (result < 0) return null!;
 
-            var persona = await _dbContext.Personas.Where(p => p.Id == updatePersonLendingDto.personId).FirstOrDefaultAsync();
+            var persona = await _dbContext.Personas.Where(p => p.Id == personaId).FirstOrDefaultAsync();
 
             persona.PrimerNombre = updatePersonLendingDto.PrimerNombre;
             persona.SegundoNombre = updatePersonLendingDto.SegundoNombre;
@@ -270,7 +381,7 @@ namespace API.Controllers
 
             _unitOfWork.Repository<Persona>().Update(persona);
 
-            result = await _unitOfWork.Complete();
+            var result = await _unitOfWork.Complete();
 
             if (result < 0) return null!;
 
@@ -404,7 +515,7 @@ namespace API.Controllers
                                  {
                                      Nombre = per.PrimerNombre + " " + per.PrimerApellido,
                                  }).FirstOrDefaultAsync();
-
+                        
             var gestor = await (from pre in _dbContext.Prestamos
                                 join ent in _dbContext.Entidades on pre.GestorPrestamoId equals ent.Id
                                 join per in _dbContext.Personas on ent.Id equals per.EntidadId
@@ -437,9 +548,10 @@ namespace API.Controllers
                 Gastos = x.MontoGastos,
                 TipoTransaccionIvaGastos = 14,
                 IvaGastos = x.MontoIvaGastos,
-                MontoPago = x.MontoPago,
+                MontoPago = x.MontoCapital + x.MontoInteres + x.MontoIvaIntereses + x.MontoMora + x.MontoIvaMora + x.MontoGastos + x.MontoIvaGastos,
                 FormaPago = x.FormaPago.Nombre,
-                NombreBanco = x.Banco.Nombre
+                NombreBanco = x.Banco.Nombre,
+                Boleta = x.NumeroDocumento
             }).ToListAsync();
         }
 
@@ -760,10 +872,10 @@ namespace API.Controllers
             var prestamo = await _unitOfWork.Repository<Prestamo>().GetByIdAsync(createPaymentPlanDto.PrestamoId);
 
             prestamo.Plazo = createPaymentPlanDto.Plazo;
-            //prestamo.TasaInteres = createPaymentPlanDto.TasaInteres / 100.0m;
-            //prestamo.TasaIva = createPaymentPlanDto.TasaIva / 100.0m;
-            //prestamo.TasaMora = createPaymentPlanDto.TasaMora / 100.0m;
-            //prestamo.TasaGastos = createPaymentPlanDto.TasaGastos / 100.0m;
+            prestamo.TasaInteres = createPaymentPlanDto.TasaInteres; /// 100.0m;
+            prestamo.TasaIva = createPaymentPlanDto.TasaIva; /// 100.0m;
+            prestamo.TasaMora = createPaymentPlanDto.TasaMora; /// 100.0m;
+            prestamo.TasaGastos = createPaymentPlanDto.TasaGastos; /// 100.0m;
             prestamo.FechaPlan = createPaymentPlanDto.FechaPlan;
 
             PlanPago planPago = new PlanPago();
@@ -850,6 +962,17 @@ namespace API.Controllers
         public async Task<ActionResult<object>> CreateRegistroPago(CreateRegistroCajaDto createRegistroCajaDto)
         {
             //return Ok(new { Mensaje = "Bloqueado Temporalmente" });
+
+            var montoPagoCalculado = createRegistroCajaDto.MontoPago;
+
+            createRegistroCajaDto.MontoPago = createRegistroCajaDto.MontoCapital + createRegistroCajaDto.MontoInteres + createRegistroCajaDto.MontoIvaIntereses
+                    + createRegistroCajaDto.MontoMora + createRegistroCajaDto.MontoIvaMora + createRegistroCajaDto.MontoGastos + createRegistroCajaDto.MontoIvaGastos;
+
+            if (createRegistroCajaDto.MontoPago != montoPagoCalculado)
+            {
+                return BadRequest("No se pudo realizar el pago. Se ha producido una Excepción por favor comuniquese con el Administrador");
+            }
+
             var registroPago = _mapper.Map<RegistroCaja>(createRegistroCajaDto);
 
             _unitOfWork.Repository<RegistroCaja>().Add(registroPago);
