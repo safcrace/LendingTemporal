@@ -2,7 +2,7 @@
 {
     public class CalcularMora : BackgroundService
     {
-        private readonly PeriodicTimer _timer = new(TimeSpan.FromHours(12));
+        private readonly PeriodicTimer _timer = new(TimeSpan.FromMinutes(480));
         private readonly IHttpClientFactory _httpClientFactory;        
 
         public CalcularMora(IHttpClientFactory httpClientFactory)

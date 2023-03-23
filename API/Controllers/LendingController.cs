@@ -29,7 +29,7 @@ namespace API.Controllers
         {
             int result;
 
-            if (createLendingDto.EntidadPrestamoId > 0)
+            if (createLendingDto.EntidadPrestamoId == 0)
             {
                 var entidad = new Entidad
                 {
@@ -1125,16 +1125,24 @@ namespace API.Controllers
             }
 
             await _unitOfWork.Complete();
-            
-            /** Actualización de Días de Mora **/                    
 
-            var diasMora = (int)(DateTime.Now - planPago.FechaPago).TotalDays;
-
-            if (diasMora < 0) diasMora = 0; 
+            /** Actualización de Prestamo: Días de Mora y Estado **/            
 
             var prestamo = await _dbContext.Prestamos.FirstOrDefaultAsync(x => x.Id == createRegistroCajaDto.PrestamoId);
+            planPago = await _dbContext.PlanPagos.Where(p => p.PrestamoId == createRegistroCajaDto.PrestamoId && p.Aplicado == false).FirstOrDefaultAsync();
 
-            prestamo.DiasMora = diasMora;
+            if (planPago is not null)
+            {
+                var diasMora = (int)(DateTime.Now - planPago.FechaPago).TotalDays;
+
+                if (diasMora < 0) diasMora = 0;
+                prestamo.DiasMora = diasMora;
+            }
+            else
+            {                
+                prestamo.DiasMora = 0;
+            }
+            
 
             /** Verificación de Saldo Total **/
             var saldos = await GetSaldos(prestamo.Id);
