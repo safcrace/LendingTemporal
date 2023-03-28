@@ -329,7 +329,8 @@ namespace API.Controllers
                                       per.EstadoCivilId,                                      
                                       per.DireccionLaboral,
                                       per.OcupacionId,
-                                      per.Comentarios                                      
+                                      per.Comentarios,
+                                      per.CodigoSAP
                                   }).ToListAsync();
 
             return Ok(persona);
@@ -377,7 +378,7 @@ namespace API.Controllers
             persona.OcupacionId = updatePersonLendingDto.OcupacionId;
             persona.DireccionLaboral = updatePersonLendingDto.DireccionLaboral;
             persona.Comentarios = updatePersonLendingDto.Comentarios;
-
+            persona.CodigoSAP = updatePersonLendingDto.CodigoSAP;
 
             _unitOfWork.Repository<Persona>().Update(persona);
 
@@ -678,7 +679,7 @@ namespace API.Controllers
                 saldoMonto = planPago.SaldoCapital + planPago.SaldoIntereses + planPago.SaldoIvaIntereses;
                 foreach (var plan in planesPago)
                 {
-                    if (montoExcedente >= 1 && plan.Id > planPago.Id)
+                    if (montoExcedente >= 0.01m && plan.Id > planPago.Id)
                     {
                         AbonarExcedente(plan.SaldoIvaIntereses, plan.SaldoIntereses, plan.SaldoCapital, ref montoExcedente, ref montoIvaIntereses, ref montoIntereses, ref montoCapital);
                     }
@@ -766,8 +767,9 @@ namespace API.Controllers
             } else
             {
                 montoIvaIntereses += montoExcedente * 0.12m;
-                montoIntereses += montoExcedente - montoIvaIntereses;
-                montoExcedente -= cuotaIvaIntereses + cuotaIntereses;
+                montoExcedente -= montoExcedente * 0.12m;
+                montoIntereses += montoExcedente;
+                montoExcedente = 0;
             }
 
             if (montoExcedente >= cuotaCapital)

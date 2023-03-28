@@ -35,6 +35,7 @@ namespace API.Dtos
         public int OcupacionId { get; set; }        
         public string? DireccionLaboral { get; set; }        
         public string? Comentarios { get; set; }
+        public string? CodigoSAP { get; set; }
     }
 }
 

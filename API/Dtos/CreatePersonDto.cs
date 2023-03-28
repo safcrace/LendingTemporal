@@ -25,5 +25,6 @@
         public string? NumeroTelefonoLaboral { get; set; }
         public string? NumeroDocumento { get; set; }
         public string? Comentarios { get; set; }
+        public string? CodigoSap { get; set; }
     }
 }
