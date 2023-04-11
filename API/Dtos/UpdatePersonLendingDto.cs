@@ -37,6 +37,7 @@ namespace API.Dtos
         public int? EmpresaPlanillaId { get; set; }
         public string? DireccionLaboral { get; set; }
         public int TipoPrestamoId { get; set; }
+        public int EstadoPrestamoId { get; set; }
         public string? Comentarios { get; set; }
     }
 }

@@ -127,6 +127,14 @@ namespace API.Controllers
             return Ok(_mapper.Map<List<TipoViviendaDto>>(tiposVivienda));
         }
 
+        [HttpGet("estados-prestamo")]
+        public async Task<ActionResult<IReadOnlyList<EstadoPrestamoDto>>> GetEstadosPrestamo()
+        {
+            var estadosPrestamo = await _unitOfWork.Repository<EstadoPrestamo>().ListAllAsync();
+
+            return Ok(_mapper.Map<IReadOnlyList<EstadoPrestamoDto>>(estadosPrestamo));
+        }
+
         [HttpGet("gestores")]
         public async Task<ActionResult<IReadOnlyList<ListadoAsesor>>> GetGestores()
         {

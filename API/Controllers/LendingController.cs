@@ -214,6 +214,7 @@ namespace API.Controllers
                                       per.DepartamentoId,
                                       per.MunicipioId,
                                       per.EstadoCivilId,
+                                      pre.EstadoPrestamoId,
                                       EstadoPrestamo = pre.EstadoPrestamo.Nombre,
                                       AsesorId = pre.GestorPrestamoId,
                                       EmpresaPlanillaId = pre.EmpresaPrestamoId,
@@ -234,6 +235,7 @@ namespace API.Controllers
             prestamo.GestorPrestamoId = updatePersonLendingDto.AsesorId;
             prestamo.EmpresaPrestamoId = updatePersonLendingDto.EmpresaPlanillaId;
             prestamo.TipoPrestamoId = updatePersonLendingDto.TipoPrestamoId;
+            prestamo.EstadoPrestamoId = updatePersonLendingDto.EstadoPrestamoId;
 
             _unitOfWork.Repository<Prestamo>().Update(prestamo);
 
@@ -266,7 +268,6 @@ namespace API.Controllers
             persona.OcupacionId = updatePersonLendingDto.OcupacionId;
             persona.DireccionLaboral = updatePersonLendingDto.DireccionLaboral;
             persona.Comentarios = updatePersonLendingDto.Comentarios;
-
 
             _unitOfWork.Repository<Persona>().Update(persona);
 
@@ -654,8 +655,9 @@ namespace API.Controllers
             } else
             {
                 montoIvaIntereses += montoExcedente * 0.12m;
-                montoIntereses += montoExcedente - montoIvaIntereses;
-                montoExcedente -= cuotaIvaIntereses + cuotaIntereses;
+                montoExcedente -= montoExcedente * 0.12m;
+                montoIntereses += montoExcedente;
+                montoExcedente = 0;
             }
 
             if (montoExcedente >= cuotaCapital)
@@ -760,10 +762,10 @@ namespace API.Controllers
             var prestamo = await _unitOfWork.Repository<Prestamo>().GetByIdAsync(createPaymentPlanDto.PrestamoId);
 
             prestamo.Plazo = createPaymentPlanDto.Plazo;
-            //prestamo.TasaInteres = createPaymentPlanDto.TasaInteres / 100.0m;
-            //prestamo.TasaIva = createPaymentPlanDto.TasaIva / 100.0m;
-            //prestamo.TasaMora = createPaymentPlanDto.TasaMora / 100.0m;
-            //prestamo.TasaGastos = createPaymentPlanDto.TasaGastos / 100.0m;
+            prestamo.TasaInteres = createPaymentPlanDto.TasaInteres; // / 100.0m;
+            prestamo.TasaIva = createPaymentPlanDto.TasaIva; /// 100.0m;
+            prestamo.TasaMora = createPaymentPlanDto.TasaMora; /// 100.0m;
+            prestamo.TasaGastos = createPaymentPlanDto.TasaGastos;/// 100.0m;
             prestamo.FechaPlan = createPaymentPlanDto.FechaPlan;
 
             PlanPago planPago = new PlanPago();
@@ -850,6 +852,17 @@ namespace API.Controllers
         public async Task<ActionResult<object>> CreateRegistroPago(CreateRegistroCajaDto createRegistroCajaDto)
         {
             //return Ok(new { Mensaje = "Bloqueado Temporalmente" });
+
+            var montoPagoCalculado = createRegistroCajaDto.MontoPago;
+
+            createRegistroCajaDto.MontoPago = createRegistroCajaDto.MontoCapital + createRegistroCajaDto.MontoInteres + createRegistroCajaDto.MontoIvaIntereses
+                    + createRegistroCajaDto.MontoMora + createRegistroCajaDto.MontoIvaMora + createRegistroCajaDto.MontoGastos + createRegistroCajaDto.MontoIvaGastos;
+
+            if (createRegistroCajaDto.MontoPago != montoPagoCalculado)
+            {
+                return BadRequest("No se pudo realizar el pago. Se ha producido una Excepción por favor comuniquese con el Administrador");
+            }
+
             var registroPago = _mapper.Map<RegistroCaja>(createRegistroCajaDto);
 
             _unitOfWork.Repository<RegistroCaja>().Add(registroPago);

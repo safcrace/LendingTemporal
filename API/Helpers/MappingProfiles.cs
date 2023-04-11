@@ -24,6 +24,7 @@ namespace API.Helpers
             CreateMap<DestinoPrestamo, DestinoPrestamoDto>();
             CreateMap<Ocupacion, OcupacionDto>();
             CreateMap<TipoVivienda, TipoViviendaDto>();
+            CreateMap<EstadoPrestamo, EstadoPrestamoDto>();
             //CreateMap<Gestor, GestorDto>();
         }
     }
