@@ -6,6 +6,7 @@ namespace Core.Entities.Views
     public class ListadoGeneral
     {
         public int Id { get; set; }
+        public int EntidadId { get; set; }
         public string ReferenciaMigracion { get; set; }
         public string Estatus { get; set; } = null!;
         public string DPI { get; set; } = null!;

@@ -130,7 +130,7 @@ namespace API.Controllers
         [HttpGet("estados-prestamo")]
         public async Task<ActionResult<IReadOnlyList<EstadoPrestamoDto>>> GetEstadosPrestamo()
         {
-            var estadosPrestamo = await _unitOfWork.Repository<EstadoPrestamo>().ListAllAsync();
+            var estadosPrestamo = await _dbContext.EstadoPrestamos.Where(x => x.Id == 1 || x.Id == 8).ToListAsync();
 
             return Ok(_mapper.Map<IReadOnlyList<EstadoPrestamoDto>>(estadosPrestamo));
         }

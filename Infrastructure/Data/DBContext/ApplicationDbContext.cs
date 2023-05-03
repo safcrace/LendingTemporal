@@ -31,6 +31,7 @@ namespace Infrastructure.Data.DBContext
         public DbSet<EstadoPrestamo>? EstadoPrestamos { get; set; }
         public DbSet<FormaPago>? FormaPagos { get; set; }
         public DbSet<Genero> Generos { get; set; } = null!;                
+        public DbSet<ListadoGeneral>? ListadoGeneral { get; set; }                   
         public DbSet<Municipio>? Municipios { get; set; }                   
         public DbSet<Ocupacion>? Ocupaciones { get; set; }                   
         public DbSet<Pais>? Paises { get; set; }
