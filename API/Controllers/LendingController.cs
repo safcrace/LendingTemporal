@@ -218,25 +218,38 @@ namespace API.Controllers
             }
 
 
-            var credit = await _dbContext.PlanPagos.FirstOrDefaultAsync(p => p.Id == id && p.Aplicado ==false && p.FechaPago.Month <= DateTime.Now.Month);
+            var totalSaldo = _dbContext.PlanPagos
+                .Where(p => p.PrestamoId == id && p.FechaPago <= DateTime.Now)
+                .Sum(p => p.SaldoCapital + p.SaldoIntereses + p.SaldoIvaIntereses + p.SaldoMora + p.SaldoIvaMora + p.SaldoGastos + p.SaldoIvaGastos);
 
-            
-            
-            if (credit == null)
-            {
-                totalCuota = 0.00m;
-            }
-            else
-            {
-                totalCuota = credit.SaldoCapital + credit.SaldoIntereses + credit.SaldoIvaIntereses + credit.SaldoMora + credit.SaldoIvaMora; 
-            }
+
+            //using (var context = _dbContext)
+            //{
+            //    var total = context.PlanPagos
+            //        .Where(p => p.PrestamoId == 1075 && p.FechaPago <= DateTime.Now)
+            //        .Sum(p => p.SaldoCapital + p.SaldoIntereses + p.SaldoIvaIntereses + p.SaldoMora + p.SaldoIvaMora + p.SaldoGastos + p.SaldoIvaGastos);
+            //}
+        //    total = context.PlanPagos
+        //.Where(p => p.PrestamoId == 1075 && p.FechaPago <= DateTime.Now)
+        //.Sum(p => p.SaldoCapital + p.SaldoIntereses + p.SaldoIvaIntereses + p.SaldoMora + p.SaldoIvaMora + p.SaldoGastos + p.SaldoIvaGastos);
+
+
+
+            //if (totalSaldo == null)
+            //{
+            //    totalCuota = 0.00m;
+            //}
+            //else
+            //{
+            //    totalCuota = credit.SaldoCapital + credit.SaldoIntereses + credit.SaldoIvaIntereses + credit.SaldoMora + credit.SaldoIvaMora; 
+            //}
 
 
             var entidadId = await _dbContext.Prestamos.Where(x => x.Id == id).Select(x => x.EntidadPrestamoId).FirstOrDefaultAsync();
 
             var nombre = await _dbContext.ListadoGeneral.Where(x => x.EntidadId == entidadId ).Select(x => x.Nombre).FirstOrDefaultAsync();
 
-            return new { nombre, totalCuota };
+            return new { nombre, totalSaldo };
         }
 
         [HttpGet("persona/{prestamoId}")]
@@ -531,12 +544,12 @@ namespace API.Controllers
 
 
             var planesPago = await _dbContext.PlanPagos.Where(p => p.PrestamoId == prestamoId && p.Aplicado == false).ToListAsync();
+
             
 
             foreach (var plan in planesPago)
             {
-                var fechaReferencia = fechaPago.Date; //DateTime.Now.Date;
-                int iteracion = 0;
+                var fechaReferencia = fechaPago.Date; //DateTime.Now.Date;               
 
                 if (!aplicaMora)
                 {
@@ -568,35 +581,49 @@ namespace API.Controllers
 
                  if (plan.FechaPago <= DateTime.Now && plan.FechaModificacion.Date != fechaReferencia)
                 {
-                    capitalVencido += plan.SaldoCapital; //* tasaMora;                
-                    //cargoMontoMora += capitalVencido * tasaMora / 365 * diasMora;
-                    //cargoMontoIvaMora += cargoMontoMora * 0.12m;
-                    //if (!aplicaMora) { plan.CuotaMora = 0; } else { plan.CuotaMora += cargoMontoMora; }
-                    //if (!aplicaMora) { plan.SaldoMora = 0; } else { plan.SaldoMora += cargoMontoMora; }
-                    //if (!aplicaMora) { plan.CuotaIvaMora = 0; } else { plan.CuotaIvaMora += cargoMontoIvaMora; }
-                    //if (!aplicaMora) { plan.SaldoIvaMora = 0; } else { plan.SaldoIvaMora += cargoMontoIvaMora; }
+                    var anio = plan.FechaPago.Year;
+                    var mes = plan.FechaPago.Month; 
+
+                    int daysInMonth = DateTime.DaysInMonth(anio, mes);
+
+                    //capitalVencido += plan.SaldoCapital; //* tasaMora;                
+                    cargoMontoMora = plan.SaldoCapital * tasaMora / 365 * daysInMonth;
+                    cargoMontoIvaMora = cargoMontoMora * 0.12m;
+                    if (!aplicaMora) { plan.CuotaMora = 0; } else { plan.CuotaMora += cargoMontoMora; }
+                    if (!aplicaMora) { plan.SaldoMora = 0; } else { plan.SaldoMora += cargoMontoMora; }
+                    if (!aplicaMora) { plan.CuotaIvaMora = 0; } else { plan.CuotaIvaMora += cargoMontoIvaMora; }
+                    if (!aplicaMora) { plan.SaldoIvaMora = 0; } else { plan.SaldoIvaMora += cargoMontoIvaMora; }
                     if (!aplicaMora) { plan.FechaModificacion = plan.FechaCreacion; } else { plan.FechaModificacion = fechaPago.Date; /*DateTime.Now;*/ }
                     //plan.TotalCuota = plan.CuotaCapital + plan.CuotaIntereses + plan.CuotaIvaIntereses + plan.CuotaMora + plan.CuotaIvaMora; 
                     _dbContext.Update(plan);
                     await _dbContext.SaveChangesAsync();
                 }
             }
-            cargoMontoMora = capitalVencido * tasaMora / 365 * diasMora;
-            cargoMontoIvaMora = cargoMontoMora * 0.12m;
-            if (!aplicaMora) { planPago.CuotaMora = 0; } else { planPago.CuotaMora += cargoMontoMora; }
-            if (!aplicaMora) { planPago.SaldoMora = 0; } else { planPago.SaldoMora += cargoMontoMora; }
-            if (!aplicaMora) { planPago.CuotaIvaMora = 0; } else { planPago.CuotaIvaMora += cargoMontoIvaMora; }
-            if (!aplicaMora) { planPago.SaldoIvaMora = 0; } else { planPago.SaldoIvaMora += cargoMontoIvaMora; }
-            //if (!aplicaMora) { planPago.FechaModificacion = planPago.FechaCreacion; } else { planPago.FechaModificacion = fechaPago.Date; }
-            _dbContext.Update(planPago);
-            await _dbContext.SaveChangesAsync();
+
+            var ultimaCuotaEnMora = await _dbContext.PlanPagos.Where(p => p.PrestamoId == prestamoId 
+            && p.Aplicado == false && p.FechaPago <= fechaPago)
+                                                                    .OrderByDescending(p => p.Id).FirstOrDefaultAsync();
+
+            if (ultimaCuotaEnMora is not null)
+            {
+                diasMora = (int)(fechaPago - ultimaCuotaEnMora.FechaPago).TotalDays;
+
+                cargoMontoMora = ultimaCuotaEnMora.SaldoCapital * tasaMora / 365 * diasMora;
+                cargoMontoIvaMora = cargoMontoMora * 0.12m;
+                if (!aplicaMora) { ultimaCuotaEnMora.CuotaMora = 0; } else { ultimaCuotaEnMora.CuotaMora = cargoMontoMora; }
+                if (!aplicaMora) { ultimaCuotaEnMora.SaldoMora = 0; } else { ultimaCuotaEnMora.SaldoMora = cargoMontoMora; }
+                if (!aplicaMora) { ultimaCuotaEnMora.CuotaIvaMora = 0; } else { ultimaCuotaEnMora.CuotaIvaMora = cargoMontoIvaMora; }
+                if (!aplicaMora) { ultimaCuotaEnMora.SaldoIvaMora = 0; } else { ultimaCuotaEnMora.SaldoIvaMora = cargoMontoIvaMora; }
+                if (!aplicaMora) { ultimaCuotaEnMora.FechaModificacion = ultimaCuotaEnMora.FechaCreacion; } else { ultimaCuotaEnMora.FechaModificacion = fechaPago.Date; }
+                _dbContext.Update(ultimaCuotaEnMora);
+                await _dbContext.SaveChangesAsync();
+            }
 
             /** Pago Mora  **/
             if ((planPago.SaldoMora > 0 || planPago.SaldoIvaMora > 0) && saldoMonto <= (planPago.SaldoMora + planPago.SaldoIvaMora))
             {
-                montoIvaMora = saldoMonto * 0.012m;
-                saldoMonto -= montoIvaMora;
-                montoMora = saldoMonto;
+                montoMora = (saldoMonto * 100)/112;
+                montoIvaMora = montoMora * 0.12m;                
                 saldoMonto = 0.0m;
             }
             else
@@ -616,7 +643,8 @@ namespace API.Controllers
                 {
                     if (montoExcedente >= 0.01m && plan.Id > planPago.Id)
                     {
-                        AbonarExcedente(plan.SaldoIvaIntereses, plan.SaldoIntereses, plan.SaldoCapital, ref montoExcedente, ref montoIvaIntereses, ref montoIntereses, ref montoCapital);
+                        AbonarExcedente(plan.SaldoIvaMora, plan.SaldoMora, plan.SaldoIvaIntereses, plan.SaldoIntereses, plan.SaldoCapital, ref montoExcedente, 
+                            ref montoIvaMora, ref montoMora, ref montoIvaIntereses, ref montoIntereses, ref montoCapital);
                     }
                 }                
             }                      
@@ -628,9 +656,9 @@ namespace API.Controllers
                 if (planPago.SaldoIntereses > 0 && saldoMonto < planPago.SaldoIntereses)
                 {
                     /** Se calcula IVA correspondiente **/
-                    var ivaMontoIntereses = saldoMonto * 0.12m;
-                    montoIntereses += saldoMonto - ivaMontoIntereses;
-                    saldoMonto = ivaMontoIntereses;
+                    montoIntereses = (saldoMonto * 100) / 112;
+                    montoIvaIntereses += montoIntereses * 0.12m;
+                    saldoMonto = 0;
                 }
 
                 if (saldoMonto >= planPago.SaldoIntereses)
@@ -692,8 +720,21 @@ namespace API.Controllers
             }) ;
         }
 
-        private decimal AbonarExcedente(decimal cuotaIvaIntereses, decimal cuotaIntereses, decimal cuotaCapital, ref decimal montoExcedente, ref decimal montoIvaIntereses, ref decimal montoIntereses, ref decimal montoCapital)
+        private decimal AbonarExcedente(decimal cuotaIvaMora, decimal cuotaMora, decimal cuotaIvaIntereses, decimal cuotaIntereses, decimal cuotaCapital, ref decimal montoExcedente, ref decimal montoIvaMora, ref decimal montoMora, ref decimal montoIvaIntereses, ref decimal montoIntereses, ref decimal montoCapital)
         {
+            if (montoExcedente >= (cuotaMora + cuotaIvaMora))
+            {
+                montoIvaMora += cuotaIvaMora;
+                montoMora += cuotaIvaMora;
+                montoExcedente -= cuotaIvaMora + cuotaMora;
+            }
+            else
+            {
+                montoMora = (montoExcedente * 100) / 112;
+                montoIvaMora += montoMora * 0.12m;
+                montoExcedente = 0;
+            }
+
             if (montoExcedente >= (cuotaIntereses + cuotaIvaIntereses))
             {
                 montoIvaIntereses += cuotaIvaIntereses;
@@ -701,9 +742,8 @@ namespace API.Controllers
                 montoExcedente -= cuotaIvaIntereses + cuotaIntereses;
             } else
             {
-                montoIvaIntereses += montoExcedente * 0.12m;
-                montoExcedente -= montoExcedente * 0.12m;
-                montoIntereses += montoExcedente;
+                montoIntereses = (montoExcedente * 100) / 112;
+                montoIvaIntereses += montoIntereses * 0.12m;
                 montoExcedente = 0;
             }
 
