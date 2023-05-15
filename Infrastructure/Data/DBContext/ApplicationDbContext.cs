@@ -6,6 +6,7 @@ using Core.Entities.Views;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
+using Infrastructure.Data.Seed;
 
 namespace Infrastructure.Data.DBContext
 {
@@ -219,6 +220,9 @@ declare @i int, @n int;
             modelBuilder.Entity<AbonoPlan>().
                 HasOne(tt => tt.PlanPago).WithMany(tt => tt.AbonoPlanes).HasForeignKey(t => t.PlanPagoId);
                 //.OnDelete(DeleteBehavior.NoAction);
+                
+            SeedManager.Seed(modelBuilder);
+
         }
     }
 }

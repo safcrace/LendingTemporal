@@ -4,6 +4,7 @@ using Infrastructure.Data.DBContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230512155450_Credit_Login_Lending_Type")]
+    partial class Credit_Login_Lending_Type
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -55,7 +57,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("PlanPagoId");
 
-                    b.ToTable("AbonoPlanes", (string)null);
+                    b.ToTable("AbonoPlanes");
                 });
 
             modelBuilder.Entity("Core.Entities.Banco", b =>
@@ -87,7 +89,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Bancos", (string)null);
+                    b.ToTable("Bancos");
                 });
 
             modelBuilder.Entity("Core.Entities.Caja", b =>
@@ -119,7 +121,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Cajas", (string)null);
+                    b.ToTable("Cajas");
                 });
 
             modelBuilder.Entity("Core.Entities.Configuration.Currency", b =>
@@ -153,7 +155,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Currency", (string)null);
+                    b.ToTable("Currency");
 
                     b.HasData(
                         new
@@ -206,7 +208,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("TipoPrestamoId");
 
-                    b.ToTable("DocumentosPrestamo", (string)null);
+                    b.ToTable("DocumentosPrestamo");
                 });
 
             modelBuilder.Entity("Core.Entities.Departamento", b =>
@@ -242,7 +244,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("PaisId");
 
-                    b.ToTable("Departamentos", (string)null);
+                    b.ToTable("Departamentos");
                 });
 
             modelBuilder.Entity("Core.Entities.DestinoPrestamo", b =>
@@ -273,7 +275,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("DestinoPrestamos", (string)null);
+                    b.ToTable("DestinoPrestamos");
                 });
 
             modelBuilder.Entity("Core.Entities.DetallePlanPagoTemporal", b =>
@@ -313,7 +315,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("DetallePlanPagoTemporales", (string)null);
+                    b.ToTable("DetallePlanPagoTemporales");
                 });
 
             modelBuilder.Entity("Core.Entities.Empresa", b =>
@@ -365,7 +367,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("EntidadId");
 
-                    b.ToTable("Empresas", (string)null);
+                    b.ToTable("Empresas");
                 });
 
             modelBuilder.Entity("Core.Entities.Entidad", b =>
@@ -392,7 +394,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("TipoEntidadId");
 
-                    b.ToTable("Entidades", (string)null);
+                    b.ToTable("Entidades");
                 });
 
             modelBuilder.Entity("Core.Entities.EstadoCivil", b =>
@@ -423,7 +425,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("EstadoCivil", (string)null);
+                    b.ToTable("EstadoCivil");
                 });
 
             modelBuilder.Entity("Core.Entities.EstadoCuenta", b =>
@@ -482,7 +484,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("TipoTransaccionId");
 
-                    b.ToTable("EstadoCuentas", (string)null);
+                    b.ToTable("EstadoCuentas");
                 });
 
             modelBuilder.Entity("Core.Entities.EstadoPrestamo", b =>
@@ -513,7 +515,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("EstadoPrestamos", (string)null);
+                    b.ToTable("EstadoPrestamos");
                 });
 
             modelBuilder.Entity("Core.Entities.FormaPago", b =>
@@ -545,7 +547,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("FormaPagos", (string)null);
+                    b.ToTable("FormaPagos");
                 });
 
             modelBuilder.Entity("Core.Entities.Genero", b =>
@@ -576,7 +578,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Generos", (string)null);
+                    b.ToTable("Generos");
                 });
 
             modelBuilder.Entity("Core.Entities.Identity.AppUser", b =>
@@ -679,7 +681,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("EstadosOrigen", (string)null);
+                    b.ToTable("EstadosOrigen");
                 });
 
             modelBuilder.Entity("Core.Entities.Municipio", b =>
@@ -712,7 +714,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("DepartamentoId");
 
-                    b.ToTable("Municipios", (string)null);
+                    b.ToTable("Municipios");
                 });
 
             modelBuilder.Entity("Core.Entities.Ocupacion", b =>
@@ -743,7 +745,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Ocupaciones", (string)null);
+                    b.ToTable("Ocupaciones");
                 });
 
             modelBuilder.Entity("Core.Entities.Pais", b =>
@@ -771,7 +773,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Paises", (string)null);
+                    b.ToTable("Paises");
                 });
 
             modelBuilder.Entity("Core.Entities.Persona", b =>
@@ -904,7 +906,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("TipoViviendaId");
 
-                    b.ToTable("Personas", (string)null);
+                    b.ToTable("Personas");
                 });
 
             modelBuilder.Entity("Core.Entities.PlanPago", b =>
@@ -993,7 +995,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("RegistroCajaId");
 
-                    b.ToTable("PlanPagos", (string)null);
+                    b.ToTable("PlanPagos");
                 });
 
             modelBuilder.Entity("Core.Entities.Prestamo", b =>
@@ -1102,7 +1104,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("TipoPrestamoId");
 
-                    b.ToTable("Prestamos", (string)null);
+                    b.ToTable("Prestamos");
                 });
 
             modelBuilder.Entity("Core.Entities.RegistroCaja", b =>
@@ -1216,7 +1218,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("PrestamoId");
 
-                    b.ToTable("RegistroCajas", (string)null);
+                    b.ToTable("RegistroCajas");
                 });
 
             modelBuilder.Entity("Core.Entities.RelacionEntidad", b =>
@@ -1253,7 +1255,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("TipoRelacionId");
 
-                    b.ToTable("RelacionEntidades", (string)null);
+                    b.ToTable("RelacionEntidades");
                 });
 
             modelBuilder.Entity("Core.Entities.Sesion", b =>
@@ -1283,7 +1285,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("TipoBitacoraId");
 
-                    b.ToTable("Sesiones", (string)null);
+                    b.ToTable("Sesiones");
                 });
 
             modelBuilder.Entity("Core.Entities.TipoBitacora", b =>
@@ -1314,7 +1316,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TipoBitacoras", (string)null);
+                    b.ToTable("TipoBitacoras");
                 });
 
             modelBuilder.Entity("Core.Entities.TipoEntidad", b =>
@@ -1346,7 +1348,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TipoEntidad", (string)null);
+                    b.ToTable("TipoEntidad");
                 });
 
             modelBuilder.Entity("Core.Entities.TipoPrestamo", b =>
@@ -1431,7 +1433,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("CurrencyId");
 
-                    b.ToTable("TipoPrestamos", (string)null);
+                    b.ToTable("TipoPrestamos");
                 });
 
             modelBuilder.Entity("Core.Entities.TipoRelacion", b =>
@@ -1461,7 +1463,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TipoRelacion", (string)null);
+                    b.ToTable("TipoRelacion");
                 });
 
             modelBuilder.Entity("Core.Entities.TipoTransaccion", b =>
@@ -1491,7 +1493,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TipoTransaccion", (string)null);
+                    b.ToTable("TipoTransaccion");
                 });
 
             modelBuilder.Entity("Core.Entities.TipoVivienda", b =>
@@ -1522,7 +1524,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TiposVivienda", (string)null);
+                    b.ToTable("TiposVivienda");
                 });
 
             modelBuilder.Entity("Core.Entities.Views.AplicacionPagos", b =>
