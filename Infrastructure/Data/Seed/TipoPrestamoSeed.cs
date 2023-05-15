@@ -7,7 +7,7 @@ public static class TipoPrestamoSeed
 {
     public static void Seed(ModelBuilder builder)
     {
-        var currencies = new Currency[]
+        var currencies = new Moneda[]
         {
             new()
             {
@@ -31,6 +31,6 @@ public static class TipoPrestamoSeed
             }
         };
         
-        builder.Entity<Currency>().HasData(currencies);
+        builder.Entity<Moneda>().HasData(currencies);
     }
 }

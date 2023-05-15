@@ -16,7 +16,7 @@ namespace Core.Entities
         [Column(TypeName = "decimal(18, 2)")] public decimal MinMora { get; set; } = 0;
         [Column(TypeName = "decimal(18, 2)")] public decimal MaxMora { get; set; } = 0;
         public int DiasGracia { get; set; } = 0;
-        public Currency? Currency { get; set; }
+        public Moneda? Currency { get; set; }
         public int CurrencyId { get; set; } = 1;
         [Column(TypeName = "decimal(18, 2)")] public decimal MinMonto { get; set; } = 1;
         [Column(TypeName = "decimal(18, 2)")] public decimal MaxMonto { get; set; } = 0;
