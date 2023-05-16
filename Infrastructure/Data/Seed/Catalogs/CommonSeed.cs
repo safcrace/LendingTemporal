@@ -14,8 +14,8 @@ public static class CommonSeed
                 Id = 1,
                 Nombre = "Ingreso Sistema",
                 Descripcion = "Ingreso Sistema",
-                FechaCreacion = DateTime.Parse("2023-16-05"),
-                FechaModificacion = DateTime.Parse("2023-16-05"),
+                FechaCreacion = DateTime.Parse("2023-05-16"),
+                FechaModificacion = DateTime.Parse("2023-05-16"),
                 Habilitado = true
             },
             new()
@@ -23,8 +23,8 @@ public static class CommonSeed
                 Id = 2,
                 Nombre = "Salida Sistema",
                 Descripcion = "Salida Sistema",
-                FechaCreacion = DateTime.Parse("2023-16-05"),
-                FechaModificacion = DateTime.Parse("2023-16-05"),
+                FechaCreacion = DateTime.Parse("2023-05-16"),
+                FechaModificacion = DateTime.Parse("2023-05-16"),
                 Habilitado = true
             }
         };
@@ -38,8 +38,8 @@ public static class CommonSeed
                 Id = 1,
                 Nombre = "FAMILIAR",
                 Descripcion = "FAMILIAR",
-                FechaCreacion = DateTime.Parse("2023-16-05"),
-                FechaModificacion = DateTime.Parse("2023-16-05"),
+                FechaCreacion = DateTime.Parse("2023-05-16"),
+                FechaModificacion = DateTime.Parse("2023-05-16"),
                 Habilitado = true
             },
             new()
@@ -47,8 +47,8 @@ public static class CommonSeed
                 Id = 2,
                 Nombre = "PROPIA",
                 Descripcion = "PROPIA",
-                FechaCreacion = DateTime.Parse("2023-16-05"),
-                FechaModificacion = DateTime.Parse("2023-16-05"),
+                FechaCreacion = DateTime.Parse("2023-05-16"),
+                FechaModificacion = DateTime.Parse("2023-05-16"),
                 Habilitado = true
             },
             new()
@@ -56,8 +56,8 @@ public static class CommonSeed
                 Id = 3,
                 Nombre = "ALQUILADA",
                 Descripcion = "ALQUILADA",
-                FechaCreacion = DateTime.Parse("2023-16-05"),
-                FechaModificacion = DateTime.Parse("2023-16-05"),
+                FechaCreacion = DateTime.Parse("2023-05-16"),
+                FechaModificacion = DateTime.Parse("2023-05-16"),
                 Habilitado = true
             }
         };

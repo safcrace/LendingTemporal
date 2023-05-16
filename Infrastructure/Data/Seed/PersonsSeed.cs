@@ -11,8 +11,8 @@ public static class PersonsSeed
         {
             new()
             {
-                Id = 0,
-                EntidadId = 5,
+                Id = 1,
+                EntidadId = 2,
                 GeneroId = 1,
                 EstadoCivilId = 1,
                 SegundoApellido = null,
@@ -21,11 +21,11 @@ public static class PersonsSeed
                 FechaNacimiento = null,
                 Email = "user@example.com",
                 Direccion = null,
-                NIT = null,
+                NIT = "123412340",
                 NumeroTelefono = null,
-                NumeroDocumento = null,
-                FechaCreacion = DateTime.Parse("2023-16-05"),
-                FechaModificacion = DateTime.Parse("2023-16-05"),
+                NumeroDocumento = "123412340",
+                FechaCreacion = DateTime.Parse("2023-05-16"),
+                FechaModificacion = DateTime.Parse("2023-05-16"),
                 Habilitado = true,
                 Colonia = null,
                 Comentarios = null,
@@ -35,7 +35,7 @@ public static class PersonsSeed
                 NumeroTelefonoLaboral = null,
                 OcupacionId = null,
                 PaisNacimientoId = null,
-                PrimerApellido = null,
+                PrimerApellido = "Example",
                 SegundoNombre = null,
                 DireccionLaboral = null,
                 TipoViviendaId = null

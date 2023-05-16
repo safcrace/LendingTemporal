@@ -18,8 +18,8 @@ public static class CompanySeed
                 Telefono = "123456",
                 Email = "admin@sinfin.com",
                 Nit = "12345678",
-                FechaCreacion = DateTime.Parse("2023-16-05"),
-                FechaModificacion = DateTime.Parse("2023-16-05"),
+                FechaCreacion = DateTime.Parse("2023-05-16"),
+                FechaModificacion = DateTime.Parse("2023-05-16"),
                 Habilitado = true
             }
         };

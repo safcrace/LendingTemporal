@@ -14,8 +14,8 @@ public static class OccupationsSeed
                 Id = 1,
                 Nombre = "ASISTENTE",
                 Descripcion = "ASISTENTE",
-                FechaCreacion = DateTime.Parse("2023-16-05"),
-                FechaModificacion = DateTime.Parse("2023-16-05"),
+                FechaCreacion = DateTime.Parse("2023-05-16"),
+                FechaModificacion = DateTime.Parse("2023-05-16"),
                 Habilitado = true
             },
             new()
@@ -23,8 +23,8 @@ public static class OccupationsSeed
                 Id = 2,
                 Nombre = "AGENTE",
                 Descripcion = "AGENTE",
-                FechaCreacion = DateTime.Parse("2023-16-05"),
-                FechaModificacion = DateTime.Parse("2023-16-05"),
+                FechaCreacion = DateTime.Parse("2023-05-16"),
+                FechaModificacion = DateTime.Parse("2023-05-16"),
                 Habilitado = true
             },
             new()
@@ -32,8 +32,8 @@ public static class OccupationsSeed
                 Id = 3,
                 Nombre = "ANALISTA",
                 Descripcion = "ANALISTA",
-                FechaCreacion = DateTime.Parse("2023-16-05"),
-                FechaModificacion = DateTime.Parse("2023-16-05"),
+                FechaCreacion = DateTime.Parse("2023-05-16"),
+                FechaModificacion = DateTime.Parse("2023-05-16"),
                 Habilitado = true
             },
             new()
@@ -41,8 +41,8 @@ public static class OccupationsSeed
                 Id = 4,
                 Nombre = "ARQUITECTO",
                 Descripcion = "ARQUITECTO",
-                FechaCreacion = DateTime.Parse("2023-16-05"),
-                FechaModificacion = DateTime.Parse("2023-16-05"),
+                FechaCreacion = DateTime.Parse("2023-05-16"),
+                FechaModificacion = DateTime.Parse("2023-05-16"),
                 Habilitado = true
             },
             new()
@@ -50,8 +50,8 @@ public static class OccupationsSeed
                 Id = 5,
                 Nombre = "ARTESANO",
                 Descripcion = "ARTESANO",
-                FechaCreacion = DateTime.Parse("2023-16-05"),
-                FechaModificacion = DateTime.Parse("2023-16-05"),
+                FechaCreacion = DateTime.Parse("2023-05-16"),
+                FechaModificacion = DateTime.Parse("2023-05-16"),
                 Habilitado = true
             },
             new()
@@ -59,8 +59,8 @@ public static class OccupationsSeed
                 Id = 6,
                 Nombre = "AUXILIAR",
                 Descripcion = "AUXILIAR",
-                FechaCreacion = DateTime.Parse("2023-16-05"),
-                FechaModificacion = DateTime.Parse("2023-16-05"),
+                FechaCreacion = DateTime.Parse("2023-05-16"),
+                FechaModificacion = DateTime.Parse("2023-05-16"),
                 Habilitado = true
             },
             new()
@@ -68,8 +68,8 @@ public static class OccupationsSeed
                 Id = 7,
                 Nombre = "CAJERO",
                 Descripcion = "CAJERO",
-                FechaCreacion = DateTime.Parse("2023-16-05"),
-                FechaModificacion = DateTime.Parse("2023-16-05"),
+                FechaCreacion = DateTime.Parse("2023-05-16"),
+                FechaModificacion = DateTime.Parse("2023-05-16"),
                 Habilitado = true
             },
             new()
@@ -77,8 +77,8 @@ public static class OccupationsSeed
                 Id = 8,
                 Nombre = "CARNICERO",
                 Descripcion = "CARNICERO",
-                FechaCreacion = DateTime.Parse("2023-16-05"),
-                FechaModificacion = DateTime.Parse("2023-16-05"),
+                FechaCreacion = DateTime.Parse("2023-05-16"),
+                FechaModificacion = DateTime.Parse("2023-05-16"),
                 Habilitado = true
             },
             new()
@@ -86,8 +86,8 @@ public static class OccupationsSeed
                 Id = 9,
                 Nombre = "CARPINTERO",
                 Descripcion = "CARPINTERO",
-                FechaCreacion = DateTime.Parse("2023-16-05"),
-                FechaModificacion = DateTime.Parse("2023-16-05"),
+                FechaCreacion = DateTime.Parse("2023-05-16"),
+                FechaModificacion = DateTime.Parse("2023-05-16"),
                 Habilitado = true
             },
             new()
@@ -95,8 +95,8 @@ public static class OccupationsSeed
                 Id = 10,
                 Nombre = "COCINERO",
                 Descripcion = "COCINERO",
-                FechaCreacion = DateTime.Parse("2023-16-05"),
-                FechaModificacion = DateTime.Parse("2023-16-05"),
+                FechaCreacion = DateTime.Parse("2023-05-16"),
+                FechaModificacion = DateTime.Parse("2023-05-16"),
                 Habilitado = true
             },
             new()
@@ -104,8 +104,8 @@ public static class OccupationsSeed
                 Id = 11,
                 Nombre = "EJECUTIVO",
                 Descripcion = "EJECUTIVO",
-                FechaCreacion = DateTime.Parse("2023-16-05"),
-                FechaModificacion = DateTime.Parse("2023-16-05"),
+                FechaCreacion = DateTime.Parse("2023-05-16"),
+                FechaModificacion = DateTime.Parse("2023-05-16"),
                 Habilitado = true
             },
             new()
@@ -113,8 +113,8 @@ public static class OccupationsSeed
                 Id = 12,
                 Nombre = "ESTILISTA",
                 Descripcion = "ESTILISTA",
-                FechaCreacion = DateTime.Parse("2023-16-05"),
-                FechaModificacion = DateTime.Parse("2023-16-05"),
+                FechaCreacion = DateTime.Parse("2023-05-16"),
+                FechaModificacion = DateTime.Parse("2023-05-16"),
                 Habilitado = true
             },
             new()
@@ -122,8 +122,8 @@ public static class OccupationsSeed
                 Id = 13,
                 Nombre = "ENFERMERO",
                 Descripcion = "ENFERMERO",
-                FechaCreacion = DateTime.Parse("2023-16-05"),
-                FechaModificacion = DateTime.Parse("2023-16-05"),
+                FechaCreacion = DateTime.Parse("2023-05-16"),
+                FechaModificacion = DateTime.Parse("2023-05-16"),
                 Habilitado = true
             },
             new()
@@ -131,8 +131,8 @@ public static class OccupationsSeed
                 Id = 14,
                 Nombre = "JEFATURA",
                 Descripcion = "JEFATURA",
-                FechaCreacion = DateTime.Parse("2023-16-05"),
-                FechaModificacion = DateTime.Parse("2023-16-05"),
+                FechaCreacion = DateTime.Parse("2023-05-16"),
+                FechaModificacion = DateTime.Parse("2023-05-16"),
                 Habilitado = true
             },
             new()
@@ -140,8 +140,8 @@ public static class OccupationsSeed
                 Id = 15,
                 Nombre = "INGENIERO",
                 Descripcion = "INGENIERO",
-                FechaCreacion = DateTime.Parse("2023-16-05"),
-                FechaModificacion = DateTime.Parse("2023-16-05"),
+                FechaCreacion = DateTime.Parse("2023-05-16"),
+                FechaModificacion = DateTime.Parse("2023-05-16"),
                 Habilitado = true
             },
             new()
@@ -149,8 +149,8 @@ public static class OccupationsSeed
                 Id = 16,
                 Nombre = "OPERARIO",
                 Descripcion = "OPERARIO",
-                FechaCreacion = DateTime.Parse("2023-16-05"),
-                FechaModificacion = DateTime.Parse("2023-16-05"),
+                FechaCreacion = DateTime.Parse("2023-05-16"),
+                FechaModificacion = DateTime.Parse("2023-05-16"),
                 Habilitado = true
             },
             new()
@@ -158,8 +158,8 @@ public static class OccupationsSeed
                 Id = 17,
                 Nombre = "MECÁNICO",
                 Descripcion = "MECÁNICO",
-                FechaCreacion = DateTime.Parse("2023-16-05"),
-                FechaModificacion = DateTime.Parse("2023-16-05"),
+                FechaCreacion = DateTime.Parse("2023-05-16"),
+                FechaModificacion = DateTime.Parse("2023-05-16"),
                 Habilitado = true
             },
             new()
@@ -167,8 +167,8 @@ public static class OccupationsSeed
                 Id = 18,
                 Nombre = "MEDICO",
                 Descripcion = "MEDICO",
-                FechaCreacion = DateTime.Parse("2023-16-05"),
-                FechaModificacion = DateTime.Parse("2023-16-05"),
+                FechaCreacion = DateTime.Parse("2023-05-16"),
+                FechaModificacion = DateTime.Parse("2023-05-16"),
                 Habilitado = true
             },
             new()
@@ -176,8 +176,8 @@ public static class OccupationsSeed
                 Id = 19,
                 Nombre = "MENSAJERO",
                 Descripcion = "MENSAJERO",
-                FechaCreacion = DateTime.Parse("2023-16-05"),
-                FechaModificacion = DateTime.Parse("2023-16-05"),
+                FechaCreacion = DateTime.Parse("2023-05-16"),
+                FechaModificacion = DateTime.Parse("2023-05-16"),
                 Habilitado = true
             },
             new()
@@ -185,8 +185,8 @@ public static class OccupationsSeed
                 Id = 20,
                 Nombre = "PANADERO",
                 Descripcion = "PANADERO",
-                FechaCreacion = DateTime.Parse("2023-16-05"),
-                FechaModificacion = DateTime.Parse("2023-16-05"),
+                FechaCreacion = DateTime.Parse("2023-05-16"),
+                FechaModificacion = DateTime.Parse("2023-05-16"),
                 Habilitado = true
             },
             new()
@@ -194,8 +194,8 @@ public static class OccupationsSeed
                 Id = 21,
                 Nombre = "PILOTO",
                 Descripcion = "PILOTO",
-                FechaCreacion = DateTime.Parse("2023-16-05"),
-                FechaModificacion = DateTime.Parse("2023-16-05"),
+                FechaCreacion = DateTime.Parse("2023-05-16"),
+                FechaModificacion = DateTime.Parse("2023-05-16"),
                 Habilitado = true
             },
             new()
@@ -203,8 +203,8 @@ public static class OccupationsSeed
                 Id = 22,
                 Nombre = "PROFESOR",
                 Descripcion = "PROFESOR",
-                FechaCreacion = DateTime.Parse("2023-16-05"),
-                FechaModificacion = DateTime.Parse("2023-16-05"),
+                FechaCreacion = DateTime.Parse("2023-05-16"),
+                FechaModificacion = DateTime.Parse("2023-05-16"),
                 Habilitado = true
             },
             new()
@@ -212,8 +212,8 @@ public static class OccupationsSeed
                 Id = 23,
                 Nombre = "PROPIETARIO",
                 Descripcion = "PROPIETARIO",
-                FechaCreacion = DateTime.Parse("2023-16-05"),
-                FechaModificacion = DateTime.Parse("2023-16-05"),
+                FechaCreacion = DateTime.Parse("2023-05-16"),
+                FechaModificacion = DateTime.Parse("2023-05-16"),
                 Habilitado = true
             },
             new()
@@ -221,8 +221,8 @@ public static class OccupationsSeed
                 Id = 24,
                 Nombre = "SERVICIOS PROFESIONALES",
                 Descripcion = "SERVICIOS PROFESIONALES",
-                FechaCreacion = DateTime.Parse("2023-16-05"),
-                FechaModificacion = DateTime.Parse("2023-16-05"),
+                FechaCreacion = DateTime.Parse("2023-05-16"),
+                FechaModificacion = DateTime.Parse("2023-05-16"),
                 Habilitado = true
             },
             new()
@@ -230,8 +230,8 @@ public static class OccupationsSeed
                 Id = 25,
                 Nombre = "TÉCNICO",
                 Descripcion = "TÉCNICO",
-                FechaCreacion = DateTime.Parse("2023-16-05"),
-                FechaModificacion = DateTime.Parse("2023-16-05"),
+                FechaCreacion = DateTime.Parse("2023-05-16"),
+                FechaModificacion = DateTime.Parse("2023-05-16"),
                 Habilitado = true
             },
             new()
@@ -239,8 +239,8 @@ public static class OccupationsSeed
                 Id = 26,
                 Nombre = "VENDEDOR",
                 Descripcion = "VENDEDOR",
-                FechaCreacion = DateTime.Parse("2023-16-05"),
-                FechaModificacion = DateTime.Parse("2023-16-05"),
+                FechaCreacion = DateTime.Parse("2023-05-16"),
+                FechaModificacion = DateTime.Parse("2023-05-16"),
                 Habilitado = true
             }
         };

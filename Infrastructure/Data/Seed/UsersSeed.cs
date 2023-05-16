@@ -12,7 +12,7 @@ public static class UsersSeed
             new()
             {
                 Id = "c44ab09d-9b73-4ea9-9191-064c903ac294",
-                PersonaId = 0,
+                PersonaId = 1,
                 UserName = "user@example.com",
                 NormalizedUserName = "USER@EXAMPLE.COM",
                 Email = "user@example.com",
@@ -29,5 +29,7 @@ public static class UsersSeed
                 AccessFailedCount = 0
             },
         };
+
+        builder.Entity<AppUser>().HasData(users);
     }
 }

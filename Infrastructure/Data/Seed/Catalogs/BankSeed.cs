@@ -14,8 +14,8 @@ public static class BankSeed
                 Id = 1,
                 Nombre = "Banco Industrial",
                 Descripcion = "Banco Industrial",
-                FechaCreacion = DateTime.Parse("2023-16-05"),
-                FechaModificacion = DateTime.Parse("2023-16-05"),
+                FechaCreacion = DateTime.Parse("2023-05-16"),
+                FechaModificacion = DateTime.Parse("2023-05-16"),
                 Habilitado = true
             },
             new()
@@ -23,8 +23,8 @@ public static class BankSeed
                 Id = 2,
                 Nombre = "Banrural",
                 Descripcion = "Banrural",
-                FechaCreacion = DateTime.Parse("2023-16-05"),
-                FechaModificacion = DateTime.Parse("2023-16-05"),
+                FechaCreacion = DateTime.Parse("2023-05-16"),
+                FechaModificacion = DateTime.Parse("2023-05-16"),
                 Habilitado = true
             },
             new()
@@ -32,8 +32,8 @@ public static class BankSeed
                 Id = 3,
                 Nombre = "Banco G&T Continental",
                 Descripcion = "Banco G&T Continental",
-                FechaCreacion = DateTime.Parse("2023-16-05"),
-                FechaModificacion = DateTime.Parse("2023-16-05"),
+                FechaCreacion = DateTime.Parse("2023-05-16"),
+                FechaModificacion = DateTime.Parse("2023-05-16"),
                 Habilitado = true
             },
             new()
@@ -41,8 +41,8 @@ public static class BankSeed
                 Id = 4,
                 Nombre = "No Aplica",
                 Descripcion = "No Aplica",
-                FechaCreacion = DateTime.Parse("2023-16-05"),
-                FechaModificacion = DateTime.Parse("2023-16-05"),
+                FechaCreacion = DateTime.Parse("2023-05-16"),
+                FechaModificacion = DateTime.Parse("2023-05-16"),
                 Habilitado = true
             }
         };
@@ -56,8 +56,8 @@ public static class BankSeed
                 Id = 1,
                 Nombre = "Caja General",
                 Descripcion = "Caja General",
-                FechaCreacion = DateTime.Parse("2023-16-05"),
-                FechaModificacion = DateTime.Parse("2023-16-05"),
+                FechaCreacion = DateTime.Parse("2023-05-16"),
+                FechaModificacion = DateTime.Parse("2023-05-16"),
                 Habilitado = true
             }
         };
