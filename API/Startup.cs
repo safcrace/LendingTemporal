@@ -7,10 +7,11 @@ namespace API
 {
     public class Startup
     {
-        public IConfiguration _configuration { get; }
+        private IConfiguration Configuration { get; }
+
         public Startup(IConfiguration configuration)
         {
-            _configuration = configuration;
+            Configuration = configuration;
         }
 
         public void ConfigureServices(IServiceCollection services)
@@ -18,7 +19,7 @@ namespace API
             services.AddHostedService<CalcularMora>();
 
             services.AddHttpClient
-                ("BackEndDeveloper", client =>
+            ("BackEndDeveloper", client =>
             {
                 client.BaseAddress = new Uri("https://sinfin-test-backend.octtopro.com/");
                 //client.BaseAddress = new Uri("https://sinfin-backend.octtopro.com/");
@@ -29,27 +30,20 @@ namespace API
             services.AddControllers();
 
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(_configuration.GetConnectionString("DefaultConnection"))); 
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddApplicationServices();
 
-            services.AddIdentityServices(_configuration);
+            services.AddIdentityServices(Configuration);
 
             services.AddSwaggerDocumentation();
-            services.AddCors(opt =>
-            {
-                opt.AddPolicy("CorsPolicy", policy =>
-                {
-                    policy.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin();
-                });
-            });
-
+            services.AddCors(opt => { opt.AddPolicy("CorsPolicy", policy => { policy.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin(); }); });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-
-            if (!env.IsProduction()) app.UseDeveloperExceptionPage();
+            // If the environment is not production, show the developer page
+            if (!env.IsEnvironment("Prod")) app.UseDeveloperExceptionPage();
 
             app.UseSwagger();
 
