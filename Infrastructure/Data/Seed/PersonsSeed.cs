@@ -50,25 +50,33 @@ public static class PersonsSeed
             {
                 Id = 1,
                 Nombre = "Soltero(a)",
-                Descripcion = "Soltero(a)"
+                Descripcion = "Soltero(a)",
+                FechaModificacion = DateTime.Parse("2023-05-16"),
+                FechaCreacion = DateTime.Parse("2023-05-16"),
             },
             new()
             {
                 Id = 2,
                 Nombre = "Casado(a)",
-                Descripcion = "Casado(a)"
+                Descripcion = "Casado(a)",
+                FechaModificacion = DateTime.Parse("2023-05-16"),
+                FechaCreacion = DateTime.Parse("2023-05-16"),
             },
             new()
             {
                 Id = 3,
                 Nombre = "Divorciado(a)",
-                Descripcion = "Divorciado(a)"
+                Descripcion = "Divorciado(a)",
+                FechaModificacion = DateTime.Parse("2023-05-16"),
+                FechaCreacion = DateTime.Parse("2023-05-16"),
             },
             new()
             {
                 Id = 4,
                 Nombre = "Viudo(a)",
-                Descripcion = "Viudo(a)"
+                Descripcion = "Viudo(a)",
+                FechaModificacion = DateTime.Parse("2023-05-16"),
+                FechaCreacion = DateTime.Parse("2023-05-16"),
             }
         };
 
@@ -80,13 +88,17 @@ public static class PersonsSeed
             {
                 Id = 1,
                 Nombre = "Masculino",
-                Descripcion = "Masculino"
+                Descripcion = "Masculino",
+                FechaModificacion = DateTime.Parse("2023-05-16"),
+                FechaCreacion = DateTime.Parse("2023-05-16"),
             },
             new()
             {
                 Id = 2,
                 Nombre = "Femenino",
-                Descripcion = "Femenino"
+                Descripcion = "Femenino",
+                FechaModificacion = DateTime.Parse("2023-05-16"),
+                FechaCreacion = DateTime.Parse("2023-05-16"),
             }
         };
 

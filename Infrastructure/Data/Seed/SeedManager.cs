@@ -20,5 +20,6 @@ public static class SeedManager
         LendingSeed.Seed(builder);
         MunicipalitiesSeed.Seed(builder);
         OccupationsSeed.Seed(builder);
+        RelationsSeed.Seed(builder);
     }
 }
