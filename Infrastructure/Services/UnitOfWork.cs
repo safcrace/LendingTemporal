@@ -9,11 +9,14 @@ namespace Infrastructure.Data.Services
     {
         private readonly ApplicationDbContext _dbContext;
         private Hashtable? _repositories;
+        public IGenericRepository<TipoPrestamo> TipoPrestamo { get; }
 
         public UnitOfWork(ApplicationDbContext dbContext)
         {
             _dbContext = dbContext;
+            TipoPrestamo = new GenericRepository<TipoPrestamo>(_dbContext);
         }
+
         public async Task<int> Complete()
         {
             return await _dbContext.SaveChangesAsync();
