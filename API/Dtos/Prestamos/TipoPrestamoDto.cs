@@ -18,6 +18,8 @@ public class TipoPrestamoListDto
     public decimal MinMonto { get; set; }
     public decimal MaxMonto { get; set; }
     public bool Habilitado { get; set; }
+    public bool DisponibleOrganizaciones { get; set; }
+    public bool DisponiblePersonas { get; set; }
 }
 
 public class TipoPrestamoDto : TipoPrestamoListDto
@@ -41,6 +43,8 @@ public class CreateTipoPrestamoDto
     public decimal MinMonto { get; set; } = 0;
     public decimal MaxMonto { get; set; } = 0;
     public int MonedaId { get; set; } = 1;
+    public bool DisponibleOrganizaciones { get; set; } = false;
+    public bool DisponiblePersonas { get; set; } = false;
     public List<CreateDocumentoPrestamoDto> DocumentosRequeridos { get; set; } = new();
 }
 
@@ -59,5 +63,7 @@ public class UpdateTipoPrestamoDto
     public decimal? MinMonto { get; set; }
     public decimal? MaxMonto { get; set; }
     public int? MonedaId { get; set; }
+    public bool? DisponibleOrganizaciones { get; set; }
+    public bool? DisponiblePersonas { get; set; }
     public List<CreateDocumentoPrestamoDto> DocumentosRequeridos { get; set; } = new();
 }

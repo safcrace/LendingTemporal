@@ -51,6 +51,16 @@ public class TipoPrestamoController : ControllerBase
         return Ok(dto);
     }
 
+    [HttpGet("moneda")]
+    public async Task<ActionResult> GetCurrencies()
+    {
+        var currencies = await repository.Repository<Moneda>().ListAllAsync();
+
+        var dtos = mapper.Map<List<CatalogDto>>(currencies);
+
+        return Ok(dtos);
+    }
+
     [HttpPost]
     public async Task<ActionResult> Post(CreateTipoPrestamoDto tipoPrestamoDto)
     {
