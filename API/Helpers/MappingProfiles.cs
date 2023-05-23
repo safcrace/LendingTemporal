@@ -27,7 +27,6 @@ namespace API.Helpers
             //CreateMap<Gestor, GestorDto>();
 
             CreateMap<TipoPrestamo, TipoPrestamoDto>();
-            CreateMap<TipoPrestamo, TipoPrestamoListDto>();
             CreateMap<CreateTipoPrestamoDto, TipoPrestamo>()
                 .ForMember(x => x.CurrencyId, opt => opt.MapFrom(src => src.MonedaId))
                 .ForMember(x => x.Descripcion, opt => opt.MapFrom(src => src.Nombre));

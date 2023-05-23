@@ -28,9 +28,17 @@ public class TipoPrestamoController : ControllerBase
         if (!validFilters.Contains(filter.ToLower()))
             return new BadRequestObjectResult($"El filtro {filter} no es válido. Los filtros válidos son: {string.Join(", ", validFilters)}");
 
-        var prestamos = await repository.TipoPrestamo.ListAllAsync();
+        var tipoPrestamos = await repository.TipoPrestamo.ListAllAsync();
 
-        var dtos = mapper.Map<List<TipoPrestamoListDto>>(prestamos);
+        var dtos = new List<TipoPrestamoDto>();
+
+        foreach (var tipo in tipoPrestamos)
+        {
+            var dto = mapper.Map<TipoPrestamoDto>(tipo);
+            dto.Moneda = await GetMoneda(tipo.CurrencyId);
+            dto.DocumentosRequeridos = await GetDocuments(tipo.Id);
+            dtos.Add(dto);
+        }
 
         return Ok(dtos);
     }
@@ -42,13 +50,9 @@ public class TipoPrestamoController : ControllerBase
 
         if (prestamo == null) return NotFound();
 
-        var moneda = await repository.Repository<Moneda>().GetByIdAsync(prestamo.CurrencyId);
-        var documentos = await repository.Repository<DocumentosPrestamo>()
-            .ListAsync(new BaseSpecification<DocumentosPrestamo>(x => x.TipoPrestamoId == id));
-
         var dto = mapper.Map<TipoPrestamoDto>(prestamo);
-        dto.Moneda = mapper.Map<CatalogDto>(moneda);
-        dto.DocumentosRequeridos = mapper.Map<List<DocumentoPrestamoDto>>(documentos);
+        dto.Moneda = await GetMoneda(prestamo.CurrencyId);
+        dto.DocumentosRequeridos = await GetDocuments(prestamo.Id);
 
         return Ok(dto);
     }
@@ -138,5 +142,20 @@ public class TipoPrestamoController : ControllerBase
                 ? new BadRequestObjectResult(e.InnerException.Message)
                 : new BadRequestObjectResult(e.Message);
         }
+    }
+
+    private async Task<List<string>> GetDocuments(int prestamoId)
+    {
+        var documentos = await repository.Repository<DocumentosPrestamo>()
+            .ListAsync(new BaseSpecification<DocumentosPrestamo>(x => x.TipoPrestamoId == prestamoId));
+
+        return documentos.Select(x => x.Name).ToList();
+    }
+
+    private async Task<CatalogDto> GetMoneda(int monedaId)
+    {
+        var moneda = await repository.Repository<Moneda>().GetByIdAsync(monedaId);
+
+        return mapper.Map<CatalogDto>(moneda);
     }
 }

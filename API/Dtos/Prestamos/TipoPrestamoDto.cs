@@ -2,7 +2,7 @@
 
 namespace API.Dtos;
 
-public class TipoPrestamoListDto
+public class TipoPrestamoDto
 {
     public int Id { get; set; }
     public string Nombre { get; set; } = null!;
@@ -20,12 +20,8 @@ public class TipoPrestamoListDto
     public bool Habilitado { get; set; }
     public bool DisponibleOrganizaciones { get; set; }
     public bool DisponiblePersonas { get; set; }
-}
-
-public class TipoPrestamoDto : TipoPrestamoListDto
-{
     public CatalogDto Moneda { get; set; }
-    public List<DocumentoPrestamoDto> DocumentosRequeridos { get; set; } = new();
+    public List<string> DocumentosRequeridos { get; set; } = new();
 }
 
 public class CreateTipoPrestamoDto
