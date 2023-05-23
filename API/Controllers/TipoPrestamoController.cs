@@ -3,6 +3,7 @@ using AutoMapper;
 using Core.Entities;
 using Core.Entities.Configuration;
 using Core.Interfaces;
+using Core.Specifications;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
@@ -42,7 +43,8 @@ public class TipoPrestamoController : ControllerBase
         if (prestamo == null) return NotFound();
 
         var moneda = await repository.Repository<Moneda>().GetByIdAsync(prestamo.CurrencyId);
-        var documentos = await repository.Repository<DocumentosPrestamo>().ListAllAsync();
+        var documentos = await repository.Repository<DocumentosPrestamo>()
+            .ListAsync(new BaseSpecification<DocumentosPrestamo>(x => x.TipoPrestamoId == id));
 
         var dto = mapper.Map<TipoPrestamoDto>(prestamo);
         dto.Moneda = mapper.Map<CatalogDto>(moneda);
