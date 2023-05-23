@@ -97,7 +97,8 @@ public class TipoPrestamoController : ControllerBase
             var tipoPrestamo = await repository.TipoPrestamo.GetByIdAsync(id);
 
             if (tipoPrestamo == null) return NotFound();
-            var docs = await repository.Repository<DocumentosPrestamo>().ListAllAsync();
+            var docs = await repository.Repository<DocumentosPrestamo>()
+                .ListAsync(new BaseSpecification<DocumentosPrestamo>(x => x.TipoPrestamoId == tipoPrestamo.Id));
 
             repository.Repository<DocumentosPrestamo>().DeleteRange(docs);
 
