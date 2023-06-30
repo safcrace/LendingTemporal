@@ -22,8 +22,8 @@
         {
             var client = _httpClientFactory.CreateClient("BackEndDeveloper");
             client.Timeout = TimeSpan.FromMinutes(3);
-            var result = await client.GetAsync($"api/Catalogues/actualiza_dias_mora");
-            Console.WriteLine(DateTime.Now.ToString("O"));            
+            var result = await client.GetAsync("api/Catalogues/actualiza_mora");
+            //Console.WriteLine(DateTime.Now.ToString("O"));            
         }
     }
 }

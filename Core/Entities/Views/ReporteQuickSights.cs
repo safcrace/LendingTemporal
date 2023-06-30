@@ -1,15 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Core.Entities.Views
 {
     [Keyless]
-    public class ReporteCasosBTS
+    public class ReporteQuickSights
     {
         public int IdPrestamo { get; set; }
         public string? Referencia { get; set; }

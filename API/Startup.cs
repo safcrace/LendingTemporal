@@ -1,6 +1,8 @@
 ﻿using API.Extensions;
 using API.Helpers;
+using Core.Entities.Identity;
 using Infrastructure.Data.DBContext;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace API
@@ -20,6 +22,8 @@ namespace API
             services.AddHttpClient
                 ("BackEndDeveloper", client =>
             {
+                //client.BaseAddress = new Uri("https://localhost:7050/");
+                //client.BaseAddress = new Uri("https://sinfin-test-backend.octtopro.com/");
                 //client.BaseAddress = new Uri("https://sinfin-test-backend.t4mapps.com/");
                 client.BaseAddress = new Uri("https://sinfin-backend.octtopro.com/");
             });
@@ -34,6 +38,10 @@ namespace API
             services.AddApplicationServices();
 
             services.AddIdentityServices(_configuration);
+
+            //services.AddIdentity<AppUser, IdentityRole>()
+            //    .AddEntityFrameworkStores<ApplicationDbContext>()
+            //    .AddDefaultTokenProviders();
 
             services.AddSwaggerDocumentation();
             services.AddCors(opt =>

@@ -40,6 +40,7 @@ namespace Infrastructure.Data.DBContext
         public DbSet<Prestamo>? Prestamos { get; set; }        
         public DbSet<RegistroCaja>? RegistroCajas { get; set; }        
         public DbSet<RelacionEntidad>? RelacionEntidades { get; set; }        
+        public DbSet<ReporteCasosBTS>? ReporteCasosBTS { get; set; }        
         public DbSet<Sesion>? Sesiones { get; set; }        
         public DbSet<TipoBitacora>? TipoBitacoras { get; set; }        
         public DbSet<TipoPrestamo>? TipoPrestamos { get; set; }
@@ -87,6 +88,7 @@ namespace Infrastructure.Data.DBContext
             //modelBuilder.Entity<AplicacionPagos>().ToSqlQuery(@"Exec ReporteContabilidad '2022-11-01', '2022-11-16'  ");            
             modelBuilder.Entity<BatchFile>().ToSqlQuery(@"Exec sp_batchfile_generator");            
             modelBuilder.Entity<ReporteTransUnion>().ToSqlQuery(@"Exec sp_transunion__batchfile_generator");            
+            modelBuilder.Entity<ReporteQuickSights>().ToSqlQuery(@"sp_reporte_moras_completo");            
             modelBuilder.Entity<ReporteCasosBTS>().ToSqlQuery(@"declare @tAcum table (
 							Id int,
 							ReferenciaMigracion nvarchar(125) null,
@@ -153,6 +155,10 @@ declare @i int, @n int;
 		, IsNull(ppl2.ULTIMO_PAGO, '0001-01-01') as FechaVencimiento
 		, IsNull(pagadu.Nombre, ' ') as [Pagaduría]
 		, tp.Nombre as TipoPrestamo
+		, SaldoTotal = IsNull((select Sum(SaldoCapital + SaldoIntereses + SaldoIvaIntereses + SaldoMora + SaldoIVaMora) From PlanPagos where prestamoId = pre.Id and FechaPago < GETDATE()),0)
+		, CuotasPendientes = IsNull((Select count(Id) From PlanPagos where PrestamoId = pre.Id And Aplicado = 0 and FechaPago < GETDATE()),0)
+		, IsNull(mdi.Telefono, '') as Telefono
+		, IsNull(mdi.Direccion, '') as Direccion
 	--into test_al_aire
 	
 	from 
@@ -191,7 +197,7 @@ declare @i int, @n int;
 		pre.EstadoPrestamoId = 1 or pre.EstadoPrestamoId = 7 or pre.EstadoPrestamoId = 8
 	order by pre.Id;
 	
-	set nocount off;");
+	set nocount off");
 
             modelBuilder.Entity<SaldosMigracion>().HasNoKey().ToTable(name: null);
 			modelBuilder.Entity<Encabezado>().HasNoKey().ToView(null);

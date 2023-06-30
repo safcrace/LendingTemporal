@@ -6,12 +6,15 @@ using Core.Entities.Views;
 using Core.Interfaces;
 using Infrastructure.Data.DBContext;
 using Infrastructure.Data.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 
 namespace API.Controllers
 {
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class CataloguesController : BaseApiController
     {        
         private readonly IUnitOfWork _unitOfWork;
@@ -157,10 +160,11 @@ namespace API.Controllers
             }).ToListAsync();
         }
 
+        [AllowAnonymous]
         [HttpGet("actualiza_mora")]
         public async Task<ActionResult<IReadOnlyList<object>>> GetActualizaMora()
         {
-            await _dbContext.Database.ExecuteSqlRawAsync("Exec sp_job_calcularMora");
+            await _dbContext.Database.ExecuteSqlRawAsync("Exec sp_job_CalcularMoraGeneral");
             return Ok(new { message = "Acción realizada Satisfactoriamente" });
         }
 
@@ -199,49 +203,7 @@ namespace API.Controllers
                     }
 
 
-                    //var cuotasPendientesPlanPago = await _dbContext.PlanPagos.Where(p => p.PrestamoId == prestamo.Id && p.Aplicado == false).ToListAsync();
-
-                    //foreach (var plan in cuotasPendientesPlanPago)
-                    //{
-                        //if (fechaReferencia.Date < plan.FechaModificacion)
-                        //{
-                        //    plan.CuotaMora = 0;
-                        //    plan.SaldoMora = 0;
-                        //    plan.CuotaIvaMora = 0;
-                        //    plan.SaldoIvaMora = 0;
-                        //    //plan.TotalCuota = plan.CuotaCapital + plan.CuotaIntereses + plan.CuotaIvaIntereses + plan.CuotaMora + plan.CuotaIvaMora;
-                        //    _dbContext.Update(plan);
-                        //    await _dbContext.SaveChangesAsync();
-                        //}
-                        //if (fechaReferencia > plan.FechaModificacion)
-                        //{
-                        //    plan.CuotaMora = 0;
-                        //    plan.SaldoMora = 0;
-                        //    plan.CuotaIvaMora = 0;
-                        //    plan.SaldoIvaMora = 0;
-                        //    //plan.TotalCuota = plan.CuotaCapital + plan.CuotaIntereses + plan.CuotaIvaIntereses + plan.CuotaMora + plan.CuotaIvaMora;
-                        //    _dbContext.Update(plan);
-                        //    await _dbContext.SaveChangesAsync();
-                        //}
-
-
-                    //    if (plan.FechaPago <= fechaActual && plan.FechaModificacion.Date != fechaReferencia)
-                    //    {
-                    //        capitalVencido += plan.SaldoCapital;
-                    //    }
-                    //}
-
-                    //cargoMontoMora = capitalVencido * tasaMora / 365 * prestamo.DiasMora;
-                    //cargoMontoIvaMora = cargoMontoMora * 0.12m;
-                    //planPago.CuotaMora = cargoMontoMora;
-                    //planPago.SaldoMora = cargoMontoMora;
-                    //planPago.CuotaIvaMora = cargoMontoIvaMora;
-                    //planPago.SaldoIvaMora = cargoMontoIvaMora;
-                    //planPago.FechaModificacion = fechaActual.Date;
-                    ////_dbContext.Update(planPago);
-                    ////await _dbContext.SaveChangesAsync();
-
-                    //_unitOfWork.Repository<PlanPago>().Update(planPago);
+                  
                     _unitOfWork.Repository<Prestamo>().Update(prestamo);
                 }
 
@@ -266,7 +228,16 @@ namespace API.Controllers
         [HttpGet("reporte_CasosBTS")]
         public async Task<ActionResult<IEnumerable<ReporteCasosBTS>>> GetReporteBts()
         {            
-            var reporte = await _dbContext.Set<ReporteCasosBTS>().ToListAsync();
+            var reporte = await _dbContext.ReporteCasosBTS.ToListAsync();
+
+            return Ok(reporte);
+        }
+
+        [HttpGet("reporte_quicksights")]
+        public async Task<ActionResult<IEnumerable<ReporteQuickSights>>> GetReporteQuick()
+        {
+            var reporte = await _dbContext.Set<ReporteQuickSights>().ToListAsync();
+            
 
             return Ok(reporte);
         }

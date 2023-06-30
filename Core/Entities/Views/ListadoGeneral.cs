@@ -18,5 +18,6 @@ namespace Core.Entities.Views
         public decimal SaldoActual { get; set; }
         public string Asesor { get; set; } = null!;
         public bool Habilitado { get; set; }
+        public string Email { get; set; }
     }
 }
