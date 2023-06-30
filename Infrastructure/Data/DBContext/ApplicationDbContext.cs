@@ -6,6 +6,8 @@ using Core.Entities.Views;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
+using Core.Entities.Configuration;
+using Infrastructure.Data.Seed;
 
 namespace Infrastructure.Data.DBContext
 {
@@ -46,6 +48,7 @@ namespace Infrastructure.Data.DBContext
         public DbSet<TipoPrestamo>? TipoPrestamos { get; set; }
         public DbSet<TipoTransaccion>? TipoTransaccion { get; set; }
         public DbSet<TipoVivienda>? TiposVivienda { get; set; }
+        public DbSet<Moneda>? Monedas { get; set; }
 
         public IQueryable<SaldosMigracion> SaldosMigracion(int prestamoId)
         {
@@ -219,6 +222,9 @@ declare @i int, @n int;
             modelBuilder.Entity<AbonoPlan>().
                 HasOne(tt => tt.PlanPago).WithMany(tt => tt.AbonoPlanes).HasForeignKey(t => t.PlanPagoId);
                 //.OnDelete(DeleteBehavior.NoAction);
+                
+            SeedManager.Seed(modelBuilder);
+
         }
     }
 }
