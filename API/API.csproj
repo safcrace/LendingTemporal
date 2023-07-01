@@ -26,6 +26,15 @@
     <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="Properties\PublishProfiles\octtopro-001-subsite2 - FTP.pubxml" />
+    <None Remove="Properties\PublishProfiles\octtopro-001-subsite4 - FTP.pubxml" />
+    <None Remove="Properties\PublishProfiles\octtopro-001-subsite4 - FTP1.pubxml" />
+    <None Remove="Properties\PublishProfiles\octtopro-001-subsite6 - FTP.pubxml" />
+    <None Remove="Properties\PublishProfiles\octtopro-001-subsite13 - FTP.pubxml" />
+    <None Remove="Properties\PublishProfiles\octtopro-001-subsite13 - FTP1.pubxml" />
+  </ItemGroup>
+
   <ProjectExtensions><VisualStudio><UserProperties appsettings_1development_1json__JsonSchema="https://cdn.jsdelivr.net/gh/roadrunner-server/roadrunner@latest/schemas/config/2.0.schema.json" appsettings_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
 
 </Project>

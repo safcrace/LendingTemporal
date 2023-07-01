@@ -17,7 +17,7 @@ namespace Infrastructure.Data
         public void Add(T entity)
         {
             _dbContext.Set<T>().Add(entity);
-        }        
+        }
 
         public async Task<int> CountAsync(ISpecification<T> spec)
         {
@@ -27,6 +27,11 @@ namespace Infrastructure.Data
         public void Delete(T entity)
         {
             _dbContext.Set<T>().Remove(entity);
+        }
+
+        public void DeleteRange(IEnumerable<T> entities)
+        {
+            _dbContext.Set<T>().RemoveRange(entities);
         }
 
         public async Task<T> GetByIdAsync(int id)

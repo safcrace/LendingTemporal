@@ -4,6 +4,7 @@ using Infrastructure.Data.DBContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230516161914_Seed")]
+    partial class Seed
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -813,8 +815,8 @@ namespace Infrastructure.Migrations
                         {
                             Id = 1,
                             Descripcion = "Soltero(a)",
-                            FechaCreacion = new DateTime(2023, 5, 16, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            FechaModificacion = new DateTime(2023, 5, 16, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            FechaCreacion = new DateTime(2023, 5, 16, 10, 19, 14, 359, DateTimeKind.Local).AddTicks(4937),
+                            FechaModificacion = new DateTime(2023, 5, 16, 10, 19, 14, 359, DateTimeKind.Local).AddTicks(4937),
                             Habilitado = true,
                             Nombre = "Soltero(a)"
                         },
@@ -822,8 +824,8 @@ namespace Infrastructure.Migrations
                         {
                             Id = 2,
                             Descripcion = "Casado(a)",
-                            FechaCreacion = new DateTime(2023, 5, 16, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            FechaModificacion = new DateTime(2023, 5, 16, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            FechaCreacion = new DateTime(2023, 5, 16, 10, 19, 14, 359, DateTimeKind.Local).AddTicks(4938),
+                            FechaModificacion = new DateTime(2023, 5, 16, 10, 19, 14, 359, DateTimeKind.Local).AddTicks(4938),
                             Habilitado = true,
                             Nombre = "Casado(a)"
                         },
@@ -831,8 +833,8 @@ namespace Infrastructure.Migrations
                         {
                             Id = 3,
                             Descripcion = "Divorciado(a)",
-                            FechaCreacion = new DateTime(2023, 5, 16, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            FechaModificacion = new DateTime(2023, 5, 16, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            FechaCreacion = new DateTime(2023, 5, 16, 10, 19, 14, 359, DateTimeKind.Local).AddTicks(4939),
+                            FechaModificacion = new DateTime(2023, 5, 16, 10, 19, 14, 359, DateTimeKind.Local).AddTicks(4939),
                             Habilitado = true,
                             Nombre = "Divorciado(a)"
                         },
@@ -840,8 +842,8 @@ namespace Infrastructure.Migrations
                         {
                             Id = 4,
                             Descripcion = "Viudo(a)",
-                            FechaCreacion = new DateTime(2023, 5, 16, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            FechaModificacion = new DateTime(2023, 5, 16, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            FechaCreacion = new DateTime(2023, 5, 16, 10, 19, 14, 359, DateTimeKind.Local).AddTicks(4940),
+                            FechaModificacion = new DateTime(2023, 5, 16, 10, 19, 14, 359, DateTimeKind.Local).AddTicks(4940),
                             Habilitado = true,
                             Nombre = "Viudo(a)"
                         });
@@ -1197,8 +1199,8 @@ namespace Infrastructure.Migrations
                         {
                             Id = 1,
                             Descripcion = "Masculino",
-                            FechaCreacion = new DateTime(2023, 5, 16, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            FechaModificacion = new DateTime(2023, 5, 16, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            FechaCreacion = new DateTime(2023, 5, 16, 10, 19, 14, 359, DateTimeKind.Local).AddTicks(4955),
+                            FechaModificacion = new DateTime(2023, 5, 16, 10, 19, 14, 359, DateTimeKind.Local).AddTicks(4956),
                             Habilitado = true,
                             Nombre = "Masculino"
                         },
@@ -1206,8 +1208,8 @@ namespace Infrastructure.Migrations
                         {
                             Id = 2,
                             Descripcion = "Femenino",
-                            FechaCreacion = new DateTime(2023, 5, 16, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            FechaModificacion = new DateTime(2023, 5, 16, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            FechaCreacion = new DateTime(2023, 5, 16, 10, 19, 14, 359, DateTimeKind.Local).AddTicks(4957),
+                            FechaModificacion = new DateTime(2023, 5, 16, 10, 19, 14, 359, DateTimeKind.Local).AddTicks(4957),
                             Habilitado = true,
                             Nombre = "Femenino"
                         });
@@ -7259,10 +7261,6 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("CodigoSAP")
-                        .HasMaxLength(75)
-                        .HasColumnType("nvarchar(75)");
-
                     b.Property<string>("Colonia")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
@@ -7371,6 +7369,9 @@ namespace Infrastructure.Migrations
                     b.HasIndex("GeneroId");
 
                     b.HasIndex("MunicipioId");
+
+                    b.HasIndex("NumeroDocumento")
+                        .IsUnique();
 
                     b.HasIndex("OcupacionId");
 
@@ -7745,18 +7746,6 @@ namespace Infrastructure.Migrations
                     b.HasIndex("TipoRelacionId");
 
                     b.ToTable("RelacionEntidades");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            EntidadHijaId = 2,
-                            EntidadPadreId = 1,
-                            FechaCreacion = new DateTime(2023, 5, 16, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            FechaModificacion = new DateTime(2023, 5, 16, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Habilitado = true,
-                            TipoRelacionId = 2
-                        });
                 });
 
             modelBuilder.Entity("Core.Entities.Sesion", b =>
