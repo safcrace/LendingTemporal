@@ -15,7 +15,7 @@ namespace Core.Entities.Views
         [Precision(18, 2)]
         public decimal SaldoInicial { get; set; }
         [Precision(18, 2)]
-        public decimal SaldoActual { get; set; }
+        public decimal SaldoActual { get; set; } = 0.0m;
         public string Asesor { get; set; } = null!;
         public bool Habilitado { get; set; }
         public string Email { get; set; }
