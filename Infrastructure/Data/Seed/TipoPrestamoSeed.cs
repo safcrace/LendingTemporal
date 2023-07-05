@@ -1,4 +1,4 @@
-﻿using Core.Entities.Configuration;
+﻿using Core.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Data.Seed;
@@ -12,9 +12,9 @@ public static class TipoPrestamoSeed
             new()
             {
                 Id = 1,
-                Name = "Quetzales",
-                Description = "Moneda de Guatemala",
-                Symbol = "Q",
+                Nombre = "Quetzales",
+                Descripcion = "Moneda de Guatemala",
+                Simbolo = "Q",
                 Habilitado = true,
                 FechaCreacion = DateTime.Parse("2023-05-12"),
                 FechaModificacion = DateTime.Parse("2023-05-12")
@@ -22,9 +22,9 @@ public static class TipoPrestamoSeed
             new()
             {
                 Id = 2,
-                Name = "Dolares",
-                Description = "Moneda de Estados Unidos",
-                Symbol = "$",
+                Nombre = "Dolares",
+                Descripcion = "Moneda de Estados Unidos",
+                Simbolo = "$",
                 Habilitado = true,
                 FechaCreacion = DateTime.Parse("2023-05-12"),
                 FechaModificacion = DateTime.Parse("2023-05-12")

@@ -6,6 +6,8 @@ public class Departamento : BaseEntity
 {
     public Pais? Pais { get; set; }
     public string? PaisId { get; set; }
+    public Region? Region { get; set; }
+    public int? RegionId { get; set; }
     public string? Nombre { get; set; }
     public string? Descripcion { get; set; }
     public List<Municipio>? Municipios { get; set; }            

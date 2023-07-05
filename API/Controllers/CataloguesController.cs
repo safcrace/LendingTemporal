@@ -35,6 +35,81 @@ namespace API.Controllers
             return Ok(_mapper.Map<List<PaisDto>>(paises));
         }
 
+        [HttpPost("regiones")]
+        public async Task<ActionResult<IEnumerable<object>>> CreateRegion(CreateRegionDto createRegionDto)
+        {
+            var region = new Region
+            {
+                Nombre = createRegionDto.Nombre,
+                Descripcion = createRegionDto.Descripcion
+            };
+
+            _unitOfWork.Repository<Region>().Add(region);
+            var result = await _unitOfWork.Complete();
+            if (result < 0) return null!;
+
+            return Ok(new { Message = "Acción realizada Satisfactoriamente.", region.Id });
+        }
+
+
+        [HttpGet("regiones")]
+        public async Task<ActionResult<IEnumerable<RegionDto>>> GetRegions()
+        {
+            var result = await _dbContext.Regiones.ToListAsync();
+
+            var regiones = _mapper.Map<List<RegionDto>>(result);
+
+            if (regiones == null) return NotFound();
+
+            foreach (var region in regiones)
+            {
+                region.NumeroDepartamentos = _dbContext.Departamentos.Where(x => x.RegionId == region.Id).Count();
+                region.NombreDepartamentos = await _dbContext.Departamentos.Where(x => x.RegionId == region.Id).Select(x => x.Nombre).ToListAsync();
+            }
+
+            return Ok(_mapper.Map<List<RegionDto>>(regiones));
+        }
+
+        [HttpPut("regiones/{regionId}")]
+        public async Task<ActionResult<IEnumerable<object>>> UPDATE(int regionId, UpdateRegionDto updateRegionDto)
+        {
+            var region = _dbContext.Regiones.Where(x => x.Id == regionId).FirstOrDefault();
+
+            if (region == null) return NotFound();
+
+            region.Nombre = updateRegionDto.Nombre;
+            region.Descripcion = updateRegionDto.Descripcion;
+
+            _unitOfWork.Repository<Region>().Update(region);
+            var result = await _unitOfWork.Complete();
+            if (result < 0) return null!;
+
+            return Ok(new { Message = "Acción realizada Satisfactoriamente."});
+        }
+
+        [HttpPut("departamento_region/{departamentoId}")]
+        public async Task<ActionResult<IEnumerable<RegionDto>>> UpdateRegionDepartamento(int departamentoId, int regionId, bool Action = true)
+        {
+            var departamento = await _dbContext.Departamentos.Where(x => x.Id == departamentoId).FirstOrDefaultAsync();            
+
+            if (departamento is null) return NotFound();
+
+            if (Action)
+            {
+                departamento.RegionId = regionId;
+            }
+            else
+            {
+                departamento.RegionId = null;
+            }
+
+            _dbContext.Departamentos.Update(departamento);
+
+            await _dbContext.SaveChangesAsync();
+
+            return Ok(new {message = "Acción Realizada Satisfactoriamente"});
+        }
+
         [HttpGet("departmentos")]
         public async Task<ActionResult<IEnumerable<DepartamentoDto>>> GetDepartments()
         {
@@ -55,6 +130,15 @@ namespace API.Controllers
             return Ok(_mapper.Map<List<MunicipioDto>>(municipios));
         }
 
+        [HttpGet("intereses_regiones/{tipoCreditoId}")]
+        public async Task<ActionResult<IEnumerable<InteresesRegionesDto>>> GetIntereses(int tipoCreditoId)
+        {
+            var intereses = await _dbContext.DocumentosPrestamos.Where(x => x.TipoPrestamoId == tipoCreditoId).ToListAsync();
+
+            if (intereses == null) return NotFound();
+
+            return Ok(_mapper.Map<List<DocumentoPrestamoDto>>(intereses));
+        }
         [HttpGet("bancos")]
         public async Task<ActionResult<IReadOnlyList<BancoDto>>> GetBancos()
         {

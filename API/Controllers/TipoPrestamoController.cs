@@ -1,11 +1,12 @@
 ﻿using API.Dtos;
 using AutoMapper;
 using Core.Entities;
-using Core.Entities.Configuration;
 using Core.Interfaces;
 using Core.Specifications;
+using Infrastructure.Data.DBContext;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers;
 
@@ -14,47 +15,59 @@ public class TipoPrestamoController : ControllerBase
 {
     private readonly IUnitOfWork repository;
     private readonly IMapper mapper;
+    private readonly ApplicationDbContext _dbContext;
 
-    public TipoPrestamoController(IUnitOfWork repository, IMapper mapper)
+    public TipoPrestamoController(IUnitOfWork repository, IMapper mapper, ApplicationDbContext dbContext)
     {
         this.repository = repository;
         this.mapper = mapper;
+        _dbContext = dbContext;
     }
 
     [HttpGet]
-    public async Task<ActionResult> Get([FromQuery, BindRequired] string filter = "all")
+    public async Task<ActionResult> GetAll()
     {
-        var validFilters = new[] { "all", "personas", "organizaciones" };
-        if (!validFilters.Contains(filter.ToLower()))
-            return new BadRequestObjectResult($"El filtro {filter} no es válido. Los filtros válidos son: {string.Join(", ", validFilters)}");
+        var tipos = await repository.TipoPrestamo.ListAllAsync();
 
-        var tipoPrestamos = await repository.TipoPrestamo.ListAllAsync();
+        var tiposCredito = this.mapper.Map<List<ListadoTiposCreditoDto>>(tipos);
 
-        var dtos = new List<TipoPrestamoDto>();
-
-        foreach (var tipo in tipoPrestamos)
+        foreach (var tipo in tiposCredito)
         {
-            var dto = mapper.Map<TipoPrestamoDto>(tipo);
-            dto.Moneda = await GetMoneda(tipo.CurrencyId);
-            dto.DocumentosRequeridos = await GetDocuments(tipo.Id);
-            dtos.Add(dto);
+            tipo.TipoCuota = await _dbContext.TipoCuotas.Where(x => x.Id == tipo.Id).Select(x => x.Nombre).FirstOrDefaultAsync();
+            tipo.Moneda = await _dbContext.Monedas.Where(x => x.Id == tipo.Id).Select(x => x.Nombre).FirstOrDefaultAsync();
         }
 
-        return Ok(dtos);
+        return Ok(tiposCredito);
     }
 
     [HttpGet("{id:int}")]
-    public async Task<ActionResult> GetById(int id)
+    public async Task<ActionResult<IEnumerable<object>>> GetById(int id)
     {
-        var prestamo = await repository.TipoPrestamo.GetByIdAsync(id);
 
-        if (prestamo == null) return NotFound();
+        var tipo = await repository.TipoPrestamo.GetByIdAsync(id);
 
-        var dto = mapper.Map<TipoPrestamoDto>(prestamo);
-        dto.Moneda = await GetMoneda(prestamo.CurrencyId);
-        dto.DocumentosRequeridos = await GetDocuments(prestamo.Id);
+        if (tipo == null) return NotFound();
 
-        return Ok(dto);
+        var tipoPrestamo = mapper.Map<TipoPrestamoDto>(tipo);
+
+        var intereses = await _dbContext.InteresesRegiones.Where(x => x.TipoPrestamoId == tipoPrestamo.Id).ToListAsync();
+        var InteresesRegiones = this.mapper.Map<List<InteresesRegionesDto>>(intereses);
+        var mora = await _dbContext.MoraRegiones.Where(x => x.TipoPrestamoId == tipoPrestamo.Id).ToListAsync();
+        var moraRegiones = this.mapper.Map<List<MoraRegionesDto>>(mora);
+        var parametros = await _dbContext.ParametrosRegiones.Where(x => x.TipoPrestamoId == tipoPrestamo.Id).ToListAsync();        
+        var parametrosRegiones = this.mapper.Map<List<ParametrosRegionesDto>>(parametros);
+        var documentos = await _dbContext.DocumentosPrestamos.Where(x => x.TipoPrestamoId == tipoPrestamo.Id).ToListAsync();
+        var documentosPrestamo = this.mapper.Map<List<DocumentoPrestamoDto>>(documentos);
+
+
+
+
+
+
+
+        ////var dtos = new List<TipoPrestamoDto>();
+
+        return Ok(new { tipoPrestamo, InteresesRegiones, moraRegiones, parametrosRegiones, documentosPrestamo });
     }
 
     [HttpGet("moneda")]
@@ -89,34 +102,34 @@ public class TipoPrestamoController : ControllerBase
         }
     }
 
-    [HttpPut("{id:int}")]
-    public async Task<ActionResult> Put(int id, UpdateTipoPrestamoDto tipoPrestamoDto)
-    {
-        try
-        {
-            var tipoPrestamo = await repository.TipoPrestamo.GetByIdAsync(id);
+    //[HttpPut("{id:int}")]
+    //public async Task<ActionResult> Put(int id, UpdateTipoPrestamoDto tipoPrestamoDto)
+    //{
+    //    try
+    //    {
+    //        var tipoPrestamo = await repository.TipoPrestamo.GetByIdAsync(id);
 
-            if (tipoPrestamo == null) return NotFound();
-            var docs = await repository.Repository<DocumentosPrestamo>()
-                .ListAsync(new BaseSpecification<DocumentosPrestamo>(x => x.TipoPrestamoId == tipoPrestamo.Id));
+    //        if (tipoPrestamo == null) return NotFound();
+    //        var docs = await repository.Repository<DocumentosPrestamo>()
+    //            .ListAsync(new BaseSpecification<DocumentosPrestamo>(x => x.TipoPrestamoId == tipoPrestamo.Id));
 
-            repository.Repository<DocumentosPrestamo>().DeleteRange(docs);
+    //        repository.Repository<DocumentosPrestamo>().DeleteRange(docs);
 
-            mapper.Map(tipoPrestamoDto, tipoPrestamo);
-            repository.TipoPrestamo.Update(tipoPrestamo);
-            var result = await repository.Complete();
+    //        mapper.Map(tipoPrestamoDto, tipoPrestamo);
+    //        repository.TipoPrestamo.Update(tipoPrestamo);
+    //        var result = await repository.Complete();
 
-            if (result <= 0) return new BadRequestObjectResult("No se pudo actualizar el tipo de préstamo");
+    //        if (result <= 0) return new BadRequestObjectResult("No se pudo actualizar el tipo de préstamo");
 
-            return Ok(new { message = "Tipo de préstamo actualizado con éxito", tipoPrestamo.Id });
-        }
-        catch (Exception e)
-        {
-            return e.InnerException != null
-                ? new BadRequestObjectResult(e.InnerException.Message)
-                : new BadRequestObjectResult(e.Message);
-        }
-    }
+    //        return Ok(new { message = "Tipo de préstamo actualizado con éxito", tipoPrestamo.Id });
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        return e.InnerException != null
+    //            ? new BadRequestObjectResult(e.InnerException.Message)
+    //            : new BadRequestObjectResult(e.Message);
+    //    }
+    //}
 
     [HttpPut("{id:int}/toggle")]
     public async Task<ActionResult> Toggle(int id)
@@ -150,7 +163,7 @@ public class TipoPrestamoController : ControllerBase
         var documentos = await repository.Repository<DocumentosPrestamo>()
             .ListAsync(new BaseSpecification<DocumentosPrestamo>(x => x.TipoPrestamoId == prestamoId));
 
-        return documentos.Select(x => x.Name).ToList();
+        return documentos.Select(x => x.Nombre).ToList();
     }
 
     private async Task<CatalogDto> GetMoneda(int monedaId)
