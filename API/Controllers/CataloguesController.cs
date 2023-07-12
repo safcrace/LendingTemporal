@@ -63,11 +63,20 @@ namespace API.Controllers
 
             foreach (var region in regiones)
             {
-                region.NumeroDepartamentos = _dbContext.Departamentos.Where(x => x.RegionId == region.Id).Count();
+                region.NumeroDepartamentos = await _dbContext.Departamentos.Where(x => x.RegionId == region.Id).CountAsync();
                 region.NombreDepartamentos = await _dbContext.Departamentos.Where(x => x.RegionId == region.Id).Select(x => x.Nombre).ToListAsync();
             }
 
             return Ok(_mapper.Map<List<RegionDto>>(regiones));
+        }
+
+        [HttpGet("regiones/{regionId}")]
+        public async Task<ActionResult<string>> GetRegionName(int regionId)
+        {
+            var region = await _dbContext.Regiones.Where(x => x.Id == regionId).Select(x => x.Nombre).FirstOrDefaultAsync();
+
+
+            return Ok(region);
         }
 
         [HttpPut("regiones/{regionId}")]
@@ -85,6 +94,16 @@ namespace API.Controllers
             if (result < 0) return null!;
 
             return Ok(new { Message = "Acción realizada Satisfactoriamente."});
+        }
+
+        [HttpGet("departamento_region/{regionId}")]
+        public async Task<ActionResult<IEnumerable<DepartamentoDto>>> GetDepartamentosRegion(int regionId)
+        {
+            var departamentos = await _dbContext.Departamentos.Where(x => x.RegionId == regionId).ToListAsync();
+
+            if (departamentos == null) return NotFound();
+
+            return Ok(_mapper.Map<List<DepartamentoDto>>(departamentos));
         }
 
         [HttpPut("departamento_region/{departamentoId}")]
@@ -110,6 +129,7 @@ namespace API.Controllers
             return Ok(new {message = "Acción Realizada Satisfactoriamente"});
         }
 
+
         [HttpGet("departmentos")]
         public async Task<ActionResult<IEnumerable<DepartamentoDto>>> GetDepartments()
         {
@@ -129,16 +149,7 @@ namespace API.Controllers
 
             return Ok(_mapper.Map<List<MunicipioDto>>(municipios));
         }
-
-        [HttpGet("intereses_regiones/{tipoCreditoId}")]
-        public async Task<ActionResult<IEnumerable<InteresesRegionesDto>>> GetIntereses(int tipoCreditoId)
-        {
-            var intereses = await _dbContext.DocumentosPrestamos.Where(x => x.TipoPrestamoId == tipoCreditoId).ToListAsync();
-
-            if (intereses == null) return NotFound();
-
-            return Ok(_mapper.Map<List<DocumentoPrestamoDto>>(intereses));
-        }
+        
         [HttpGet("bancos")]
         public async Task<ActionResult<IReadOnlyList<BancoDto>>> GetBancos()
         {
@@ -189,6 +200,22 @@ namespace API.Controllers
             var destinoPrestamo = await _unitOfWork.Repository<DestinoPrestamo>().ListAllAsync();
 
             return Ok(_mapper.Map<IReadOnlyList<DestinoPrestamoDto>>(destinoPrestamo));
+        }
+
+        [HttpGet("tipo_cuota")]
+        public async Task<ActionResult<IEnumerable<TipoCuotaDto>>> GetTipoCuota()
+        {
+            var tipoCuotas = await _unitOfWork.Repository<TipoCuota>().ListAllAsync();
+
+            return Ok(_mapper.Map<IReadOnlyList<TipoCuotaDto>>(tipoCuotas));
+        }
+
+        [HttpGet("monedas")]
+        public async Task<ActionResult<IEnumerable<MonedaDto>>> GetMoneda()
+        {
+            var monedas = await _unitOfWork.Repository<Moneda>().ListAllAsync();
+
+            return Ok(_mapper.Map<IReadOnlyList<MonedaDto>>(monedas));
         }
 
         [HttpGet("ocupaciones")]

@@ -1,9 +1,9 @@
 ﻿namespace API.Dtos
 {
-    public class CreateParametrosRegionesDto
+    public class CreateParametrosDepartamentosDto
     {
         public int TipoPrestamoId { get; set; }
-        public int RegionId { get; set; }
+        public int DepartamentoId { get; set; }
         public bool MontoFijo { get; set; }
         public bool MontoVariable { get; set; }        
         public decimal MontoMinimo { get; set; }

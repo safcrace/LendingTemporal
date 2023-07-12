@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Data.Config
 {
-    public class ParametrosRegionesConfiguration : IEntityTypeConfiguration<ParametrosRegiones>
+    public class ParametrosDepartamentosConfiguration : IEntityTypeConfiguration<ParametrosDepartamentos>
     {
-        public void Configure(EntityTypeBuilder<ParametrosRegiones> builder)
+        public void Configure(EntityTypeBuilder<ParametrosDepartamentos> builder)
         {
             builder.Property(x => x.MontoMinimo).HasColumnType("decimal(18,2)");
             builder.Property(x => x.MontoMaximo).HasColumnType("decimal(18,2)");

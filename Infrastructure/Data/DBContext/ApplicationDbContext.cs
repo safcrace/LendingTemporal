@@ -33,14 +33,14 @@ namespace Infrastructure.Data.DBContext
         public DbSet<EstadoPrestamo>? EstadoPrestamos { get; set; }
         public DbSet<FormaPago>? FormaPagos { get; set; }
         public DbSet<Genero> Generos { get; set; } = null!;                
-        public DbSet<InteresesRegiones> InteresesRegiones { get; set; } = null!;                
+        public DbSet<InteresesDepartamentos> InteresesRegiones { get; set; } = null!;                
         public DbSet<ListadoGeneral> ListadoGeneral { get; set; } = null!;                
         public DbSet<ListadoDeudores> ListadoDeudores { get; set; } = null!;                
         public DbSet<Municipio>? Municipios { get; set; }                   
-        public DbSet<MoraRegiones>? MoraRegiones { get; set; }                   
+        public DbSet<MoraDepartamentos>? MoraRegiones { get; set; }                   
         public DbSet<Ocupacion>? Ocupaciones { get; set; }                   
         public DbSet<Pais>? Paises { get; set; }
-        public DbSet<ParametrosRegiones>? ParametrosRegiones { get; set; }
+        public DbSet<ParametrosDepartamentos>? ParametrosRegiones { get; set; }
         public DbSet<Persona>? Personas { get; set; }        
         public DbSet<PlanPago>? PlanPagos { get; set; }        
         public DbSet<Prestamo>? Prestamos { get; set; }        
@@ -228,23 +228,23 @@ declare @i int, @n int;
                 HasOne(tt => tt.PlanPago).WithMany(tt => tt.AbonoPlanes).HasForeignKey(t => t.PlanPagoId);
             //.OnDelete(DeleteBehavior.NoAction);
 
-            modelBuilder.Entity<InteresesRegiones>().HasKey(pp => new { pp.TipoPrestamoId, pp.RegionId });
-            modelBuilder.Entity<InteresesRegiones>().
-                HasOne(pp => pp.TipoPrestamo).WithMany(pp => pp.InteresesRegiones).HasForeignKey(t => t.TipoPrestamoId);
-            modelBuilder.Entity<InteresesRegiones>().
-                HasOne(tt => tt.Region).WithMany(tt => tt.InteresesRegiones).HasForeignKey(t => t.RegionId);
+            modelBuilder.Entity<InteresesDepartamentos>().HasKey(pp => new { pp.TipoPrestamoId, pp.DepartamentoId });
+            modelBuilder.Entity<InteresesDepartamentos>().
+                HasOne(pp => pp.TipoPrestamo).WithMany(pp => pp.InteresesDepartamentos).HasForeignKey(t => t.TipoPrestamoId);
+            modelBuilder.Entity<InteresesDepartamentos>().
+                HasOne(tt => tt.Departamento).WithMany(tt => tt.InteresesDepartamentos).HasForeignKey(t => t.DepartamentoId);
 
-            modelBuilder.Entity<MoraRegiones>().HasKey(pp => new { pp.TipoPrestamoId, pp.RegionId });
-            modelBuilder.Entity<MoraRegiones>().
-                HasOne(pp => pp.TipoPrestamo).WithMany(pp => pp.MoraRegiones).HasForeignKey(t => t.TipoPrestamoId);
-            modelBuilder.Entity<MoraRegiones>().
-                HasOne(tt => tt.Region).WithMany(tt => tt.MoraRegiones).HasForeignKey(t => t.RegionId);
+            modelBuilder.Entity<MoraDepartamentos>().HasKey(pp => new { pp.TipoPrestamoId, pp.DepartamentoId });
+            modelBuilder.Entity<MoraDepartamentos>().
+                HasOne(pp => pp.TipoPrestamo).WithMany(pp => pp.MoraDepartamentos).HasForeignKey(t => t.TipoPrestamoId);
+            modelBuilder.Entity<MoraDepartamentos>().
+                HasOne(tt => tt.Departamento).WithMany(tt => tt.MoraDepartamentos).HasForeignKey(t => t.DepartamentoId);
 
-            modelBuilder.Entity<ParametrosRegiones>().HasKey(pp => new { pp.TipoPrestamoId, pp.RegionId });
-            modelBuilder.Entity<ParametrosRegiones>().
-                HasOne(pp => pp.TipoPrestamo).WithMany(pp => pp.ParametrosRegiones).HasForeignKey(t => t.TipoPrestamoId);
-            modelBuilder.Entity<ParametrosRegiones>().
-                HasOne(tt => tt.Region).WithMany(tt => tt.ParametrosRegiones).HasForeignKey(t => t.RegionId);
+            modelBuilder.Entity<ParametrosDepartamentos>().HasKey(pp => new { pp.TipoPrestamoId, pp.DepartamentoId });
+            modelBuilder.Entity<ParametrosDepartamentos>().
+                HasOne(pp => pp.TipoPrestamo).WithMany(pp => pp.ParametrosDepartamentos).HasForeignKey(t => t.TipoPrestamoId);
+            modelBuilder.Entity<ParametrosDepartamentos>().
+                HasOne(tt => tt.Departamento).WithMany(tt => tt.ParametrosDepartamentos).HasForeignKey(t => t.DepartamentoId);
 
             //SeedManager.Seed(modelBuilder);
 

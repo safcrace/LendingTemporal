@@ -7,8 +7,8 @@ public class TipoPrestamoDto
     public string? Descripcion { get; set; }
     public bool DisponibleOrganizaciones { get; set; } = false;
     public bool DisponiblePersonas { get; set; } = false;
-    public int MonedaId { get; set; }
-    public int TipoCuotaId { get; set; }
+    public int MonedaId { get; set; }    
+    public int TipoCuotaId { get; set; }   
     public bool TasaInteresGeneral { get; set; } = false;
     public bool TasaInteresRegional { get; set; } = false;
     public bool TasaInteresVariable { get; set; } = false;

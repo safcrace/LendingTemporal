@@ -1,13 +1,12 @@
-﻿using API.Dtos;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace API.Dtos
 {
-    public class CreateTipoPrestamoDto
+    public class UpdateTipoPrestamoDto
     {
-        [Required] 
+        [Required]
         public string? Nombre { get; set; }
-        public string? Descripcion { get; set; }                
+        public string? Descripcion { get; set; }
         public bool DisponibleOrganizaciones { get; set; } = false;
         public bool DisponiblePersonas { get; set; } = false;
         public int MonedaId { get; set; }
@@ -21,11 +20,11 @@ namespace API.Dtos
         public bool TasaMoraRegional { get; set; } = false;
         public bool TasaMoraVariable { get; set; } = false;
         public bool TasaMoraFija { get; set; } = false;
-        public List<CreateMoraDepartamentosDto>? MoraRegiones { get; set; }
+        public List<CreateMoraDepartamentosDto>? MoraDepartamentos { get; set; }
         public decimal TasaIva { get; set; }
         public bool ParametrosGeneral { get; set; } = false;
         public bool ParametrosRegional { get; set; } = false;
-        public List<CreateParametrosDepartamentosDto>? ParametrosRegiones { get; set; }
-        public List<CreateDocumentoPrestamoDto> DocumentosRequeridos { get; set; } = new();
+        public List<CreateParametrosDepartamentosDto>? ParametrosDepartamentos { get; set; }
+        //public List<CreateDocumentoPrestamoDto> DocumentosRequeridos { get; set; } = new();
     }
 }

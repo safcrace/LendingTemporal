@@ -15,14 +15,16 @@ namespace API.Helpers
             CreateMap<CreateRegistroCajaDto, RegistroCaja>();
             CreateMap<CreateTipoPrestamoDto, TipoPrestamo>();
             CreateMap<CreateDocumentoPrestamoDto, DocumentosPrestamo>();
-            CreateMap<CreateInteresesRegionesDto, InteresesRegiones>();
-            CreateMap<CreateMoraRegionesDto, MoraRegiones>();
-            CreateMap<CreateParametrosRegionesDto, ParametrosRegiones>();
+            CreateMap<CreateInteresesDepartamentosDto, InteresesDepartamentos>();
+            CreateMap<CreateMoraDepartamentosDto, MoraDepartamentos>();
+            CreateMap<CreateParametrosDepartamentosDto, ParametrosDepartamentos>();
             CreateMap<Pais, PaisDto>();
             CreateMap<Region, RegionDto>();
             CreateMap<Departamento, DepartamentoDto>();
             CreateMap<Municipio, MunicipioDto>();
-            CreateMap<InteresesRegiones, InteresesRegionesDto>();
+            CreateMap<TipoCuota, TipoCuotaDto>();
+            CreateMap<Moneda, MonedaDto>();
+            CreateMap<InteresesDepartamentos, InteresesDepartamentosDto>(); 
             CreateMap<Banco, BancoDto>();
             CreateMap<Caja, CajaDto>();
             CreateMap<FormaPago, FormaPagoDto>();
@@ -38,8 +40,9 @@ namespace API.Helpers
                 .ForMember(x => x.TipoCuota, Mc => Mc.MapFrom(y => y.TipoCuota.Nombre))
                 .ForMember(x => x.Moneda, Mc => Mc.MapFrom(y => y.Moneda.Nombre)); 
             //CreateMap<InteresesRegiones, InteresesRegionesDto>();
-            CreateMap<MoraRegiones, MoraRegionesDto>();
-            CreateMap<ParametrosRegiones, ParametrosRegionesDto>();
+            CreateMap<MoraDepartamentos, MoraDepartamentosDto>();
+            CreateMap<ParametrosDepartamentos, ParametrosDepartamentosDto>();
+            CreateMap<UpdateTipoPrestamoDto, TipoPrestamo>();
             //CreateMap<CreateTipoPrestamoDto, TipoPrestamo>()
             //    .ForMember(x => x.MonedaId, opt => opt.MapFrom(src => src.MonedaId))
             //    .ForMember(x => x.Descripcion, opt => opt.MapFrom(src => src.Nombre));

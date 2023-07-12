@@ -1,11 +1,10 @@
-﻿namespace Core.Entities
+﻿namespace API.Dtos
 {
-    public class InteresesRegiones
+    public class InteresesDepartamentosDto
     {
-        public TipoPrestamo TipoPrestamo { get; set; } = null!;
         public int TipoPrestamoId { get; set; }
-        public Region Region { get; set; } = null!;
-        public int RegionId { get; set; }
+        public int DepartamentoId { get; set; }
+        public string? Region { get; set; }
         public decimal TasaMinima { get; set; }
         public decimal TasaMaxima { get; set; }
         public decimal TasaPredeterminada { get; set; }

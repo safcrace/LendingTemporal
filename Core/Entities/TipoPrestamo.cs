@@ -12,7 +12,7 @@ namespace Core.Entities
         public int? TipoCuotaId { get; set; }
         public bool TasaInteresGeneral { get; set; }
         public bool TasaInteresRegional { get; set; }
-        public bool TasInteresVariable { get; set; }
+        public bool TasaInteresVariable { get; set; }
         public bool TasaInteresFija { get; set; }
         public bool TasaMoraGeneral { get; set; }
         public bool TasaMoraRegional { get; set; }
@@ -24,8 +24,8 @@ namespace Core.Entities
         public bool ParametrosGeneral { get; set; }
         public bool ParametrosRegional { get; set; }        
         public List<DocumentosPrestamo> DocumentosRequeridos { get; set; } = new();
-        public ICollection<InteresesRegiones> InteresesRegiones { get; set; } = new List<InteresesRegiones>();
-        public ICollection<MoraRegiones> MoraRegiones { get; set; } = new List<MoraRegiones>();
-        public ICollection<ParametrosRegiones> ParametrosRegiones { get; set; } = new List<ParametrosRegiones>();
+        public ICollection<InteresesDepartamentos> InteresesDepartamentos { get; set; } = new List<InteresesDepartamentos>();
+        public ICollection<MoraDepartamentos> MoraDepartamentos { get; set; } = new List<MoraDepartamentos>();
+        public ICollection<ParametrosDepartamentos> ParametrosDepartamentos { get; set; } = new List<ParametrosDepartamentos>();
     }
 }

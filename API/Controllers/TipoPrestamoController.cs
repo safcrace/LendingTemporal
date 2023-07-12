@@ -33,8 +33,8 @@ public class TipoPrestamoController : ControllerBase
 
         foreach (var tipo in tiposCredito)
         {
-            tipo.TipoCuota = await _dbContext.TipoCuotas.Where(x => x.Id == tipo.Id).Select(x => x.Nombre).FirstOrDefaultAsync();
-            tipo.Moneda = await _dbContext.Monedas.Where(x => x.Id == tipo.Id).Select(x => x.Nombre).FirstOrDefaultAsync();
+            tipo.TipoCuota = await _dbContext.TipoCuotas.Where(x => x.Id == tipo.TipoCuotaId).Select(x => x.Nombre).FirstOrDefaultAsync();
+            tipo.Moneda = await _dbContext.Monedas.Where(x => x.Id == tipo.MonedaId).Select(x => x.Nombre).FirstOrDefaultAsync();
         }
 
         return Ok(tiposCredito);
@@ -46,16 +46,20 @@ public class TipoPrestamoController : ControllerBase
 
         var tipo = await repository.TipoPrestamo.GetByIdAsync(id);
 
+        var nombreMoneda = await _dbContext.Monedas.Where(x => x.Id == tipo.MonedaId).Select(x => x.Nombre).FirstOrDefaultAsync();
+        var nombreTipoCuota = await _dbContext.TipoCuotas.Where(x => x.Id == tipo.TipoCuotaId).Select(x => x.Nombre).FirstOrDefaultAsync();
+        
+
         if (tipo == null) return NotFound();
 
         var tipoPrestamo = mapper.Map<TipoPrestamoDto>(tipo);
 
-        var intereses = await _dbContext.InteresesRegiones.Where(x => x.TipoPrestamoId == tipoPrestamo.Id).ToListAsync();
-        var InteresesRegiones = this.mapper.Map<List<InteresesRegionesDto>>(intereses);
+        var intereses = await _dbContext.InteresesRegiones.Where(x => x.TipoPrestamoId == tipoPrestamo.Id).ToListAsync();       
+        var InteresesRegiones = this.mapper.Map<List<InteresesDepartamentosDto>>(intereses);        
         var mora = await _dbContext.MoraRegiones.Where(x => x.TipoPrestamoId == tipoPrestamo.Id).ToListAsync();
-        var moraRegiones = this.mapper.Map<List<MoraRegionesDto>>(mora);
+        var moraRegiones = this.mapper.Map<List<MoraDepartamentosDto>>(mora);
         var parametros = await _dbContext.ParametrosRegiones.Where(x => x.TipoPrestamoId == tipoPrestamo.Id).ToListAsync();        
-        var parametrosRegiones = this.mapper.Map<List<ParametrosRegionesDto>>(parametros);
+        var parametrosRegiones = this.mapper.Map<List<ParametrosDepartamentosDto>>(parametros);
         var documentos = await _dbContext.DocumentosPrestamos.Where(x => x.TipoPrestamoId == tipoPrestamo.Id).ToListAsync();
         var documentosPrestamo = this.mapper.Map<List<DocumentoPrestamoDto>>(documentos);
 
@@ -67,7 +71,7 @@ public class TipoPrestamoController : ControllerBase
 
         ////var dtos = new List<TipoPrestamoDto>();
 
-        return Ok(new { tipoPrestamo, InteresesRegiones, moraRegiones, parametrosRegiones, documentosPrestamo });
+        return Ok(new { tipoPrestamo, nombreMoneda, nombreTipoCuota, InteresesRegiones, moraRegiones, parametrosRegiones, documentosPrestamo });
     }
 
     [HttpGet("moneda")]
@@ -102,34 +106,34 @@ public class TipoPrestamoController : ControllerBase
         }
     }
 
-    //[HttpPut("{id:int}")]
-    //public async Task<ActionResult> Put(int id, UpdateTipoPrestamoDto tipoPrestamoDto)
-    //{
-    //    try
-    //    {
-    //        var tipoPrestamo = await repository.TipoPrestamo.GetByIdAsync(id);
+    [HttpPut("{id:int}")]
+    public async Task<ActionResult> Put(int id, UpdateTipoPrestamoDto tipoPrestamoDto)
+    {
+        try
+        {
+            var tipoPrestamo = await repository.TipoPrestamo.GetByIdAsync(id);
 
-    //        if (tipoPrestamo == null) return NotFound();
-    //        var docs = await repository.Repository<DocumentosPrestamo>()
-    //            .ListAsync(new BaseSpecification<DocumentosPrestamo>(x => x.TipoPrestamoId == tipoPrestamo.Id));
+            //if (tipoPrestamo == null) return NotFound();
+            //var docs = await repository.Repository<DocumentosPrestamo>()
+            //    .ListAsync(new BaseSpecification<DocumentosPrestamo>(x => x.TipoPrestamoId == tipoPrestamo.Id));
 
-    //        repository.Repository<DocumentosPrestamo>().DeleteRange(docs);
+            //repository.Repository<DocumentosPrestamo>().DeleteRange(docs);
 
-    //        mapper.Map(tipoPrestamoDto, tipoPrestamo);
-    //        repository.TipoPrestamo.Update(tipoPrestamo);
-    //        var result = await repository.Complete();
+            mapper.Map(tipoPrestamoDto, tipoPrestamo);
+            _dbContext.TipoPrestamos.Update(tipoPrestamo);
+            var result = await repository.Complete();
 
-    //        if (result <= 0) return new BadRequestObjectResult("No se pudo actualizar el tipo de préstamo");
+            if (result <= 0) return new BadRequestObjectResult("No se pudo actualizar el tipo de préstamo");
 
-    //        return Ok(new { message = "Tipo de préstamo actualizado con éxito", tipoPrestamo.Id });
-    //    }
-    //    catch (Exception e)
-    //    {
-    //        return e.InnerException != null
-    //            ? new BadRequestObjectResult(e.InnerException.Message)
-    //            : new BadRequestObjectResult(e.Message);
-    //    }
-    //}
+            return Ok(new { message = "Tipo de préstamo actualizado con éxito", tipoPrestamo.Id });
+        }
+        catch (Exception e)
+        {
+            return e.InnerException != null
+                ? new BadRequestObjectResult(e.InnerException.Message)
+                : new BadRequestObjectResult(e.Message);
+        }
+    }
 
     [HttpPut("{id:int}/toggle")]
     public async Task<ActionResult> Toggle(int id)

@@ -10,7 +10,10 @@ public class Departamento : BaseEntity
     public int? RegionId { get; set; }
     public string? Nombre { get; set; }
     public string? Descripcion { get; set; }
-    public List<Municipio>? Municipios { get; set; }            
+    public List<Municipio>? Municipios { get; set; }
+    public ICollection<InteresesDepartamentos> InteresesDepartamentos { get; set; } = new List<InteresesDepartamentos>();
+    public ICollection<MoraDepartamentos> MoraDepartamentos { get; set; } = new List<MoraDepartamentos>();
+    public ICollection<ParametrosDepartamentos> ParametrosDepartamentos { get; set; } = new List<ParametrosDepartamentos>();
     //[InverseProperty("DepartamentoNacmiento")]
     //public List<Persona> DepartamentoNacimientos { get; set; } = new List<Persona>();
     //[InverseProperty("DepartamentoResidencia")]
