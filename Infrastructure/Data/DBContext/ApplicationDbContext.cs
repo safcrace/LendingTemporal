@@ -33,14 +33,14 @@ namespace Infrastructure.Data.DBContext
         public DbSet<EstadoPrestamo>? EstadoPrestamos { get; set; }
         public DbSet<FormaPago>? FormaPagos { get; set; }
         public DbSet<Genero> Generos { get; set; } = null!;                
-        public DbSet<InteresesDepartamentos> InteresesRegiones { get; set; } = null!;                
+        public DbSet<InteresesDepartamentos> InteresesDepartamentos { get; set; } = null!;                
         public DbSet<ListadoGeneral> ListadoGeneral { get; set; } = null!;                
         public DbSet<ListadoDeudores> ListadoDeudores { get; set; } = null!;                
         public DbSet<Municipio>? Municipios { get; set; }                   
-        public DbSet<MoraDepartamentos>? MoraRegiones { get; set; }                   
+        public DbSet<MoraDepartamentos>? MoraDepartamentos { get; set; }                   
         public DbSet<Ocupacion>? Ocupaciones { get; set; }                   
         public DbSet<Pais>? Paises { get; set; }
-        public DbSet<ParametrosDepartamentos>? ParametrosRegiones { get; set; }
+        public DbSet<ParametrosDepartamentos>? ParametrosDepartamentos { get; set; }
         public DbSet<Persona>? Personas { get; set; }        
         public DbSet<PlanPago>? PlanPagos { get; set; }        
         public DbSet<Prestamo>? Prestamos { get; set; }        

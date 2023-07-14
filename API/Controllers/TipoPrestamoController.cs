@@ -54,12 +54,12 @@ public class TipoPrestamoController : ControllerBase
 
         var tipoPrestamo = mapper.Map<TipoPrestamoDto>(tipo);
 
-        var intereses = await _dbContext.InteresesRegiones.Where(x => x.TipoPrestamoId == tipoPrestamo.Id).ToListAsync();       
-        var InteresesRegiones = this.mapper.Map<List<InteresesDepartamentosDto>>(intereses);        
-        var mora = await _dbContext.MoraRegiones.Where(x => x.TipoPrestamoId == tipoPrestamo.Id).ToListAsync();
-        var moraRegiones = this.mapper.Map<List<MoraDepartamentosDto>>(mora);
-        var parametros = await _dbContext.ParametrosRegiones.Where(x => x.TipoPrestamoId == tipoPrestamo.Id).ToListAsync();        
-        var parametrosRegiones = this.mapper.Map<List<ParametrosDepartamentosDto>>(parametros);
+        var intereses = await _dbContext.InteresesDepartamentos.Where(x => x.TipoPrestamoId == tipoPrestamo.Id).ToListAsync();       
+        var interesesDepartamentos = this.mapper.Map<List<InteresesDepartamentosDto>>(intereses);        
+        var mora = await _dbContext.MoraDepartamentos.Where(x => x.TipoPrestamoId == tipoPrestamo.Id).ToListAsync();
+        var moraDepartamentos = this.mapper.Map<List<MoraDepartamentosDto>>(mora);
+        var parametros = await _dbContext.ParametrosDepartamentos.Where(x => x.TipoPrestamoId == tipoPrestamo.Id).ToListAsync();        
+        var parametrosDepartamentos = this.mapper.Map<List<ParametrosDepartamentosDto>>(parametros);
         var documentos = await _dbContext.DocumentosPrestamos.Where(x => x.TipoPrestamoId == tipoPrestamo.Id).ToListAsync();
         var documentosPrestamo = this.mapper.Map<List<DocumentoPrestamoDto>>(documentos);
 
@@ -71,7 +71,7 @@ public class TipoPrestamoController : ControllerBase
 
         ////var dtos = new List<TipoPrestamoDto>();
 
-        return Ok(new { tipoPrestamo, nombreMoneda, nombreTipoCuota, InteresesRegiones, moraRegiones, parametrosRegiones, documentosPrestamo });
+        return Ok(new { tipoPrestamo, nombreMoneda, nombreTipoCuota, interesesDepartamentos, moraDepartamentos, parametrosDepartamentos, documentosPrestamo });
     }
 
     [HttpGet("moneda")]
@@ -113,11 +113,9 @@ public class TipoPrestamoController : ControllerBase
         {
             var tipoPrestamo = await repository.TipoPrestamo.GetByIdAsync(id);
 
-            //if (tipoPrestamo == null) return NotFound();
-            //var docs = await repository.Repository<DocumentosPrestamo>()
-            //    .ListAsync(new BaseSpecification<DocumentosPrestamo>(x => x.TipoPrestamoId == tipoPrestamo.Id));
+            if (tipoPrestamo == null) return NotFound();
 
-            //repository.Repository<DocumentosPrestamo>().DeleteRange(docs);
+            await UpdateComplements(id);
 
             mapper.Map(tipoPrestamoDto, tipoPrestamo);
             _dbContext.TipoPrestamos.Update(tipoPrestamo);
@@ -133,6 +131,29 @@ public class TipoPrestamoController : ControllerBase
                 ? new BadRequestObjectResult(e.InnerException.Message)
                 : new BadRequestObjectResult(e.Message);
         }
+    }
+
+    private async Task UpdateComplements(int id)
+    {
+        await _dbContext.Database.ExecuteSqlInterpolatedAsync($@"Delete From
+                                                                        InteresesDepartamentos
+                                                                     Where
+                                                                        TipoPrestamoId = {id}");
+
+        await _dbContext.Database.ExecuteSqlInterpolatedAsync($@"Delete From
+                                                                        MoraDepartamentos
+                                                                     Where
+                                                                        TipoPrestamoId = {id}");
+
+        await _dbContext.Database.ExecuteSqlInterpolatedAsync($@"Delete From
+                                                                        ParametrosDepartamentos
+                                                                     Where
+                                                                        TipoPrestamoId = {id}");
+
+        await _dbContext.Database.ExecuteSqlInterpolatedAsync($@"Delete From
+                                                                        DocumentosPrestamos
+                                                                     Where
+                                                                        TipoPrestamoId = {id}");
     }
 
     [HttpPut("{id:int}/toggle")]
