@@ -14,8 +14,8 @@ public class Departamento : BaseEntity
     public ICollection<InteresesDepartamentos> InteresesDepartamentos { get; set; } = new List<InteresesDepartamentos>();
     public ICollection<MoraDepartamentos> MoraDepartamentos { get; set; } = new List<MoraDepartamentos>();
     public ICollection<ParametrosDepartamentos> ParametrosDepartamentos { get; set; } = new List<ParametrosDepartamentos>();
-    //[InverseProperty("DepartamentoNacmiento")]
-    //public List<Persona> DepartamentoNacimientos { get; set; } = new List<Persona>();
+    [InverseProperty("DepartamentoNegocio")]
+    public List<Persona> DepartamentoNegocios { get; set; } = new List<Persona>();
     //[InverseProperty("DepartamentoResidencia")]
     //public List<Persona> DepartamentoResidencias { get; set; } = new List<Persona>();
 }

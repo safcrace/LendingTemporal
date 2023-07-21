@@ -24,6 +24,14 @@ namespace API.Helpers
             CreateMap<Municipio, MunicipioDto>();
             CreateMap<TipoCuota, TipoCuotaDto>();
             CreateMap<Moneda, MonedaDto>();
+            CreateMap<CanalIngreso, CanalIngresoDto>();
+            CreateMap<EmpresaCelular, EmpresaCelularDto>();
+            CreateMap<GrupoFamiliar, GrupoFamiliarDto>();
+            CreateMap<MontoInteresado, MontoInteresadoDto>();
+            CreateMap<OcupacionSinFin, OcupacionSinFinDto>();
+            CreateMap<ProductoInteresado, ProductoInteresadoDto>();
+            CreateMap<SegmentoNegocio, SegmentoNegocioDto>();
+            CreateMap<SubSegmentoNegocio, SubSegmentoNegocioDto>();
             CreateMap<InteresesDepartamentos, InteresesDepartamentosDto>(); 
             CreateMap<Banco, BancoDto>();
             CreateMap<Caja, CajaDto>();

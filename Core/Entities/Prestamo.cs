@@ -18,6 +18,12 @@ namespace Core.Entities
         public int EstadoPrestamoId { get; set; }
         public EstadoOrigen? EstadoOrigen { get; set; }
         public int? EstadoOrigenId { get; set; }
+        public ProductoInteresado? ProductoInteresado { get; set; }
+        public int? ProductoInteresadoId { get; set; }
+        public MontoInteresado? MontoInteresado { get; set; }
+        public int? MontoInteresadoId { get; set; }
+        public CanalIngreso? CanalIngreso { get; set; }
+        public int? CanalIngresoId { get; set; }
         public DestinoPrestamo? DestinoPrestamo { get; set; }
         public int DestinoPrestamoId { get; set; }
         public TipoPrestamo? TipoPrestamo { get; set; }

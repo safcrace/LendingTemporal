@@ -11,9 +11,9 @@ public class Municipio
     public string? Descripcion { get; set; }
     public DateTime FechaCreacion { get; set; } = DateTime.Now;
     public DateTime FechaModificacion { get; set; } = DateTime.Now;
-    public bool Habilitado { get; set; } = true;    
-    //[InverseProperty("MunicipioNacimiento")]
-    //public List<Persona> MunicipioNacimientos { get; set; } = new List<Persona>();
+    public bool Habilitado { get; set; } = true;
+    [InverseProperty("MunicipioNegocio")]
+    public List<Persona> MunicipioNegocios { get; set; } = new List<Persona>();
     //[InverseProperty("MunicipioResidencia")]
     //public List<Persona> MunicipioResidencias { get; set; } = new List<Persona>();
 }

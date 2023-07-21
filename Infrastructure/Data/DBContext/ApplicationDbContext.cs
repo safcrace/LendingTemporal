@@ -20,12 +20,16 @@ namespace Infrastructure.Data.DBContext
         public DbSet<AplicacionPagos>? AplicacionPagos { get; set; }
         public DbSet<Banco>? Bancos { get; set; }
         public DbSet<Caja>? Cajas { get; set; }        
+        public DbSet<CanalIngreso>? CanalesIngresos { get; set; }        
+        public DbSet<ContactoEmpresa>? ContactosEmpresas { get; set; }        
         public DbSet<Departamento>? Departamentos { get; set; }
         public DbSet<DestinoPrestamo>? DestinoPrestamos { get; set; }        
         public DbSet<DetallePlanPagoTemporal>? DetallePlanPagoTemporales { get; set; }
         public DbSet<DocumentosPrestamo>? DocumentosPrestamos { get; set; }
         public DbSet<Entidad>? Entidades { get; set; }
         public DbSet<Empresa>? Empresas { get; set; }
+        public DbSet<EmpresaCelular>? EmpresasCelulares { get; set; }
+        public DbSet<Escolaridad>? Escolaridad { get; set; }
         public DbSet<EstadoCivil>? EstadoCivil { get; set; }
         public DbSet<EstadoCuenta>? EstadoCuentas { get; set; }        
         public DbSet<EstadoCuentaPrestamo>? EstadoCuentaPrestamos { get; set; }        
@@ -33,21 +37,27 @@ namespace Infrastructure.Data.DBContext
         public DbSet<EstadoPrestamo>? EstadoPrestamos { get; set; }
         public DbSet<FormaPago>? FormaPagos { get; set; }
         public DbSet<Genero> Generos { get; set; } = null!;                
+        public DbSet<GrupoFamiliar> GrupoFamiliar { get; set; } = null!;                
         public DbSet<InteresesDepartamentos> InteresesDepartamentos { get; set; } = null!;                
         public DbSet<ListadoGeneral> ListadoGeneral { get; set; } = null!;                
         public DbSet<ListadoDeudores> ListadoDeudores { get; set; } = null!;                
         public DbSet<Municipio>? Municipios { get; set; }                   
+        public DbSet<MontoInteresado>? MontosInteresados { get; set; }                   
         public DbSet<MoraDepartamentos>? MoraDepartamentos { get; set; }                   
         public DbSet<Ocupacion>? Ocupaciones { get; set; }                   
+        public DbSet<OcupacionSinFin>? OcupacionSinFin { get; set; }                   
         public DbSet<Pais>? Paises { get; set; }
         public DbSet<ParametrosDepartamentos>? ParametrosDepartamentos { get; set; }
         public DbSet<Persona>? Personas { get; set; }        
         public DbSet<PlanPago>? PlanPagos { get; set; }        
         public DbSet<Prestamo>? Prestamos { get; set; }        
+        public DbSet<ProductoInteresado>? ProductosInteresados { get; set; }        
         public DbSet<RegistroCaja>? RegistroCajas { get; set; }        
         public DbSet<Region>? Regiones { get; set; }        
         public DbSet<RelacionEntidad>? RelacionEntidades { get; set; }        
+        public DbSet<SegmentoNegocio>? SegmentoNegocios { get; set; }        
         public DbSet<Sesion>? Sesiones { get; set; }        
+        public DbSet<SubSegmentoNegocio>? SubSegmentoNegocios { get; set; }        
         public DbSet<TipoBitacora>? TipoBitacoras { get; set; }        
         public DbSet<TipoCuota>? TipoCuotas { get; set; }        
         public DbSet<TipoPrestamo>? TipoPrestamos { get; set; }

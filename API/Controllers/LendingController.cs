@@ -212,7 +212,7 @@ namespace API.Controllers
                                                 x.NumeroTelefono,
                                                 x.NumeroCelular,
                                                 x.Direccion,
-                                                x.DireccionLaboral
+                                                x.DireccionNegocio
                                             }).FirstOrDefaultAsync();
 
                 //var agenteP = await (from pre in _dbContext.Prestamos
@@ -321,14 +321,14 @@ namespace API.Controllers
                                       per.Colonia,
                                       per.NumeroTelefono,
                                       per.NumeroCelular,
-                                      per.NumeroTelefonoLaboral,
+                                      per.NumeroTelefonoNegocio,
                                       per.NIT,
                                       per.PaisNacimientoId,
                                       per.DepartamentoId,
                                       per.MunicipioId,
                                       per.EstadoCivilId,                                      
-                                      per.DireccionLaboral,
-                                      per.OcupacionId,
+                                      per.DireccionNegocio,
+                                      per.OcupacionSinFinId,
                                       per.Comentarios,
                                       per.CodigoSAP
                                   }).ToListAsync();
@@ -369,14 +369,14 @@ namespace API.Controllers
             persona.TipoViviendaId = updatePersonLendingDto.TipoViviendaId;
             persona.NumeroTelefono = updatePersonLendingDto.NumeroTelefono;
             persona.NumeroCelular = updatePersonLendingDto.NumeroCelular;
-            persona.NumeroTelefonoLaboral = updatePersonLendingDto.NumeroTelefonoLaboral;
+            persona.NumeroTelefonoNegocio = updatePersonLendingDto.NumeroTelefonoLaboral;
             persona.NIT = updatePersonLendingDto.NIT;
             persona.EstadoCivilId = updatePersonLendingDto.EstadoCivilId;
             persona.PaisNacimientoId = updatePersonLendingDto.PaisNacimientoId;
             persona.DepartamentoId = updatePersonLendingDto.DepartamentoId;
             persona.MunicipioId = updatePersonLendingDto.MunicipioId;
-            persona.OcupacionId = updatePersonLendingDto.OcupacionId;
-            persona.DireccionLaboral = updatePersonLendingDto.DireccionLaboral;
+            persona.OcupacionSinFinId = updatePersonLendingDto.OcupacionId;
+            persona.DireccionNegocio = updatePersonLendingDto.DireccionLaboral;
             persona.Comentarios = updatePersonLendingDto.Comentarios;
             persona.CodigoSAP = updatePersonLendingDto.CodigoSAP;
 

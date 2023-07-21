@@ -32,13 +32,13 @@ public static class PersonsSeed
                 DepartamentoId = null,
                 MunicipioId = null,
                 NumeroCelular = null,
-                NumeroTelefonoLaboral = null,
-                OcupacionId = null,
+                NumeroTelefonoNegocio = null,
+                OcupacionSinFinId = null,
                 PaisNacimientoId = null,
                 PrimerApellido = "Example",
                 SegundoNombre = null,
-                DireccionLaboral = null,
-                TipoViviendaId = null
+                DireccionNegocio = null,
+                //TipoViviendaId = null
             }
         };
 

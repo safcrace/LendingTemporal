@@ -13,13 +13,13 @@ using System.Collections.Generic;
 namespace API.Controllers
 {
     public class CataloguesController : BaseApiController
-    {        
+    {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly ApplicationDbContext _dbContext;
 
         public CataloguesController(IUnitOfWork unitOfWork, IMapper mapper, ApplicationDbContext dbContext)
-        {            
+        {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _dbContext = dbContext;
@@ -93,7 +93,7 @@ namespace API.Controllers
             var result = await _unitOfWork.Complete();
             if (result < 0) return null!;
 
-            return Ok(new { Message = "Acción realizada Satisfactoriamente."});
+            return Ok(new { Message = "Acción realizada Satisfactoriamente." });
         }
 
         [HttpGet("departamento_region/{regionId}")]
@@ -109,7 +109,7 @@ namespace API.Controllers
         [HttpPut("departamento_region/{departamentoId}")]
         public async Task<ActionResult<IEnumerable<RegionDto>>> UpdateRegionDepartamento(int departamentoId, int regionId, bool Action = true)
         {
-            var departamento = await _dbContext.Departamentos.Where(x => x.Id == departamentoId).FirstOrDefaultAsync();            
+            var departamento = await _dbContext.Departamentos.Where(x => x.Id == departamentoId).FirstOrDefaultAsync();
 
             if (departamento is null) return NotFound();
 
@@ -126,7 +126,7 @@ namespace API.Controllers
 
             await _dbContext.SaveChangesAsync();
 
-            return Ok(new {message = "Acción Realizada Satisfactoriamente"});
+            return Ok(new { message = "Acción Realizada Satisfactoriamente" });
         }
 
 
@@ -149,7 +149,7 @@ namespace API.Controllers
 
             return Ok(_mapper.Map<List<MunicipioDto>>(municipios));
         }
-        
+
         [HttpGet("bancos")]
         public async Task<ActionResult<IReadOnlyList<BancoDto>>> GetBancos()
         {
@@ -172,7 +172,7 @@ namespace API.Controllers
         {
             var estadoCivil = await _unitOfWork.Repository<EstadoCivil>().ListAllAsync();
 
-            return Ok(_mapper.Map<IReadOnlyList<EstadoCivilDto>>(estadoCivil));           
+            return Ok(_mapper.Map<IReadOnlyList<EstadoCivilDto>>(estadoCivil));
         }
 
         [HttpGet("forma_pago")]
@@ -241,7 +241,7 @@ namespace API.Controllers
         [HttpGet("gestores")]
         public async Task<ActionResult<IReadOnlyList<ListadoAsesor>>> GetGestores()
         {
-            return await _dbContext.Set<ListadoAsesor>().ToListAsync();            
+            return await _dbContext.Set<ListadoAsesor>().ToListAsync();
         }
 
         [HttpGet("empresaPlanilla")]
@@ -306,26 +306,26 @@ namespace API.Controllers
 
                     //foreach (var plan in cuotasPendientesPlanPago)
                     //{
-                        //if (fechaReferencia.Date < plan.FechaModificacion)
-                        //{
-                        //    plan.CuotaMora = 0;
-                        //    plan.SaldoMora = 0;
-                        //    plan.CuotaIvaMora = 0;
-                        //    plan.SaldoIvaMora = 0;
-                        //    //plan.TotalCuota = plan.CuotaCapital + plan.CuotaIntereses + plan.CuotaIvaIntereses + plan.CuotaMora + plan.CuotaIvaMora;
-                        //    _dbContext.Update(plan);
-                        //    await _dbContext.SaveChangesAsync();
-                        //}
-                        //if (fechaReferencia > plan.FechaModificacion)
-                        //{
-                        //    plan.CuotaMora = 0;
-                        //    plan.SaldoMora = 0;
-                        //    plan.CuotaIvaMora = 0;
-                        //    plan.SaldoIvaMora = 0;
-                        //    //plan.TotalCuota = plan.CuotaCapital + plan.CuotaIntereses + plan.CuotaIvaIntereses + plan.CuotaMora + plan.CuotaIvaMora;
-                        //    _dbContext.Update(plan);
-                        //    await _dbContext.SaveChangesAsync();
-                        //}
+                    //if (fechaReferencia.Date < plan.FechaModificacion)
+                    //{
+                    //    plan.CuotaMora = 0;
+                    //    plan.SaldoMora = 0;
+                    //    plan.CuotaIvaMora = 0;
+                    //    plan.SaldoIvaMora = 0;
+                    //    //plan.TotalCuota = plan.CuotaCapital + plan.CuotaIntereses + plan.CuotaIvaIntereses + plan.CuotaMora + plan.CuotaIvaMora;
+                    //    _dbContext.Update(plan);
+                    //    await _dbContext.SaveChangesAsync();
+                    //}
+                    //if (fechaReferencia > plan.FechaModificacion)
+                    //{
+                    //    plan.CuotaMora = 0;
+                    //    plan.SaldoMora = 0;
+                    //    plan.CuotaIvaMora = 0;
+                    //    plan.SaldoIvaMora = 0;
+                    //    //plan.TotalCuota = plan.CuotaCapital + plan.CuotaIntereses + plan.CuotaIvaIntereses + plan.CuotaMora + plan.CuotaIvaMora;
+                    //    _dbContext.Update(plan);
+                    //    await _dbContext.SaveChangesAsync();
+                    //}
 
 
                     //    if (plan.FechaPago <= fechaActual && plan.FechaModificacion.Date != fechaReferencia)
@@ -368,7 +368,7 @@ namespace API.Controllers
 
         [HttpGet("reporte_CasosBTS")]
         public async Task<ActionResult<IEnumerable<ReporteCasosBTS>>> GetReporteBts()
-        {            
+        {
             var reporte = await _dbContext.Set<ReporteCasosBTS>().ToListAsync();
 
             return Ok(reporte);
@@ -424,12 +424,93 @@ namespace API.Controllers
         [HttpGet("busqueda_personas/{search}")]
         public async Task<ActionResult<ListadoPersonas>> GetSearchPerson(string search)
         {
-            List<Core.Entities.Views.ListadoPersonas> listado = new();            
+            List<Core.Entities.Views.ListadoPersonas> listado = new();
 
-            listado = await _dbContext.fxMDI_PersonsQryFull(search).ToListAsync();                
-            
+            listado = await _dbContext.fxMDI_PersonsQryFull(search).ToListAsync();
+
 
             return Ok(listado);
         }
+
+        [HttpGet("canales-ingreso")]
+        public async Task<ActionResult<IEnumerable<CanalIngresoDto>>> GetCanalesIngreso()
+        {
+            var canalesIngresos = await _unitOfWork.Repository<CanalIngreso>().ListAllAsync();
+
+            if (canalesIngresos == null) return NotFound();
+
+            return Ok(_mapper.Map<List<CanalIngresoDto>>(canalesIngresos));
+        }
+
+        [HttpGet("empresas-celular")]
+        public async Task<ActionResult<IEnumerable<EmpresaCelularDto>>> GetEmpresasCelular()
+        {
+            var empresasCelulares = await _unitOfWork.Repository<EmpresaCelular>().ListAllAsync();
+
+            if (empresasCelulares == null) return NotFound();
+
+            return Ok(_mapper.Map<List<EmpresaCelularDto>>(empresasCelulares));
+        }
+
+        [HttpGet("grupo-familiar")]
+        public async Task<ActionResult<IEnumerable<GrupoFamiliarDto>>> GetFamiliarGroup()
+        {
+            var grupoFamiliar = await _unitOfWork.Repository<GrupoFamiliar>().ListAllAsync();
+
+            if (grupoFamiliar == null) return NotFound();
+
+            return Ok(_mapper.Map<List<GrupoFamiliarDto>>(grupoFamiliar));
+        }
+
+        [HttpGet("monto-interesado")]
+        public async Task<ActionResult<IEnumerable<MontoInteresadoDto>>> GetMontosInteresados()
+        {
+            var montoInteresados = await _unitOfWork.Repository<MontoInteresado>().ListAllAsync();
+
+            if (montoInteresados == null) return NotFound();
+
+            return Ok(_mapper.Map<List<MontoInteresadoDto>>(montoInteresados));
+        }
+
+        [HttpGet("ocupaciones-SinFin")]
+        public async Task<ActionResult<IEnumerable<OcupacionSinFinDto>>> GetOcupacionesSinFin()
+        {
+            var ocupaciones = await _unitOfWork.Repository<OcupacionSinFin>().ListAllAsync();
+
+            if (ocupaciones == null) return NotFound();
+
+            return Ok(_mapper.Map<List<OcupacionSinFinDto>>(ocupaciones));
+        }
+
+        [HttpGet("productos-interesados")]
+        public async Task<ActionResult<IEnumerable<ProductoInteresadoDto>>> GetProductosInteresados()
+        {
+            var productoInteresados = await _unitOfWork.Repository<ProductoInteresado>().ListAllAsync();
+
+            if (productoInteresados == null) return NotFound();
+
+            return Ok(_mapper.Map<List<ProductoInteresadoDto>>(productoInteresados));
+        }
+
+        [HttpGet("segmentos-negocio")]
+        public async Task<ActionResult<IEnumerable<SegmentoNegocioDto>>> GetSegmentosNegocio()
+        {
+            var segmentoNegocios = await _unitOfWork.Repository<SegmentoNegocio>().ListAllAsync();
+
+            if (segmentoNegocios == null) return NotFound();
+
+            return Ok(_mapper.Map<List<SegmentoNegocioDto>>(segmentoNegocios));
+        }
+
+        [HttpGet("subgementos-negocio/{segmentoNegocioId}")]
+        public async Task<ActionResult<IEnumerable<SubSegmentoNegocioDto>>> GetSubsegmentosNegocios(int segmentoNegocioId)
+        {
+            var subsegmentos = await _dbContext.SubSegmentoNegocios.Where(x => x.SegmentoNegocioId == segmentoNegocioId ).ToListAsync();
+
+            if (subsegmentos == null) return NotFound();
+
+            return Ok(_mapper.Map<List<SubSegmentoNegocioDto>>(subsegmentos));
+        }
+
     }
 }
