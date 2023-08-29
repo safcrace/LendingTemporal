@@ -1,7 +1,5 @@
 ﻿using Core.Entities.Identity;
-using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
-using System.Security.Cryptography;
 
 namespace Core.Entities;
 
@@ -20,21 +18,32 @@ public class Persona : BaseEntity
     public int? DepartamentoId { get; set; }
     public Municipio? Municipio { get; set; }
     public string? MunicipioId { get; set; }
-    public Ocupacion? OcupacionSinFin { get; set; }
+    public OcupacionSinFin? OcupacionSinFin { get; set; }
     public int? OcupacionSinFinId { get; set; }
     public TipoVivienda? TipoVivienda { get; set; }
     public int? TipoViviendaId { get; set; }
     public Escolaridad? Escolaridad { get; set; }
     public int? EscolaridadId { get; set; }
     public GrupoFamiliar? GrupoFamiliar { get; set; }
+    public int? GrupoFamiliarId { get; set; }
+    public GrupoFamiliar? NumeroPersonasTrabajan { get; set; }
+    public int? NumeroPersonasTrabajanId{ get; set; }
     public Departamento? DepartamentoNegocio { get; set; }
     public int? DepartamentoNegocioId { get; set; }
     public Municipio? MunicipioNegocio { get; set; }
     public string? MunicipioNegocioId { get; set; }
-    public int? GrupoFamiliarId { get; set; }
+    public UbicacionNegocio? UbicacionNegocio { get; set; }
+    public int? UbicacionNegocioId { get; set; }
+    public ClienteHabitual? ClientesHabituales { get; set; }
+    public int? ClientesHabitualesId { get; set; }
+    public SegmentoNegocio? SegmentoNegocio { get; set; }
+    public int? SegmentoNegocioId { get; set; }
+    public SubSegmentoNegocio? SubSegmentoNegocio { get; set; }
+    public int? SubSegmentoNegocioId { get; set; }
     public string? PrimerNombre { get; set; }    
     public string? PrimerApellido { get; set; }
     public string? SegundoNombre { get; set; }
+    public string? TercerNombre { get; set; }
     public string? SegundoApellido { get; set; }    
     public string? ApellidoCasada { get; set; }
     public DateTime? FechaNacimiento { get; set; } = null;
@@ -47,8 +56,16 @@ public class Persona : BaseEntity
     public string? NumeroCelular { get; set; }
     public string? NumeroTelefonoNegocio { get; set; }
     public string? NumeroDocumento { get; set; }
+    public bool PoseeNegocio { get; set; }
+    public bool PoseeRegistroSAT { get; set; }
+    public DateTime? FechaInicioNegocio { get; set; }
     public string? NombreNegocio { get; set; }
     public string? DireccionNegocio { get; set; }
+    public decimal VentasMensuales { get; set; }
+    public decimal GananciasMensuales { get; set; }
     public string? Comentarios { get; set; }
+    public decimal OtrosIngresos { get; set; }
+    public string? OrigenOtrosIngresos { get; set; }
     public string? CodigoSAP { get; set; }
+    public List<ReferenciaPersona> BitacoraPrestamos { get; set; } = new List<ReferenciaPersona>();
 }

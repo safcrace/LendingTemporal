@@ -183,6 +183,16 @@ public class TipoPrestamoController : ControllerBase
         }
     }
 
+    [HttpGet("documentos_requeridos/{tipoPrestamoId:int}")]
+    public async Task<ActionResult<ResponseCatalogoDto>> GetDocumentosRequeridos(int tipoPrestamoId)
+    {
+        var documentos = await _dbContext.DocumentosPrestamos.Where(p => p.TipoPrestamoId == tipoPrestamoId).ToListAsync();
+
+        var documentosRequeridos = mapper.Map<List<ResponseCatalogoDto>>(documentos);
+
+        return Ok(documentosRequeridos);
+    }
+
     private async Task<List<string>> GetDocuments(int prestamoId)
     {
         var documentos = await repository.Repository<DocumentosPrestamo>()

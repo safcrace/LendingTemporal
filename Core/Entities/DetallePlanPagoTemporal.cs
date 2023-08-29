@@ -12,5 +12,6 @@
         public decimal TotalCuota { get; set; }
         public decimal SaldoCapital { get; set; }
         public DateTime FechaPago { get; set; }
+        
     }
 }

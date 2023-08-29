@@ -18,6 +18,8 @@ namespace Infrastructure.Data.Config
             builder.Property(x => x.TasaIva).HasColumnType("decimal(18,2)");                        
             builder.Property(x => x.TasaMora).HasColumnType("decimal(18,2)");                        
             builder.Property(x => x.TasaGastos).HasColumnType("decimal(18,2)");
+            builder.Property(x => x.MontoRealSolicitado).HasColumnType("decimal(18,2)");            
+            builder.Property(x => x.ObjetivoCredito).HasMaxLength(300);
         }
     }
 }

@@ -10,6 +10,8 @@ namespace Core.Entities
         public ICollection<Prestamo> EntidadesPrestamos { get; set; } = new List<Prestamo>();
         [InverseProperty("GestorPrestamo")]
         public ICollection<Prestamo> GestoresPrestamos { get; set; } = new List<Prestamo>();
+        [InverseProperty("AnalistaPrestamo")]
+        public ICollection<Prestamo> AnalistaPrestamos { get; set; } = new List<Prestamo>();
         [InverseProperty("EmpresaPrestamo")]
         public ICollection<Prestamo> EmpresasPrestamos { get; set; } = new List<Prestamo>();
     }

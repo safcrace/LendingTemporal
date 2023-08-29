@@ -1,7 +1,9 @@
 ﻿
 using API.Dtos;
+using API.Helpers;
 using AutoMapper;
 using Core.Entities;
+using Core.Entities.Identity;
 using Core.Entities.Views;
 using Core.Interfaces;
 using Infrastructure.Data.DBContext;
@@ -244,6 +246,28 @@ namespace API.Controllers
             return await _dbContext.Set<ListadoAsesor>().ToListAsync();
         }
 
+        [HttpGet("analistas")]
+        public async Task<ActionResult<IReadOnlyList<Object>>> GetAnalistas()
+        {
+            var analistas = from per in _dbContext.Personas
+                            join ent in _dbContext.Entidades on per.EntidadId equals ent.Id
+                            join ren in _dbContext.RelacionEntidades on ent.Id equals ren.EntidadHijaId
+                            where  ren.TipoRelacionId == 5 && ren.Habilitado == true
+                            select new ListadoAnalistasDto
+                            {
+                                EntidadId = ent.Id,                               
+                                NombreAnalista = per.ApellidoCasada == null
+                                    ? $"{per.PrimerNombre} {per.SegundoNombre} {per.TercerNombre} {per.PrimerApellido} {per.SegundoApellido}"
+                                    : $"{per.PrimerNombre} {per.SegundoNombre} {per.TercerNombre} {per.PrimerApellido} {per.SegundoApellido} De {per.ApellidoCasada}"
+                            };
+
+            foreach (var analista in analistas)
+            {
+                analista.NombreAnalista = analista.NombreAnalista.RemoveWhiteSpaces();
+            }
+            return Ok(analistas);
+        }
+
         [HttpGet("empresaPlanilla")]
         public async Task<ActionResult<IReadOnlyList<ListadoEmpresaPlanilla>>> GetEmpresasPlanilla()
         {
@@ -452,6 +476,16 @@ namespace API.Controllers
             return Ok(_mapper.Map<List<EmpresaCelularDto>>(empresasCelulares));
         }
 
+        [HttpGet("escolaridad")]
+        public async Task<ActionResult<IEnumerable<EscolaridadDto>>> GetEscolaridad()
+        {
+            var escolaridad = await _unitOfWork.Repository<Escolaridad>().ListAllAsync();
+
+            if (escolaridad == null) return NotFound();
+
+            return Ok(_mapper.Map<List<EscolaridadDto>>(escolaridad));
+        }
+
         [HttpGet("grupo-familiar")]
         public async Task<ActionResult<IEnumerable<GrupoFamiliarDto>>> GetFamiliarGroup()
         {
@@ -512,5 +546,105 @@ namespace API.Controllers
             return Ok(_mapper.Map<List<SubSegmentoNegocioDto>>(subsegmentos));
         }
 
+        [HttpGet("origen-solicitud")]
+        public async Task<ActionResult<IEnumerable<ResponseCatalogoDto>>> GetOrigenSolicitud()
+        {
+            var origenSolicitud = await _unitOfWork.Repository<OrigenSolicitud>().ListAllAsync();
+
+            if (origenSolicitud == null) return NotFound();
+
+            return Ok(_mapper.Map<List<ResponseCatalogoDto>>(origenSolicitud));
+        }
+
+        [HttpGet("otros-ingresos")]
+        public async Task<ActionResult<IEnumerable<ResponseCatalogoDto>>> GetOtrosIngresos()
+        {
+            var origenIngresos = await _unitOfWork.Repository<OrigenIngreso>().ListAllAsync();
+
+            if (origenIngresos == null) return NotFound();
+
+            return Ok(_mapper.Map<List<ResponseCatalogoDto>>(origenIngresos));
+        }
+
+
+        [HttpGet("ubicación-negocio")]
+        public async Task<ActionResult<IEnumerable<ResponseCatalogoDto>>> GetUbicaciónNegocio()
+        {
+            var ubicacionNegocio = await _unitOfWork.Repository<UbicacionNegocio>().ListAllAsync();
+
+            if (ubicacionNegocio == null) return NotFound();
+
+            return Ok(_mapper.Map<List<ResponseCatalogoDto>>(ubicacionNegocio));
+        }
+
+        [HttpGet("cantidad-personas")]
+        public async Task<ActionResult<IEnumerable<GrupoFamiliarDto>>> GetCantidadPersonas()
+        {
+            var cantidadPersonas = await _unitOfWork.Repository<GrupoFamiliar>().ListAllAsync();
+
+            if (cantidadPersonas == null) return NotFound();
+
+            return Ok(_mapper.Map<List<GrupoFamiliarDto>>(cantidadPersonas));
+        }
+
+        [HttpGet("clientes-habituales")]
+        public async Task<ActionResult<IEnumerable<ResponseCatalogoDto>>> GetClientesHabituales()
+        {
+            var clientesHabituales = await _unitOfWork.Repository<ClienteHabitual>().ListAllAsync();
+
+            if (clientesHabituales == null) return NotFound();
+
+            return Ok(_mapper.Map<List<ResponseCatalogoDto>>(clientesHabituales));
+        }
+
+        [HttpGet("tipos-referencia")]
+        public async Task<ActionResult<IEnumerable<ResponseCatalogoDto>>> GetTiposReferencia()
+        {
+            var tiposReferencia = await _unitOfWork.Repository<TipoReferencia>().ListAllAsync();
+
+            if (tiposReferencia == null) return NotFound();
+
+            return Ok(_mapper.Map<List<ResponseCatalogoDto>>(tiposReferencia));
+        }
+
+        [HttpGet("usuarios")]
+        public async Task<ActionResult<IEnumerable<UsuariosDto>>> GetUserList()
+        {
+            var tiposReferencia = await _dbContext.Users.ToListAsync();
+
+            if (tiposReferencia == null) return NotFound();
+
+            return Ok(_mapper.Map<List<UsuariosDto>>(tiposReferencia));
+        }
+
+        [HttpGet("medios-desembolso")]
+        public async Task<ActionResult<IEnumerable<ResponseCatalogoDto>>> GetMediosDesembolso()
+        {
+            var medios = await _unitOfWork.Repository<MedioDesembolso>().ListAllAsync();
+
+            if (medios == null) return NotFound();
+
+            return Ok(_mapper.Map<List<ResponseCatalogoDto>>(medios));
+        }
+
+        [HttpGet("motivos-rechazo")]
+        public async Task<ActionResult<IEnumerable<ResponseCatalogoDto>>> GetMotivosRechazo()
+        {
+            var motivosRechazo = await _unitOfWork.Repository<MotivoRechazo>().ListAllAsync();
+
+            if (motivosRechazo == null) return NotFound();
+
+            return Ok(_mapper.Map<List<ResponseCatalogoDto>>(motivosRechazo));
+        }
+
+        [HttpGet("tipos-cuenta")]
+        public async Task<ActionResult<IEnumerable<ResponseCatalogoDto>>> GetTiposCuenta()
+        {
+            var tiposCuenta = await _unitOfWork.Repository<TipoCuenta>().ListAllAsync();
+
+            if (tiposCuenta == null) return NotFound();
+
+            return Ok(_mapper.Map<List<ResponseCatalogoDto>>(tiposCuenta));
+        }
     }
 }

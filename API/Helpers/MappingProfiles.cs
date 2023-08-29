@@ -1,6 +1,7 @@
 ﻿using API.Dtos;
 using AutoMapper;
 using Core.Entities;
+using Core.Entities.Identity;
 
 namespace API.Helpers
 {
@@ -10,14 +11,19 @@ namespace API.Helpers
         {
             CreateMap<CreatePaymentPlanDetailsDto, PlanPago>();
             CreateMap<CreateLendingDto, Prestamo>();
-            CreateMap<CreatePersonDto, Persona>();
+            CreateMap<CreatePersonDto, Persona>().ReverseMap();
             CreateMap<CreateEmpresaDto, Empresa>();
+            CreateMap<CreateContactoEmpresaDto, ContactoEmpresa>();
             CreateMap<CreateRegistroCajaDto, RegistroCaja>();
             CreateMap<CreateTipoPrestamoDto, TipoPrestamo>();
             CreateMap<CreateDocumentoPrestamoDto, DocumentosPrestamo>();
             CreateMap<CreateInteresesDepartamentosDto, InteresesDepartamentos>();
             CreateMap<CreateMoraDepartamentosDto, MoraDepartamentos>();
             CreateMap<CreateParametrosDepartamentosDto, ParametrosDepartamentos>();
+            CreateMap<CreatePersonReferenceDto, ReferenciaPersona>();
+            CreateMap<CreateDesembolsoDto, Desembolso>();
+            CreateMap<CreaterBitacoraPrestamoDto, BitacoraPrestamo>();
+            CreateMap<BitacoraPrestamo, BitacoraPrestamoDto>();
             CreateMap<Pais, PaisDto>();
             CreateMap<Region, RegionDto>();
             CreateMap<Departamento, DepartamentoDto>();
@@ -26,6 +32,7 @@ namespace API.Helpers
             CreateMap<Moneda, MonedaDto>();
             CreateMap<CanalIngreso, CanalIngresoDto>();
             CreateMap<EmpresaCelular, EmpresaCelularDto>();
+            CreateMap<Escolaridad, EscolaridadDto>();
             CreateMap<GrupoFamiliar, GrupoFamiliarDto>();
             CreateMap<MontoInteresado, MontoInteresadoDto>();
             CreateMap<OcupacionSinFin, OcupacionSinFinDto>();
@@ -40,7 +47,23 @@ namespace API.Helpers
             CreateMap<DestinoPrestamo, DestinoPrestamoDto>();
             CreateMap<Ocupacion, OcupacionDto>();
             CreateMap<TipoVivienda, TipoViviendaDto>();
+            CreateMap<OrigenSolicitud, ResponseCatalogoDto>();
+            CreateMap<OrigenIngreso, ResponseCatalogoDto>();
+            CreateMap<UbicacionNegocio, ResponseCatalogoDto>();
+            CreateMap<ClienteHabitual, ResponseCatalogoDto>();
+            CreateMap<TipoReferencia, ResponseCatalogoDto>();
+            CreateMap<DocumentosPrestamo, ResponseCatalogoDto>();
+            CreateMap<AppUser, UsuariosDto>();
+            CreateMap<MedioDesembolso, ResponseCatalogoDto>();
+            CreateMap<TipoCuenta, ResponseCatalogoDto>();
+            CreateMap<MotivoRechazo, ResponseCatalogoDto>();
             CreateMap<DocumentosPrestamo, DocumentoPrestamoDto>();
+            CreateMap<Persona, DatosPersonaDto>().ReverseMap();
+            CreateMap<Empresa, DatosEmpresaDto>().ReverseMap();
+            CreateMap<Prestamo, DatosPrestamoDto>().ReverseMap();
+            CreateMap<ContactoEmpresa, DatosContactoEmpresaDto>().ReverseMap();
+            CreateMap<ReferenciaPersona, ReferenciaPersonaDto>().ReverseMap();
+
             //CreateMap<Gestor, GestorDto>();
 
             CreateMap<TipoPrestamo, TipoPrestamoDto>();

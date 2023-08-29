@@ -1,9 +1,5 @@
 ﻿using Core.Entities.Identity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Security.Cryptography;
 
 namespace Core.Entities
 {
@@ -15,7 +11,7 @@ namespace Core.Entities
         public Entidad? EntidadPrestamo { get; set; }
         public int? EntidadPrestamoId { get; set; }
         public EstadoPrestamo? EstadoPrestamo { get; set; }
-        public int EstadoPrestamoId { get; set; }
+        public int? EstadoPrestamoId { get; set; }
         public EstadoOrigen? EstadoOrigen { get; set; }
         public int? EstadoOrigenId { get; set; }
         public ProductoInteresado? ProductoInteresado { get; set; }
@@ -25,15 +21,22 @@ namespace Core.Entities
         public CanalIngreso? CanalIngreso { get; set; }
         public int? CanalIngresoId { get; set; }
         public DestinoPrestamo? DestinoPrestamo { get; set; }
-        public int DestinoPrestamoId { get; set; }
+        public int? DestinoPrestamoId { get; set; }
         public TipoPrestamo? TipoPrestamo { get; set; }
-        public int TipoPrestamoId { get; set; }
+        public int? TipoPrestamoId { get; set; }
         public Entidad? GestorPrestamo { get; set; }
         public int? GestorPrestamoId { get; set; }
+        public Entidad? AnalistaPrestamo { get; set; }
+        public int? AnalistaPrestamoId { get; set; }
         public Entidad? EmpresaPrestamo { get; set; }
         public int? EmpresaPrestamoId { get; set; }
+        public OrigenSolicitud? OrigenSolicitud { get; set; }
+        public int? OrigenSolicitudId { get; set; }
+        public MotivoRechazo? MotivoRechazo { get; set; }
+        public int? MotivoRechazoId { get; set; }
         public DateTime? FechaAprobacion { get; set; }
-        public DateTime? FechaDesembolso { get; set; }        
+        public DateTime? FechaDesembolso { get; set; }               
+        public decimal MontoRealSolicitado { get; set; }        
         public decimal MontoOtorgado { get; set; }
         public decimal InteresProyectado { get; set; }
         public decimal IvaProyectado { get; set; }
@@ -46,5 +49,8 @@ namespace Core.Entities
         public decimal TasaGastos { get; set; }
         public int DiasMora { get; set; }
         public DateTime? FechaPlan { get; set; }
+        public string? TokenAutorización { get; set; }
+        public string? ObjetivoCredito { get; set; }
+        public List<BitacoraPrestamo> BitacoraPrestamos { get; set; } = new List<BitacoraPrestamo>();
     }
 }

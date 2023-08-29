@@ -18,10 +18,12 @@ namespace API.Services
         {
             var apiKey = _configuration["Token:SendGridAPIKey"];
             var client = new SendGridClient(apiKey);
-            var from = new EmailAddress("support@doctorclick.app", "Info Doctor Click");
+            var from = new EmailAddress("info@t4mapps.com", "Info SinFin");
             var to = new EmailAddress(toEmail);
             var msg = MailHelper.CreateSingleEmail(from, to, subject, content, content);
             var response = await client.SendEmailAsync(msg);
+            Console.WriteLine(response.StatusCode);
+            Console.WriteLine(response.Body.ReadAsStringAsync());
         }
     }
 }

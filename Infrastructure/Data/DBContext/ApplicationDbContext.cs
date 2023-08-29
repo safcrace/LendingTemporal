@@ -19,10 +19,14 @@ namespace Infrastructure.Data.DBContext
         public DbSet<AbonoPlan>? AbonoPlanes { get; set; }
         public DbSet<AplicacionPagos>? AplicacionPagos { get; set; }
         public DbSet<Banco>? Bancos { get; set; }
+        public DbSet<BitacoraPrestamo>? BitacoraPrestamos { get; set; }
+        public DbSet<BitacoraFicha>? BitacoraFichas { get; set; }
         public DbSet<Caja>? Cajas { get; set; }        
         public DbSet<CanalIngreso>? CanalesIngresos { get; set; }        
         public DbSet<ContactoEmpresa>? ContactosEmpresas { get; set; }        
+        public DbSet<ClienteHabitual>? ClientesHabituales { get; set; }        
         public DbSet<Departamento>? Departamentos { get; set; }
+        public DbSet<Desembolso>? Desembolsos { get; set; }
         public DbSet<DestinoPrestamo>? DestinoPrestamos { get; set; }        
         public DbSet<DetallePlanPagoTemporal>? DetallePlanPagoTemporales { get; set; }
         public DbSet<DocumentosPrestamo>? DocumentosPrestamos { get; set; }
@@ -40,29 +44,37 @@ namespace Infrastructure.Data.DBContext
         public DbSet<GrupoFamiliar> GrupoFamiliar { get; set; } = null!;                
         public DbSet<InteresesDepartamentos> InteresesDepartamentos { get; set; } = null!;                
         public DbSet<ListadoGeneral> ListadoGeneral { get; set; } = null!;                
-        public DbSet<ListadoDeudores> ListadoDeudores { get; set; } = null!;                
+        public DbSet<ListadoDeudores> ListadoDeudores { get; set; } = null!;                                    
+        public DbSet<MedioDesembolso>? MediosDesembolso { get; set; }                   
         public DbSet<Municipio>? Municipios { get; set; }                   
         public DbSet<MontoInteresado>? MontosInteresados { get; set; }                   
         public DbSet<MoraDepartamentos>? MoraDepartamentos { get; set; }                   
+        public DbSet<MotivoRechazo>? MotivosRechazo { get; set; }                   
         public DbSet<Ocupacion>? Ocupaciones { get; set; }                   
-        public DbSet<OcupacionSinFin>? OcupacionSinFin { get; set; }                   
+        public DbSet<OcupacionSinFin>? OcupacionSinFin { get; set; }                           
+        public DbSet<OrigenSolicitud>? OrigenSolicitudes { get; set; }                   
         public DbSet<Pais>? Paises { get; set; }
         public DbSet<ParametrosDepartamentos>? ParametrosDepartamentos { get; set; }
         public DbSet<Persona>? Personas { get; set; }        
         public DbSet<PlanPago>? PlanPagos { get; set; }        
         public DbSet<Prestamo>? Prestamos { get; set; }        
         public DbSet<ProductoInteresado>? ProductosInteresados { get; set; }        
+        public DbSet<ReferenciaPersona>? ReferenciasPersonas { get; set; }        
         public DbSet<RegistroCaja>? RegistroCajas { get; set; }        
         public DbSet<Region>? Regiones { get; set; }        
         public DbSet<RelacionEntidad>? RelacionEntidades { get; set; }        
         public DbSet<SegmentoNegocio>? SegmentoNegocios { get; set; }        
         public DbSet<Sesion>? Sesiones { get; set; }        
         public DbSet<SubSegmentoNegocio>? SubSegmentoNegocios { get; set; }        
+        public DbSet<TipoEntidad>? TipoEntidades { get; set; }        
         public DbSet<TipoBitacora>? TipoBitacoras { get; set; }        
+        public DbSet<TipoCuenta>? TiposCuenta { get; set; }        
         public DbSet<TipoCuota>? TipoCuotas { get; set; }        
         public DbSet<TipoPrestamo>? TipoPrestamos { get; set; }
+        public DbSet<TipoReferencia>? TipoReferencias { get; set; }
         public DbSet<TipoTransaccion>? TipoTransaccion { get; set; }
         public DbSet<TipoVivienda>? TiposVivienda { get; set; }
+        public DbSet<UbicacionNegocio>? UbicacionNegocios { get; set; }
         public DbSet<Moneda>? Monedas { get; set; }
 
         public IQueryable<SaldosMigracion> SaldosMigracion(int prestamoId)
@@ -104,9 +116,11 @@ namespace Infrastructure.Data.DBContext
             modelBuilder.Entity<ListadoGeneral>().HasNoKey().ToView("v_sct_listadogeneral");
             modelBuilder.Entity<ListadoDeudores>().HasNoKey().ToView("v_sct_listadogeneral_deudores");
             modelBuilder.Entity<ListadoAsesor>().HasNoKey().ToView("v_mdi_lista__asesores");
+            //modelBuilder.Entity<ListadoProspectos>().HasNoKey().ToView(null);
             modelBuilder.Entity<ListadoEmpresaPlanilla>().HasNoKey().ToView("v_mdi_lista__empresas_con_planilla");
             modelBuilder.Entity<AplicacionPagos>().HasNoKey().ToView(null);
             modelBuilder.Entity<EstadoCuentaPrestamo>().HasNoKey().ToView("VEstadoCuenta");
+            modelBuilder.Entity<ListadoProspectos>().ToSqlQuery(@"Exec sp_ListadoProspectos");            
             modelBuilder.Entity<ReporteGeneralCreditos>().ToSqlQuery(@"Exec ReporteGeneralCreditos");            
             //modelBuilder.Entity<AplicacionPagos>().ToSqlQuery(@"Exec ReporteContabilidad '2022-11-01', '2022-11-16'  ");            
             modelBuilder.Entity<BatchFile>().ToSqlQuery(@"Exec sp_batchfile_generator");            
@@ -169,7 +183,7 @@ declare @i int, @n int;
 		, acum.SaldoMora
 		, acum.SaldoIvaMora		
 		, estados.Nombre as Estado
-		,(Select Top 1 TotalCuota from PlanPagos where PrestamoId = pre.Id and Aplicado = 0) as CuotaCalculada --Ajuste relizado por SAFC el 17/02/2023		
+		, IsNull((Select Top 1 TotalCuota from PlanPagos where PrestamoId = pre.Id and Aplicado = 0), 0) as CuotaCalculada --Ajuste relizado por SAFC el 17/02/2023
 		, convert(date, pre.FechaAprobacion) as FechaAprobacion
 		, IsNull(convert(date, pre.FechaAprobacion), convert(date, pre.FechaDesembolso)) as FechaDesembolso
 		, IsNull(ppl.PROXIMO_PAGO, '0001-01-01') as ProximoPago

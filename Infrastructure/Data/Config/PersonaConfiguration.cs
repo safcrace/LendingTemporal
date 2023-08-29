@@ -17,6 +17,7 @@ namespace Infrastructure.Data.Config
             builder.Property(x => x.NIT).IsRequired().HasMaxLength(10);
             builder.Property(x => x.PrimerNombre).IsRequired().HasMaxLength(50);
             builder.Property(x => x.SegundoNombre).HasMaxLength(50);
+            builder.Property(x => x.TercerNombre).HasMaxLength(50);
             builder.Property(x => x.PrimerApellido).IsRequired().HasMaxLength(50);
             builder.Property(x => x.SegundoApellido).HasMaxLength(50);
             builder.Property(x => x.ApellidoCasada).HasMaxLength(50);
@@ -32,7 +33,11 @@ namespace Infrastructure.Data.Config
             builder.Property(x => x.DireccionNegocio).HasMaxLength(150);
             builder.Property(x => x.NumeroDocumento).IsRequired().HasMaxLength(25);
             builder.HasIndex(x => x.NumeroDocumento).IsUnique();
-            builder.Property(x => x.CodigoSAP).HasMaxLength(75);
+            builder.HasIndex(x => x.NIT).IsUnique();
+            builder.Property(x => x.OrigenOtrosIngresos).HasMaxLength(75);
+            builder.Property(x => x.CodigoSAP).HasMaxLength(75);            
+            builder.Property(x => x.VentasMensuales).HasColumnType("decimal(18,2)");
+            builder.Property(x => x.GananciasMensuales).HasColumnType("decimal(18,2)");
         }
     }
 }

@@ -34,7 +34,7 @@ namespace Infrastructure.Data
             _dbContext.Set<T>().RemoveRange(entities);
         }
 
-        public async Task<T> GetByIdAsync(int id)
+        public async Task<T> GetByIdAsync(int? id)
         {
             return await _dbContext.Set<T>().FindAsync(id);
         }

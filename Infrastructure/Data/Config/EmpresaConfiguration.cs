@@ -9,10 +9,12 @@ namespace Infrastructure.Data.Config
         public void Configure(EntityTypeBuilder<Empresa> builder)
         {
             builder.Property(x => x.Nombre).IsRequired().HasMaxLength(100);
+            builder.Property(x => x.Alias).IsRequired().HasMaxLength(100);
             builder.Property(x => x.Telefono).HasMaxLength(30);
             builder.Property(x => x.Direccion).HasMaxLength(100);
             builder.Property(x => x.Email).HasMaxLength(50);
-            builder.Property(x => x.Nit).IsRequired().HasMaxLength(50);            
+            builder.Property(x => x.Nit).IsRequired().HasMaxLength(50);
+            builder.HasIndex(x => x.Nit).IsUnique();
         }
     }
 }

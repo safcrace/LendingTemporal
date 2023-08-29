@@ -30,7 +30,7 @@ namespace API.Dtos
         public bool PermisosComiteGerencia { get; set; } = false;
         public decimal MontoMinimoComiteGerencia { get; set; }
         public decimal MontoMaximoComiteGerencia { get; set; }
-        public bool PermisoComiteDirectores { get; set; } = false;
+        public bool PermisosComiteDirectores { get; set; } = false;
         public decimal MontoMinimoComiteDirectores { get; set; }
         public decimal MontoMaximoComiteDirectores { get; set; }
         public List<CreateParametrosDepartamentosDto>? ParametrosDepartamentos { get; set; }

@@ -172,7 +172,7 @@ namespace API.Controllers
 
             return Ok(new { message = result.Succeeded ? "Succsesful Action" : "An Error has ocurred" });
         }
-        
+
         //[HttpGet("token/is-valid/{token}")]
         //public async Task<IActionResult> TokenIsValid(string token, string appUserId)
         //{
@@ -200,6 +200,26 @@ namespace API.Controllers
 
         //    return Ok(new { isValid = true, personId = person?.Id, areadId = person?.AreaId, canKillFile = true });
         //}
+
+        [HttpPost("validar_password")]
+        public async Task<ActionResult<object>> GetValidatePassword(LoginDto loginDto)
+        {
+            var user = await _userManager.FindByEmailAsync(loginDto.Email);
+
+            if (user == null)
+            {
+                return Unauthorized(new ApiResponse(401));
+            }
+
+            var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
+
+            if (!result.Succeeded)
+            {
+                return Unauthorized(new ApiResponse(401));
+            }
+
+            return Ok(new { message = "Usuario Autorizado" });
+        }
 
         [HttpPost("logout")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
