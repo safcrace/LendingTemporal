@@ -204,17 +204,29 @@ namespace API.Controllers
 
         }
 
-        [HttpGet("serbipagos/{id:int}")]
-        public async Task<ActionResult<object>> GetCreditById(int id)
+        [HttpGet("serbipagos/{idstr}")]
+        public async Task<ActionResult<object>> GetCreditById(string idstr)
         {
             var totalCuota = 0.00m;
+
+            int id;
+            bool result = int.TryParse(idstr, out id);
+
+            if (id == 0)
+            {
+                return new
+                {
+                    CodigoError = "04",
+                    Mensaje = $"Error en Datos de identificador"
+                };
+            }
 
             var credito = await _dbContext.Prestamos.FirstOrDefaultAsync(x => x.Id == id);
             if (credito is null)
             {
                 return new
                 {
-                    CodigoError = 1930,
+                    CodigoError = "01",
                     Mensaje = $"El identificador {id} no existe"
                 };
             }
@@ -223,8 +235,8 @@ namespace API.Controllers
             {
                 return new
                 {
-                    CodigoError = 1945,
-                    Mensaje = $"El identificador {id} se encuentra en estado Cancelado"
+                    CodigoError = "02",
+                    Mensaje = $"El identificador {id} no se encuentra Vigente se encuentra en estado Cancelado"
                 };
             }
 
@@ -232,6 +244,16 @@ namespace API.Controllers
             var totalSaldo = _dbContext.PlanPagos
                 .Where(p => p.PrestamoId == id && p.FechaPago <= DateTime.Now)
                 .Sum(p => p.SaldoCapital + p.SaldoIntereses + p.SaldoIvaIntereses + p.SaldoMora + p.SaldoIvaMora + p.SaldoGastos + p.SaldoIvaGastos);
+
+            if (totalSaldo <= 0)
+            {
+                return new
+                {
+                    CodigoError = "03",
+                    Mensaje = $"El identificador {id} no se encuentra Vigente se encuentra en estado Cancelado"
+                };
+            }
+            
 
 
             //using (var context = _dbContext)
