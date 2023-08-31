@@ -28,6 +28,7 @@ namespace Infrastructure.Data.DBContext
         public DbSet<Departamento>? Departamentos { get; set; }
         public DbSet<Desembolso>? Desembolsos { get; set; }
         public DbSet<DestinoPrestamo>? DestinoPrestamos { get; set; }        
+        public DbSet<DetalleLote>? DetalleLotes { get; set; }
         public DbSet<DetallePlanPagoTemporal>? DetallePlanPagoTemporales { get; set; }
         public DbSet<DocumentosPrestamo>? DocumentosPrestamos { get; set; }
         public DbSet<Entidad>? Entidades { get; set; }
@@ -45,6 +46,7 @@ namespace Infrastructure.Data.DBContext
         public DbSet<InteresesDepartamentos> InteresesDepartamentos { get; set; } = null!;                
         public DbSet<ListadoGeneral> ListadoGeneral { get; set; } = null!;                
         public DbSet<ListadoDeudores> ListadoDeudores { get; set; } = null!;                                    
+        public DbSet<Lote> Lotes { get; set; } = null!;                                    
         public DbSet<MedioDesembolso>? MediosDesembolso { get; set; }                   
         public DbSet<Municipio>? Municipios { get; set; }                   
         public DbSet<MontoInteresado>? MontosInteresados { get; set; }                   
@@ -120,7 +122,8 @@ namespace Infrastructure.Data.DBContext
             modelBuilder.Entity<ListadoEmpresaPlanilla>().HasNoKey().ToView("v_mdi_lista__empresas_con_planilla");
             modelBuilder.Entity<AplicacionPagos>().HasNoKey().ToView(null);
             modelBuilder.Entity<EstadoCuentaPrestamo>().HasNoKey().ToView("VEstadoCuenta");
-            modelBuilder.Entity<ListadoProspectos>().ToSqlQuery(@"Exec sp_ListadoProspectos");            
+            modelBuilder.Entity<ListadoProspectos>().ToSqlQuery(@"Exec sp_ListadoProspectos"); 
+            modelBuilder.Entity<ListadoDesembolso>().ToSqlQuery(@"Exec sp_ListadoDesembolsos");            
             modelBuilder.Entity<ReporteGeneralCreditos>().ToSqlQuery(@"Exec ReporteGeneralCreditos");            
             //modelBuilder.Entity<AplicacionPagos>().ToSqlQuery(@"Exec ReporteContabilidad '2022-11-01', '2022-11-16'  ");            
             modelBuilder.Entity<BatchFile>().ToSqlQuery(@"Exec sp_batchfile_generator");            

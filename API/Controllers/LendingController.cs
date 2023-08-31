@@ -204,7 +204,8 @@ namespace API.Controllers
                     if (tipoUsuario == 2)
                     {
                         listado = listado.Where(x => x.GestorAsignadoId == entidadId).ToList();
-                    } else if (tipoUsuario == 5)
+                    }
+                    else if (tipoUsuario == 5)
                     {
                         listado = listado.Where(x => x.AnalistaAsignadoId == entidadId).ToList();
                     }
@@ -453,22 +454,27 @@ namespace API.Controllers
             var bitacoraActual = await _dbContext.BitacoraPrestamos.Where(x => x.PrestamoId == updateEstadoDto.PrestamoId &&
                                         x.CambioEstado == false).FirstOrDefaultAsync();
 
-            bitacoraActual.CambioEstado = true;
-
-            await _dbContext.SaveChangesAsync();
-
-            _unitOfWork.Repository<BitacoraPrestamo>().Update(bitacoraActual);
-            await _unitOfWork.Complete();
-
-            var bitacoraPrestamo = new BitacoraPrestamo
+            if (bitacoraActual is not null)
             {
-                PrestamoId = prestamo.Id,
-                AppUserId = updateEstadoDto.AppUserId,
-                Comentarios = updateEstadoDto.Comentario,
-                TimeInStatus = 0,
-                EstadoPrestamoId = estadoActual,
-                NuevoEstadoPrestamoId = updateEstadoDto.NuevoEstadoId
-            };
+                bitacoraActual.CambioEstado = true;
+
+                await _dbContext.SaveChangesAsync();
+
+                _unitOfWork.Repository<BitacoraPrestamo>().Update(bitacoraActual);
+                await _unitOfWork.Complete();
+
+                var bitacoraPrestamo = new BitacoraPrestamo
+                {
+                    PrestamoId = prestamo.Id,
+                    AppUserId = updateEstadoDto.AppUserId,
+                    Comentarios = updateEstadoDto.Comentario,
+                    TimeInStatus = 0,
+                    EstadoPrestamoId = estadoActual,
+                    NuevoEstadoPrestamoId = updateEstadoDto.NuevoEstadoId
+                };
+
+                _unitOfWork.Repository<BitacoraPrestamo>().Add(bitacoraPrestamo);
+            }
 
             prestamo.EstadoPrestamoId = updateEstadoDto.NuevoEstadoId;
 
@@ -482,7 +488,30 @@ namespace API.Controllers
                 prestamo.MotivoRechazoId = updateEstadoDto.MotivoRechazoId;
             }
 
-            _unitOfWork.Repository<BitacoraPrestamo>().Add(bitacoraPrestamo);
+            if (updateEstadoDto.NuevoEstadoId == 16 || updateEstadoDto.NuevoEstadoId == 17 || updateEstadoDto.NuevoEstadoId == 18)
+            {
+                var desembolso = await _dbContext.Desembolsos.Where(x => x.PrestamoId == updateEstadoDto.PrestamoId).FirstOrDefaultAsync();
+
+                var personaId = await _dbContext.Users.Where(x => x.Id == updateEstadoDto.AppUserId).Select(x => x.PersonaId).FirstOrDefaultAsync();
+
+                var nombre = await _dbContext.Personas.Where(x => x.Id == personaId).Select(x => new { nombre = x.PrimerNombre + ' ' + x.PrimerApellido }).FirstOrDefaultAsync();
+
+                switch (updateEstadoDto.NuevoEstadoId)
+                {
+                    case 16:
+                        desembolso.AprobacionCreditos = nombre.nombre;
+                        break;
+                    case 17:
+                        desembolso.AprobacionDireccion = nombre.nombre;
+                        break;
+                    case 18:
+                        desembolso.AprobacionGerencia = nombre.nombre;
+                        break;
+                    default:
+                        break;
+                }
+            }
+
 
             await _unitOfWork.Complete();
 
@@ -2300,7 +2329,7 @@ namespace API.Controllers
         public async Task<ActionResult<object>> GetDistribucionDesembolsos()
         {
             var distribucion = from des in _dbContext.Desembolsos
-                               join tip in _dbContext.TiposCuenta on des.TipoCuentaId equals tip.Id
+                               join tip in _dbContext.MediosDesembolso on des.MedioDesembolsoId equals tip.Id
                                group tip by tip.Nombre into g
                                select new
                                {
@@ -2309,6 +2338,169 @@ namespace API.Controllers
                                };
 
             return Ok(distribucion);
+        }
+
+        [HttpGet("listado-desembolsos/{medioDesembolsoId}")]
+        public async Task<ActionResult<IEnumerable<ListadoDesembolso>>> GetListadoDesembolsos(int medioDesembolsoId)
+        {
+            List<Core.Entities.Views.ListadoDesembolso> listado = new();
+
+            listado = await _dbContext.Set<ListadoDesembolso>().ToListAsync();
+
+            listado = listado.Where(x => x.MedioDesembolsoId == medioDesembolsoId).ToList();
+
+
+            foreach (var item in listado)
+            {
+
+                var bitacora = await _dbContext.BitacoraPrestamos.Where(x => x.PrestamoId == item.SolicitudId).OrderByDescending(x => x.Id).FirstOrDefaultAsync();
+                if (bitacora != null)
+                {
+                    TimeSpan tiempoTranscurrido = DateTime.Now.Subtract(bitacora.FechaCreacion);
+                    item.TiempoSolicitud = (int)tiempoTranscurrido.TotalHours;
+                    bitacora.TimeInStatus = (byte)item.TiempoSolicitud;
+                    if (item.TiempoSolicitud > 120)
+                    {
+                        bitacora.CambioEstado = true;
+                        var prestamo = _dbContext.Prestamos.Where(x => x.Id == item.SolicitudId).FirstOrDefault();
+                        prestamo.EstadoPrestamoId = 11;
+                        _dbContext.Prestamos.Update(prestamo);
+                        await _dbContext.SaveChangesAsync();
+
+
+                        var nuevoEstado = new BitacoraPrestamo
+                        {
+                            PrestamoId = item.SolicitudId,
+                            AppUserId = "8f00ad3d-22d4-424d-8e48-6df7aef4f7d6",
+                            EstadoPrestamoId = bitacora.NuevoEstadoPrestamoId,
+                            NuevoEstadoPrestamoId = 11,
+                            Comentarios = "Cambio de Estado Automatico Aplicado"
+                        };
+
+                        await _dbContext.BitacoraPrestamos.AddAsync(nuevoEstado);
+
+                    }
+                    _dbContext.BitacoraPrestamos.Update(bitacora);
+                    await _dbContext.SaveChangesAsync();
+
+                }
+            }
+
+
+            return Ok(listado);
+        }
+
+        [HttpPost("lotes")]
+        public async Task<ActionResult<IEnumerable<object>>> CreateLotesDesembolsos(CreateLoteDto createLoteDto)
+        {
+            try
+            {
+                var lote = _mapper.Map<Lote>(createLoteDto);
+
+                _unitOfWork.Repository<Lote>().Add(lote);
+
+                var result = await _unitOfWork.Complete();
+
+                if (result < 0) return null!;
+
+                foreach (var item in createLoteDto.DetalleLotes)
+                {
+                    var desembolso = await _dbContext.Desembolsos.Where(x => x.Id == item.DesembolsoId).FirstOrDefaultAsync();
+
+                    desembolso.LoteId = lote.Id;
+                    desembolso.TieneLote = true;
+                }
+
+                _dbContext.SaveChanges();
+
+                return Ok(new { message = "Acción realizada Satisfactoriamente" });
+            }
+            catch (Exception e)
+            {
+
+                return e.InnerException != null
+                ? new BadRequestObjectResult(e.InnerException.Message)
+                : new BadRequestObjectResult(e.Message);
+            }
+
+        }
+
+        [HttpGet("listado-lotes")]
+        public async Task<ActionResult<IEnumerable<LoteDto>>> GetListadoLotes()
+        {            
+
+            var lotes = await _dbContext.Lotes.ToListAsync();
+
+            var listadoLotes = _mapper.Map<List<LoteDto>>(lotes);
+
+            foreach (var item in listadoLotes)
+            {
+                var personaId = await _dbContext.Users.Where(x => x.Id == item.AppUserId).Select(x => x.PersonaId).FirstOrDefaultAsync();
+
+                var nombres = await _dbContext.Personas.Where(x => x.Id == personaId).Select(x => new { nombre = x.PrimerNombre, apellido = x.PrimerApellido }).FirstOrDefaultAsync();
+
+                var nombreUsuario = $"{nombres.nombre} {nombres.apellido}";
+
+                item.GeneradoPor = nombreUsuario;
+            }
+
+            return Ok(listadoLotes);
+        }
+
+        [HttpGet("detalle-lote/{loteId}")]
+        public async Task<ActionResult<IEnumerable<DetalleLoteDto>>> GetDetalleLotes(int loteId)
+        {
+
+            var detalle = await _dbContext.DetalleLotes.Where(x => x.LoteId == loteId && x.Aprobado == false).ToListAsync();
+
+            var detalleLote = _mapper.Map<List<DetalleLoteDto>>(detalle);            
+
+            return Ok(detalleLote);
+        }
+
+        [HttpPut("detalle-lote/{detalleLoteId}")]
+        public async Task<ActionResult<object>> UpdateDetalleLote(int detalleLoteId, DetalleLoteDto detalleLoteDto)
+        {           
+
+            var detalleLote = await _unitOfWork.Repository<DetalleLote>().GetByIdAsync(detalleLoteId);
+
+            _mapper.Map(detalleLoteDto, detalleLote);
+            
+            /** Pendiente Crear Créditos **/
+
+            await _unitOfWork.Complete();
+
+            return Ok(new { message = "Actualizacion realizada Satisfactoriamente" });
+        }
+
+        [HttpPut("rechazar/{loteId}")]
+        public async Task<ActionResult<object>> UpdateLote(int loteId)
+        {   
+            var lote  = await _unitOfWork.Repository<Lote>().GetByIdAsync(loteId);
+
+            lote.Habilitado = false;
+
+            await _unitOfWork.Complete();
+
+            var desembolsos = await _dbContext.Desembolsos.Where(x => x.LoteId == loteId).ToListAsync();
+
+            foreach (var item in desembolsos)
+            {
+                item.LoteId = null;
+                item.TieneLote = false;
+            }
+
+            var detalleLote = await _dbContext.DetalleLotes.Where(x => x.LoteId == loteId).ToListAsync();
+
+            foreach (var item in detalleLote)
+            {
+                item.Habilitado = false;
+            }           
+            
+
+            await _dbContext.SaveChangesAsync();
+
+            return Ok(new { message = "Actualizacion realizada Satisfactoriamente" });
         }
 
     }
