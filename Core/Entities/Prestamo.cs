@@ -51,6 +51,7 @@ namespace Core.Entities
         public DateTime? FechaPlan { get; set; }
         public string? TokenAutorización { get; set; }
         public string? ObjetivoCredito { get; set; }
+        public int? CarpetaSidId { get; set; }
         public List<BitacoraPrestamo> BitacoraPrestamos { get; set; } = new List<BitacoraPrestamo>();
     }
 }

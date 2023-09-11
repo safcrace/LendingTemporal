@@ -5,6 +5,7 @@
         public int Id { get; set; }
         public string? ReferenciaMigracion { get; set; }        
         public string AppUserId { get; set; } = null!;        
+        public int? CarpetaSidId { get; set; }
         public int? EntidadPrestamoId { get; set; }        
         public int? EstadoPrestamoId { get; set; }
         public string? NombreEstadoPrestamo { get; set; }

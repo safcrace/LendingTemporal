@@ -4,6 +4,7 @@
     {
         public int Id { get; set; }
         public int EntidadId { get; set; }
+        public int? ExpedienteSidId { get; set; }
         public int? GeneroId { get; set; }
         public string? DescripcionGenero { get; set; }
         public int? EstadoCivilId { get; set; }

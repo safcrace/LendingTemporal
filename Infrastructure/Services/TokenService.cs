@@ -59,9 +59,13 @@ namespace Infrastructure.Services
             }
 
 
+
             var claims = new List<Claim>
             {
-                new Claim("UserName", user.UserName),   
+                new Claim("PersonId", user.PersonaId.ToString()),
+                new Claim("AreaId", 1.ToString()),
+                new Claim("UserName", user.UserName),
+                new Claim("CanKilFiles", 1.ToString()),
                 new Claim("UserId", user.Id)
             };
 

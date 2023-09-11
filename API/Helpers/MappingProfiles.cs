@@ -18,14 +18,17 @@ namespace API.Helpers
             CreateMap<CreateDetalleLoteDto, DetalleLote>();
             CreateMap<CreateRegistroCajaDto, RegistroCaja>();
             CreateMap<CreateTipoPrestamoDto, TipoPrestamo>();
-            CreateMap<CreateDocumentoPrestamoDto, DocumentosPrestamo>();
+            CreateMap<CreateArchivoPrestamoDto, DocumentosPrestamo>();
             CreateMap<CreateInteresesDepartamentosDto, InteresesDepartamentos>();
             CreateMap<CreateMoraDepartamentosDto, MoraDepartamentos>();
             CreateMap<CreateParametrosDepartamentosDto, ParametrosDepartamentos>();
             CreateMap<CreatePersonReferenceDto, ReferenciaPersona>();
+            CreateMap<CreateEmpresaReferenceDto, ReferenciaEmpresa>();
             CreateMap<CreateDesembolsoDto, Desembolso>();
+            CreateMap<CreateArchivoPrestamoDto, ArchivoPrestamo>();
             CreateMap<CreaterBitacoraPrestamoDto, BitacoraPrestamo>();
             CreateMap<BitacoraPrestamo, BitacoraPrestamoDto>();
+            CreateMap<ArchivoPrestamo, ArchivoPrestamoDto>();
             CreateMap<Pais, PaisDto>();
             CreateMap<Region, RegionDto>();
             CreateMap<Departamento, DepartamentoDto>();
@@ -67,6 +70,8 @@ namespace API.Helpers
             CreateMap<Prestamo, DatosPrestamoDto>().ReverseMap();
             CreateMap<ContactoEmpresa, DatosContactoEmpresaDto>().ReverseMap();
             CreateMap<ReferenciaPersona, ReferenciaPersonaDto>().ReverseMap();
+            CreateMap<ReferenciaEmpresa, ReferenciaEmpresaDto>().ReverseMap();
+            CreateMap<Desembolso, DesembolsoDto>().ReverseMap();
 
             //CreateMap<Gestor, GestorDto>();
 

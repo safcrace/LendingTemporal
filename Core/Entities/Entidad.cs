@@ -6,6 +6,7 @@ namespace Core.Entities
     {
         public TipoEntidad? EntityType { get; set; }
         public int TipoEntidadId { get; set; }
+        public int? ExpedienteSidId { get; set; }
         [InverseProperty("EntidadPrestamo")]
         public ICollection<Prestamo> EntidadesPrestamos { get; set; } = new List<Prestamo>();
         [InverseProperty("GestorPrestamo")]

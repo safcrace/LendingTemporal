@@ -30,4 +30,5 @@ public class TipoPrestamoDto
     public bool PermisoComiteDirectores { get; set; } = false;
     public decimal MontoMinimoComiteDirectores { get; set; }
     public decimal MontoMaximoComiteDirectores { get; set; }
+    public bool Habilitado { get; set; }
 }

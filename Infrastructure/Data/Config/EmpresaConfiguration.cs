@@ -15,6 +15,11 @@ namespace Infrastructure.Data.Config
             builder.Property(x => x.Email).HasMaxLength(50);
             builder.Property(x => x.Nit).IsRequired().HasMaxLength(50);
             builder.HasIndex(x => x.Nit).IsUnique();
+            builder.Property(x => x.VentasMensuales).HasColumnType("decimal(18,2)");
+            builder.Property(x => x.GananciasMensuales).HasColumnType("decimal(18,2)");
+            builder.Property(x => x.OtrosIngresos).HasColumnType("decimal(18,2)");
+            builder.Property(x => x.OrigenOtrosIngresos).HasMaxLength(200);
+            builder.Property(x => x.Comentarios).HasMaxLength(150);            
         }
     }
 }

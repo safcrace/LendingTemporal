@@ -18,6 +18,8 @@ namespace API.Dtos
         public int? TipoPrestamoId { get; set; }
         public int? GestorPrestamoId { get; set; }
         public int? EmpresaPrestamoId { get; set; }
+        [Required]
+        public int CarpetaSidId { get; set; }
         public DateTime? FechaAprobacion { get; set; } = DateTime.Now;
         public DateTime? FechaDesembolso { get; set; }
         public decimal MontoOtorgado { get; set; }

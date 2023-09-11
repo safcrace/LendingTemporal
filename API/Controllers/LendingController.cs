@@ -5,6 +5,7 @@ using Core.Entities;
 using Core.Entities.Functions;
 using Core.Entities.Views;
 using Core.Interfaces;
+using EllipticCurve.Utils;
 using Infrastructure.Data.DBContext;
 using Infrastructure.Migrations;
 using Microsoft.AspNetCore.Mvc;
@@ -40,9 +41,12 @@ namespace API.Controllers
 
                 if (createLendingDto.EntidadPrestamoId == 0)
                 {
+                    var expedienteSid = createLendingDto.TipoEntidad == 1 ? createLendingDto?.CreatePersonDto?.ExpedienteSidId : createLendingDto?.CreateCompanyDto?.ExpedienteSidId;
+
                     var entidad = new Entidad
                     {
-                        TipoEntidadId = createLendingDto.TipoEntidad
+                        TipoEntidadId = createLendingDto.TipoEntidad,
+                        ExpedienteSidId = expedienteSid
                     };
 
                     _unitOfWork.Repository<Entidad>().Add(entidad);
@@ -86,6 +90,12 @@ namespace API.Controllers
                         personaDto.EntidadId = createLendingDto.EntidadPrestamoId;
                         _mapper.Map(personaDto, persona);
 
+                        var entidad = await _dbContext.Entidades.Where(x => x.Id == persona.EntidadId).FirstOrDefaultAsync();
+
+                        entidad.ExpedienteSidId = personaDto.ExpedienteSidId;
+
+                        _dbContext.Entidades.Update(entidad);                        
+
                         if (createLendingDto.AppUserAutorizoId is not null)
                         {
                             var bitacoraFicha = new BitacoraFicha
@@ -106,6 +116,12 @@ namespace API.Controllers
                         empresaDto.EntidadId = createLendingDto.EntidadPrestamoId;
                         _mapper.Map(empresaDto, empresa);
 
+                        var entidad = await _dbContext.Entidades.Where(x => x.Id == empresa.EntidadId).FirstOrDefaultAsync();
+
+                        entidad.ExpedienteSidId = empresaDto.ExpedienteSidId;
+
+                        _dbContext.Entidades.Update(entidad);
+
                         if (createLendingDto.AppUserAutorizoId is not null)
                         {
                             var bitacoraFicha = new BitacoraFicha
@@ -122,6 +138,7 @@ namespace API.Controllers
                     }
                 }
 
+                await _dbContext.SaveChangesAsync();
 
                 var prestamo = _mapper.Map<Prestamo>(createLendingDto);
 
@@ -164,6 +181,27 @@ namespace API.Controllers
             return await _dbContext.ListadoDeudores.OrderBy(x => x.EntidadId).ToListAsync();
         }
 
+        [HttpGet("listado-entidades/{tipoEntidadId}")]
+        public async Task<ActionResult<IEnumerable<ListadoEntidades>>> GetEntidades(int tipoEntidadId)
+        {
+            var entidades = await _dbContext.Set<ListadoEntidades>().ToListAsync();
+            entidades = entidades.Where(x => x.TipoEntidadId == tipoEntidadId).ToList();
+
+            return Ok(entidades);
+        }
+
+        [HttpPut("entidades/{entidadId}")]
+        public async Task<ActionResult<object>> UpdateEntidades(int entidadId, UpdateEntidadDto updateEntidadDto)
+        {
+            var entidad = await _unitOfWork.Repository<Entidad>().GetByIdAsync(entidadId);
+            
+            entidad.ExpedienteSidId = updateEntidadDto.ExpedienteSidId;
+
+            await _unitOfWork.Complete();
+
+            return Ok(new {mensaje = "Actualización realizada satisfactoriamente!"});
+        }
+
         [HttpGet("listado_prospectos/{appUserId}")]
         public async Task<ActionResult<IEnumerable<ListadoProspectos>>> GetRequests(string? appUserId, string tipoConsulta = "General", int tipoPrestamoId = 0)
         {
@@ -171,7 +209,7 @@ namespace API.Controllers
 
             listado = await _dbContext.Set<ListadoProspectos>().ToListAsync();
 
-            var estadosPermitidos = new List<int> { 9, 10, 12, 13, 14, 15 };
+            var estadosPermitidos = new List<int> { 9, 10, 12, 13, 14, 15, 16, 17, 18, 19 };
 
             if (tipoConsulta == "General")
             {
@@ -222,6 +260,11 @@ namespace API.Controllers
 
             }
 
+            if (tipoConsulta == "Historial")
+            {
+                listado = listado.Where(x => x.EstadoPrestamoId == 11 || x.EstadoPrestamoId == 12).ToList();
+            }
+
             if (tipoConsulta == "Evaluacion")
             {
                 listado = listado.Where(x => x.TipoPrestamoId == tipoPrestamoId && x.EstadoPrestamoId == 14).ToList();
@@ -245,40 +288,48 @@ namespace API.Controllers
             foreach (var item in listado)
             {
 
-                var bitacora = await _dbContext.BitacoraPrestamos.Where(x => x.PrestamoId == item.SolicitudId).OrderByDescending(x => x.Id).FirstOrDefaultAsync();
-                if (bitacora != null)
+                var prestamo = _dbContext.Prestamos?.Where(x => x.Id == item.SolicitudId).FirstOrDefault();
+                if (prestamo is not null)
                 {
-                    TimeSpan tiempoTranscurrido = DateTime.Now.Subtract(bitacora.FechaCreacion);
-                    item.TiempoEnEstado = (int)tiempoTranscurrido.TotalHours;
-                    bitacora.TimeInStatus = (byte)item.TiempoEnEstado;
-                    if (item.TiempoEnEstado > 120)
+
+                    var bitacora = await _dbContext.BitacoraPrestamos.Where(x => x.PrestamoId == prestamo.Id).OrderByDescending(x => x.Id).FirstOrDefaultAsync();
+                    if (bitacora is not null)
                     {
-                        bitacora.CambioEstado = true;
-                        var prestamo = _dbContext.Prestamos.Where(x => x.Id == item.SolicitudId).FirstOrDefault();
-                        prestamo.EstadoPrestamoId = 11;
-                        _dbContext.Prestamos.Update(prestamo);
+                        TimeSpan tiempoTranscurrido = DateTime.Now.Subtract(bitacora.FechaCreacion);
+                        item.TiempoEnEstado = (int)tiempoTranscurrido.TotalHours;
+                        bitacora.TimeInStatus = (byte)item.TiempoEnEstado;
+
+                        if (item.TiempoEnEstado > 120 && (item.EstadoPrestamoId != 11 || item.EstadoPrestamoId != 20))
+                        {
+                            bitacora.CambioEstado = true;
+                            prestamo.EstadoPrestamoId = 11;
+                            _dbContext.Prestamos.Update(prestamo);
+                            await _dbContext.SaveChangesAsync();
+
+
+                            var nuevoEstado = new BitacoraPrestamo
+                            {
+                                PrestamoId = item.SolicitudId,
+                                AppUserId = "8f00ad3d-22d4-424d-8e48-6df7aef4f7d6",
+                                EstadoPrestamoId = bitacora.NuevoEstadoPrestamoId,
+                                NuevoEstadoPrestamoId = 11,
+                                Comentarios = "Cambio de Estado Automatico Aplicado"
+                            };
+
+                            await _dbContext.BitacoraPrestamos.AddAsync(nuevoEstado);
+
+                            item.EstadoPrestamoId = 11;
+                            item.Estado = "Rechazado";
+                        }
+                        _dbContext.BitacoraPrestamos.Update(bitacora);
                         await _dbContext.SaveChangesAsync();
 
-
-                        var nuevoEstado = new BitacoraPrestamo
-                        {
-                            PrestamoId = item.SolicitudId,
-                            AppUserId = "8f00ad3d-22d4-424d-8e48-6df7aef4f7d6",
-                            EstadoPrestamoId = bitacora.NuevoEstadoPrestamoId,
-                            NuevoEstadoPrestamoId = 11,
-                            Comentarios = "Cambio de Estado Automatico Aplicado"
-                        };
-
-                        await _dbContext.BitacoraPrestamos.AddAsync(nuevoEstado);
-
-                        item.EstadoPrestamoId = 11;
-                        item.Estado = "Rechazado";
                     }
-                    _dbContext.BitacoraPrestamos.Update(bitacora);
-                    await _dbContext.SaveChangesAsync();
 
+                    item.FechaIngreso = bitacora.FechaCreacion;
                 }
             }
+
 
 
             return Ok(listado);
@@ -421,6 +472,9 @@ namespace API.Controllers
             var tipo = await _dbContext.TipoPrestamos.Where(x => x.Id == tipoPrestamoId).FirstOrDefaultAsync();
             var nombreTipoCuota = await _dbContext.TipoCuotas.Where(x => x.Id == tipo.TipoCuotaId).Select(x => x.Nombre).FirstOrDefaultAsync();
 
+            var documentosRequeridos = await _dbContext.DocumentosPrestamos.Where(x => x.TipoPrestamoId == tipo.Id).Select(x => new { x.Id, x.Nombre }).ToListAsync();
+
+
 
             var parametrosComplementoPrestamo = new
             {
@@ -437,7 +491,8 @@ namespace API.Controllers
                 tipo.TasaIva,
                 tipo.PermisosJefeCreditos,
                 tipo.PermisosComiteDirectores,
-                tipo.PermisosComiteGerencia
+                tipo.PermisosComiteGerencia,
+                documentosRequeridos
             };
 
             return Ok(parametrosComplementoPrestamo);
@@ -447,6 +502,17 @@ namespace API.Controllers
         [HttpPut("cambio_estado")]
         public async Task<ActionResult<object>> UpdateLendingStatus(UpdateEstadoDto updateEstadoDto)
         {
+            var desembolso = await _dbContext.Desembolsos.Where(x => x.PrestamoId == updateEstadoDto.PrestamoId).FirstOrDefaultAsync();
+
+            if (updateEstadoDto.NuevoEstadoId > 14)
+            {
+
+                if (desembolso is null)
+                {
+                    return BadRequest("Alerta! La solicitud aún no cuenta con Desembolso!");
+                }
+
+            }
             var prestamo = await _unitOfWork.Repository<Prestamo>().GetByIdAsync(updateEstadoDto.PrestamoId);
 
             var estadoActual = prestamo.EstadoPrestamoId;
@@ -460,8 +526,8 @@ namespace API.Controllers
 
                 await _dbContext.SaveChangesAsync();
 
-                _unitOfWork.Repository<BitacoraPrestamo>().Update(bitacoraActual);
-                await _unitOfWork.Complete();
+                //_unitOfWork.Repository<BitacoraPrestamo>().Update(bitacoraActual);
+                //await _unitOfWork.Complete();
 
                 var bitacoraPrestamo = new BitacoraPrestamo
                 {
@@ -490,8 +556,6 @@ namespace API.Controllers
 
             if (updateEstadoDto.NuevoEstadoId == 16 || updateEstadoDto.NuevoEstadoId == 17 || updateEstadoDto.NuevoEstadoId == 18)
             {
-                var desembolso = await _dbContext.Desembolsos.Where(x => x.PrestamoId == updateEstadoDto.PrestamoId).FirstOrDefaultAsync();
-
                 var personaId = await _dbContext.Users.Where(x => x.Id == updateEstadoDto.AppUserId).Select(x => x.PersonaId).FirstOrDefaultAsync();
 
                 var nombre = await _dbContext.Personas.Where(x => x.Id == personaId).Select(x => new { nombre = x.PrimerNombre + ' ' + x.PrimerApellido }).FirstOrDefaultAsync();
@@ -659,6 +723,7 @@ namespace API.Controllers
             {
                 var persona = await _dbContext.Personas.Where(x => x.EntidadId == entidadId).FirstOrDefaultAsync();
                 datosPersona = _mapper.Map<DatosPersonaDto>(persona);
+                datosPersona.ExpedienteSidId = await _dbContext.Entidades.Where(x => x.Id == persona.EntidadId).Select(x => x.ExpedienteSidId).FirstOrDefaultAsync();
                 datosPersona.DescripcionEstadoCivil = await _dbContext.EstadoCivil.Where(x => x.Id == datosPersona.EstadoCivilId).Select(x => x.Nombre).FirstOrDefaultAsync();
                 datosPersona.DescripcionGenero = await _dbContext.Generos.Where(x => x.Id == datosPersona.GeneroId).Select(x => x.Nombre).FirstOrDefaultAsync();
                 datosPersona.DescripcionDepartamento = await _dbContext.Departamentos.Where(x => x.Id == datosPersona.DepartamentoId).Select(x => x.Nombre).FirstOrDefaultAsync();
@@ -669,7 +734,9 @@ namespace API.Controllers
             else
             {
                 var empresa = await _dbContext.Empresas.Where(x => x.EntidadId == entidadId).Include(x => x.ContactoEmpresas).FirstOrDefaultAsync();
+
                 datosEmpresa = _mapper.Map<DatosEmpresaDto>(empresa);
+                datosEmpresa.ExpedienteSidId = await _dbContext.Entidades.Where(x => x.Id == empresa.EntidadId).Select(x => x.ExpedienteSidId).FirstOrDefaultAsync();
 
                 foreach (var contacto in datosEmpresa.ContactoEmpresas)
                 {
@@ -684,6 +751,7 @@ namespace API.Controllers
                 var prestamo = await _dbContext.Prestamos.Where(x => x.Id == prestamoId).FirstOrDefaultAsync();
                 datosPrestamo = _mapper.Map<DatosPrestamoDto>(prestamo);
                 //datosProspectoDto.EstadoPrestamo = await _dbContext.EstadoPrestamos.Where(x => x.Id == prestamo.EstadoPrestamoId).Select(x => x.Nombre).FirstOrDefaultAsync();
+
                 datosPrestamo.DescripcionMontoInteresado = await _dbContext.MontosInteresados.Where(x => x.Id == datosPrestamo.MontoInteresadoId).Select(x => x.Nombre).FirstOrDefaultAsync();
                 datosPrestamo.NombreEstadoPrestamo = await _dbContext.EstadoPrestamos.Where(x => x.Id == datosPrestamo.EstadoPrestamoId).Select(x => x.Nombre).FirstOrDefaultAsync();
                 datosPrestamo.DescripcionProductoInteresado = await _dbContext.ProductosInteresados.Where(x => x.Id == datosPrestamo.ProductoInteresadoId).Select(x => x.Nombre).FirstOrDefaultAsync();
@@ -756,8 +824,6 @@ namespace API.Controllers
         }
 
 
-
-
         [HttpPut("{id:int}")]
         public async Task<ActionResult> UpdateLending(int id, UpdateProspectoDto updateProspectoDto)
         {
@@ -813,6 +879,21 @@ namespace API.Controllers
 
                     if (prestamo == null) return NotFound();
 
+                    if (prestamo.EstadoPrestamoId != prestamoDto.EstadoPrestamoId)
+                    {
+                        var bitacoraPrestamo = new BitacoraPrestamo
+                        {
+                            PrestamoId = prestamo.Id,
+                            AppUserId = prestamoDto.AppUserId,
+                            Comentarios = null,
+                            TimeInStatus = 0,
+                            EstadoPrestamoId = prestamo.EstadoPrestamoId,
+                            NuevoEstadoPrestamoId = prestamoDto.EstadoPrestamoId
+                        };
+
+                        _unitOfWork.Repository<BitacoraPrestamo>().Add(bitacoraPrestamo);
+                    }
+
                     _mapper.Map(prestamoDto, prestamo);
                 }
 
@@ -832,6 +913,18 @@ namespace API.Controllers
                     ? new BadRequestObjectResult(e.InnerException.Message)
                     : new BadRequestObjectResult(e.Message);
             }
+        }
+
+        [HttpPut("carpeta/{id:int}")]
+        public async Task<ActionResult<object>> UpdateCarpetaCredito(int id, UpdateCarpetaPrestamoDto updateCarpetaPrestamoDto)
+        {
+            var prestamo = await _unitOfWork.Repository<Prestamo>().GetByIdAsync(id);
+
+            prestamo.CarpetaSidId = updateCarpetaPrestamoDto.CarpetaSidId;
+
+            await _unitOfWork.Complete();
+
+            return Ok(new { mensaje = "Actualización realizada satisfactoriamente!" });
         }
 
         [HttpGet("persona/{personaId}")]
@@ -2225,6 +2318,48 @@ namespace API.Controllers
             return Ok(new { message = "Acción realizada Satisfactoriamente" });
         }
 
+        [HttpPost("referencia-empresa")]
+        public async Task<ActionResult<IEnumerable<object>>> CreateEmpresaReference(CreateEmpresaReferenceDto createEmpresaReferenceDto)
+        {
+            //foreach (var item in createPersonReferenceDto)
+            //{
+            var referenciaEmpresa = _mapper.Map<ReferenciaEmpresa>(createEmpresaReferenceDto);
+
+            _unitOfWork.Repository<ReferenciaEmpresa>().Add(referenciaEmpresa);
+            //}
+
+            var result = await _unitOfWork.Complete();
+
+            if (result < 0) return null!;
+
+            return Ok(new { message = "Acción realizada Satisfactoriamente" });
+        }
+
+        [HttpGet("referencias_empresa/{empresaId:int}")]
+        public async Task<ActionResult<ReferenciaEmpresaDto>> GetReferenciEmpresa(int empresaId)
+        {
+            var referencias = await _dbContext.ReferenciasEmpresas.Where(p => p.EmpresaId == empresaId).ToListAsync();
+
+            var referenciasEmpresa = _mapper.Map<List<ReferenciaEmpresaDto>>(referencias);
+
+            foreach (var item in referenciasEmpresa)
+            {
+                item.DescripciónReferencia = await _dbContext.TipoReferencias.Where(x => x.Id == item.TipoReferenciaId).Select(x => x.Nombre).FirstOrDefaultAsync();
+            }
+
+            return Ok(referenciasEmpresa);
+        }
+
+        [HttpDelete("referencias_empresa/{referenciaId:int}")]
+        public async Task<ActionResult<ReferenciaEmpresaDto>> DeleteReferenciaEmpresa(int referenciaId)
+        {
+            var referencia = await _unitOfWork.Repository<ReferenciaEmpresa>().GetByIdAsync(referenciaId);
+            _unitOfWork.Repository<ReferenciaEmpresa>().Delete(referencia);
+            await _unitOfWork.Complete();
+
+            return Ok(new { message = "Acción realizada Satisfactoriamente" });
+        }
+
         [HttpGet("solicitudes_categorias")]
         public async Task<ActionResult<object>> GetSolicitudesPorCategoria()
         {
@@ -2330,6 +2465,7 @@ namespace API.Controllers
         {
             var distribucion = from des in _dbContext.Desembolsos
                                join tip in _dbContext.MediosDesembolso on des.MedioDesembolsoId equals tip.Id
+                               where des.TieneLote == false
                                group tip by tip.Nombre into g
                                select new
                                {
@@ -2338,6 +2474,14 @@ namespace API.Controllers
                                };
 
             return Ok(distribucion);
+        }
+
+        [HttpGet("desembolsos/{desembolsoId}")]
+        public async Task<ActionResult<DesembolsoDto>> GetDesembolsoPorId(int? desembolsoId)
+        {
+            var desembolso = await _unitOfWork.Repository<Desembolso>().GetByIdAsync(desembolsoId);
+
+            return Ok(_mapper.Map<DesembolsoDto>(desembolso));
         }
 
         [HttpGet("listado-desembolsos/{medioDesembolsoId}")]
@@ -2413,7 +2557,15 @@ namespace API.Controllers
 
                 _dbContext.SaveChanges();
 
-                return Ok(new { message = "Acción realizada Satisfactoriamente" });
+                var personaId = await _dbContext.Users.Where(x => x.Id == lote.AppUserId).Select(x => x.PersonaId).FirstOrDefaultAsync();
+
+                var nombres = await _dbContext.Personas.Where(x => x.Id == personaId).Select(x => new { nombre = x.PrimerNombre, apellido = x.PrimerApellido }).FirstOrDefaultAsync();
+
+                var nombre = $"{nombres.nombre} {nombres.apellido}";
+
+
+
+                return Ok(new { message = "Acción realizada Satisfactoriamente", lote.Id, lote.FechaCreacion, nombre });
             }
             catch (Exception e)
             {
@@ -2427,11 +2579,13 @@ namespace API.Controllers
 
         [HttpGet("listado-lotes")]
         public async Task<ActionResult<IEnumerable<LoteDto>>> GetListadoLotes()
-        {            
+        {
 
             var lotes = await _dbContext.Lotes.ToListAsync();
 
             var listadoLotes = _mapper.Map<List<LoteDto>>(lotes);
+
+            listadoLotes = listadoLotes.Where(x => x.Habilitado == true).ToList();
 
             foreach (var item in listadoLotes)
             {
@@ -2451,22 +2605,21 @@ namespace API.Controllers
         public async Task<ActionResult<IEnumerable<DetalleLoteDto>>> GetDetalleLotes(int loteId)
         {
 
-            var detalle = await _dbContext.DetalleLotes.Where(x => x.LoteId == loteId && x.Aprobado == false).ToListAsync();
+            var detalle = await _dbContext.DetalleLotes.Where(x => x.LoteId == loteId && x.Aprobado == false && x.Habilitado == true).ToListAsync();
 
-            var detalleLote = _mapper.Map<List<DetalleLoteDto>>(detalle);            
+            var detalleLote = _mapper.Map<List<DetalleLoteDto>>(detalle);
 
             return Ok(detalleLote);
         }
 
         [HttpPut("detalle-lote/{detalleLoteId}")]
         public async Task<ActionResult<object>> UpdateDetalleLote(int detalleLoteId, DetalleLoteDto detalleLoteDto)
-        {           
+        {
 
             var detalleLote = await _unitOfWork.Repository<DetalleLote>().GetByIdAsync(detalleLoteId);
 
             _mapper.Map(detalleLoteDto, detalleLote);
-            
-            /** Pendiente Crear Créditos **/
+
 
             await _unitOfWork.Complete();
 
@@ -2475,8 +2628,8 @@ namespace API.Controllers
 
         [HttpPut("rechazar/{loteId}")]
         public async Task<ActionResult<object>> UpdateLote(int loteId)
-        {   
-            var lote  = await _unitOfWork.Repository<Lote>().GetByIdAsync(loteId);
+        {
+            var lote = await _unitOfWork.Repository<Lote>().GetByIdAsync(loteId);
 
             lote.Habilitado = false;
 
@@ -2495,12 +2648,74 @@ namespace API.Controllers
             foreach (var item in detalleLote)
             {
                 item.Habilitado = false;
-            }           
-            
+            }
+
 
             await _dbContext.SaveChangesAsync();
 
             return Ok(new { message = "Actualizacion realizada Satisfactoriamente" });
+        }
+
+        [HttpPut("aprobar-lote/{loteId}")]
+        public async Task<ActionResult<object>> AprobarLote(int loteId)
+        {
+
+            var detalleLote = await _dbContext.DetalleLotes.Where(x => x.LoteId == loteId).ToListAsync();
+
+            foreach (var item in detalleLote)
+            {
+                if (item.Documento is not null && item.Habilitado == true)
+                {
+                    item.Aprobado = true;
+                }
+            }
+
+            await _dbContext.SaveChangesAsync();
+
+            return Ok(new { message = "Aprobación Realizada Satisfactoriamente" });
+        }
+
+        [HttpPost("archivos-prestamos")]
+        public async Task<ActionResult<IEnumerable<object>>> CreateDocumentosPrestamos(CreateArchivoPrestamoDto createArchivoPrestamoDto)
+        {
+            try
+            {
+                var archivo = _mapper.Map<ArchivoPrestamo>(createArchivoPrestamoDto);
+
+                _unitOfWork.Repository<ArchivoPrestamo>().Add(archivo);
+
+                var result = await _unitOfWork.Complete();
+
+                if (result < 0) return null!;
+
+                return Ok(new { message = "Acción realizada Satisfactoriamente" });
+
+            }
+            catch (Exception e)
+            {
+                return e.InnerException != null
+                    ? new BadRequestObjectResult(e.InnerException.Message)
+                    : new BadRequestObjectResult(e.Message);
+            }
+        }
+
+        [HttpGet("archivos-prestamos/{prestamoId}")]
+        public async Task<ActionResult<IEnumerable<ArchivoPrestamoDto>>> GetListadoArchivos(int prestamoId)
+        {
+
+            var archivos = await _dbContext.ArchivosPrestamo.Where(x => x.PrestamoId == prestamoId).ToListAsync();
+
+            return Ok(_mapper.Map<List<ArchivoPrestamoDto>>(archivos));
+        }
+
+        [HttpDelete("archivo-prestamos/{id}")]
+        public async Task<ActionResult<object>> DeleteArchivoPrestamo(int id)
+        {
+            var archivo = await _unitOfWork.Repository<ArchivoPrestamo>().GetByIdAsync(id);
+            _unitOfWork.Repository<ArchivoPrestamo>().Delete(archivo);
+            await _unitOfWork.Complete();
+
+            return Ok(new { message = "Acción realizada Satisfactoriamente" });
         }
 
     }

@@ -18,6 +18,9 @@ namespace Infrastructure.Data.DBContext
 
         public DbSet<AbonoPlan>? AbonoPlanes { get; set; }
         public DbSet<AplicacionPagos>? AplicacionPagos { get; set; }
+        public DbSet<ArchivoPrestamo>? ArchivosPrestamo { get; set; }
+        public DbSet<Area>? Areas { get; set; }
+        public DbSet<AreaPersonas>? AreaPersonas { get; set; }
         public DbSet<Banco>? Bancos { get; set; }
         public DbSet<BitacoraPrestamo>? BitacoraPrestamos { get; set; }
         public DbSet<BitacoraFicha>? BitacoraFichas { get; set; }
@@ -62,6 +65,7 @@ namespace Infrastructure.Data.DBContext
         public DbSet<Prestamo>? Prestamos { get; set; }        
         public DbSet<ProductoInteresado>? ProductosInteresados { get; set; }        
         public DbSet<ReferenciaPersona>? ReferenciasPersonas { get; set; }        
+        public DbSet<ReferenciaEmpresa>? ReferenciasEmpresas { get; set; }        
         public DbSet<RegistroCaja>? RegistroCajas { get; set; }        
         public DbSet<Region>? Regiones { get; set; }        
         public DbSet<RelacionEntidad>? RelacionEntidades { get; set; }        
@@ -118,6 +122,7 @@ namespace Infrastructure.Data.DBContext
             modelBuilder.Entity<ListadoGeneral>().HasNoKey().ToView("v_sct_listadogeneral");
             modelBuilder.Entity<ListadoDeudores>().HasNoKey().ToView("v_sct_listadogeneral_deudores");
             modelBuilder.Entity<ListadoAsesor>().HasNoKey().ToView("v_mdi_lista__asesores");
+            modelBuilder.Entity<ListadoEntidades>().HasNoKey().ToView("v_ListadoEntidades");
             //modelBuilder.Entity<ListadoProspectos>().HasNoKey().ToView(null);
             modelBuilder.Entity<ListadoEmpresaPlanilla>().HasNoKey().ToView("v_mdi_lista__empresas_con_planilla");
             modelBuilder.Entity<AplicacionPagos>().HasNoKey().ToView(null);
@@ -254,6 +259,12 @@ declare @i int, @n int;
             modelBuilder.Entity<AbonoPlan>().
                 HasOne(tt => tt.PlanPago).WithMany(tt => tt.AbonoPlanes).HasForeignKey(t => t.PlanPagoId);
             //.OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<AreaPersonas>().HasKey(pp => new { pp.AreaId, pp.PersonaId });
+            modelBuilder.Entity<AreaPersonas>().
+                HasOne(pp => pp.Area).WithMany(pp => pp.AreaPersonas).HasForeignKey(t => t.AreaId);
+            modelBuilder.Entity<AreaPersonas>().
+                HasOne(tt => tt.Persona).WithMany(tt => tt.AreaPersonas).HasForeignKey(t => t.PersonaId);
 
             modelBuilder.Entity<InteresesDepartamentos>().HasKey(pp => new { pp.TipoPrestamoId, pp.DepartamentoId });
             modelBuilder.Entity<InteresesDepartamentos>().

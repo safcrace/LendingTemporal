@@ -11,5 +11,6 @@ namespace API.Dtos
         public string? GeneradoPor { get; set; }
         public string? TipoLote { get; set; }
         public bool Aprobado { get; set; }
+        public bool Habilitado { get; set; }
     }
 }

@@ -40,6 +40,8 @@ public class Persona : BaseEntity
     public int? SegmentoNegocioId { get; set; }
     public SubSegmentoNegocio? SubSegmentoNegocio { get; set; }
     public int? SubSegmentoNegocioId { get; set; }
+    public Area? Area { get; set; }
+    public int? AreaId { get; set; }
     public string? PrimerNombre { get; set; }    
     public string? PrimerApellido { get; set; }
     public string? SegundoNombre { get; set; }
@@ -68,4 +70,5 @@ public class Persona : BaseEntity
     public string? OrigenOtrosIngresos { get; set; }
     public string? CodigoSAP { get; set; }
     public List<ReferenciaPersona> BitacoraPrestamos { get; set; } = new List<ReferenciaPersona>();
+    public ICollection<AreaPersonas> AreaPersonas { get; set; } = new List<AreaPersonas>();
 }

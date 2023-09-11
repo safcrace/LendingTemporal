@@ -27,7 +27,7 @@ public class TipoPrestamoController : ControllerBase
     [HttpGet]
     public async Task<ActionResult> GetAll()
     {
-        var tipos = await repository.TipoPrestamo.ListAllAsync();
+        var tipos = await _dbContext.TipoPrestamos.Where(x => x.Habilitado == true).ToListAsync();
 
         var tiposCredito = this.mapper.Map<List<ListadoTiposCreditoDto>>(tipos);
 

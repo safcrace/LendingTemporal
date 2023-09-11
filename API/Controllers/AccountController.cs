@@ -173,33 +173,35 @@ namespace API.Controllers
             return Ok(new { message = result.Succeeded ? "Succsesful Action" : "An Error has ocurred" });
         }
 
-        //[HttpGet("token/is-valid/{token}")]
-        //public async Task<IActionResult> TokenIsValid(string token, string appUserId)
-        //{
-        //    if (appUserId is null)
-        //    {
-        //        return BadRequest("Parámetros inválidos");
-        //    }
+        [HttpGet("token/is-valid/{appUserId}")]
+        public async Task<IActionResult> TokenIsValid(string appUserId, string token)
+        {            
+            if (appUserId is null)
+            {
+                return BadRequest("Parámetros inválidos");
+            }
 
-        //    var currentUser = await _dbContext.Sessions.Where(s => s.AppUserId == appUserId).Select(s => new { s.Id, s.Token, s.TipoBitacoraId }).OrderByDescending(s => s.Id).FirstOrDefaultAsync();
+            var currentUser = await _dbContext.Sesiones.Where(s => s.AppUserId == appUserId).Select(s => new { s.Id, s.Token, s.TipoBitacoraId }).OrderByDescending(s => s.Id).FirstOrDefaultAsync();
 
-        //    if (currentUser is null)
-        //    {
-        //        return BadRequest($"El Usuario no ha abierto sesión.");
-        //    }
-        //    if (currentUser.TipoBitacoraId != 1)
-        //    {
-        //        return BadRequest($"El Usuario no tiene una sesión abierta.");
-        //    }
-        //    if (currentUser.Token != token)
-        //    {
-        //        return BadRequest($"El Token no es válido para la Sesión Actual.");
-        //    }
+            if (currentUser is null)
+            {
+                return BadRequest($"El Usuario no ha abierto sesión.");
+            }
+            if (currentUser.TipoBitacoraId != 1)
+            {
+                return BadRequest($"El Usuario no tiene una sesión abierta.");
+            }
+            if (currentUser.Token != token)
+            {
+                return BadRequest($"El Token no es válido para la Sesión Actual.");
+            }
 
-        //    var person = await _dbContext.Persons.Where(p => p.AppUserId == appUserId).Select(s => new { s.Id, s.AreaId }).FirstOrDefaultAsync();            
+            var personaId = _dbContext.Users.Where(x => x.Id == appUserId).Select(x => x.PersonaId).FirstOrDefault();
 
-        //    return Ok(new { isValid = true, personId = person?.Id, areadId = person?.AreaId, canKillFile = true });
-        //}
+            var person = await _dbContext.Personas.Where(p => p.Id == personaId).Select(x => new { x.Id, x.AreaId }).FirstOrDefaultAsync();
+
+            return Ok(new { isValid = true, personId = person?.Id, areadId = person?.AreaId, canKillFile = true });            
+        }
 
         [HttpPost("validar_password")]
         public async Task<ActionResult<object>> GetValidatePassword(LoginDto loginDto)

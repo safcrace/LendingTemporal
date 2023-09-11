@@ -34,6 +34,6 @@ namespace API.Dtos
         public decimal MontoMinimoComiteDirectores { get; set; }
         public decimal MontoMaximoComiteDirectores { get; set; }
         public List<CreateParametrosDepartamentosDto>? ParametrosDepartamentos { get; set; }
-        public List<CreateDocumentoPrestamoDto>? DocumentosRequeridos { get; set; } 
+        public List<CreateArchivoPrestamoDto>? DocumentosRequeridos { get; set; } 
     }
 }

@@ -1,8 +1,12 @@
-﻿namespace API.Dtos
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace API.Dtos
 {
     public class CreatePersonDto
     {
         public int EntidadId { get; set; }
+        [Required]
+        public int ExpedienteSidId { get; set; }
         public int GeneroId { get; set; }
         public int? EstadoCivilId { get; set; }
         public int? OcupacionSinFinId { get; set; }

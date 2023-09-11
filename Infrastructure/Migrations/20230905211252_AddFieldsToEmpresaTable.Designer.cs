@@ -4,6 +4,7 @@ using Infrastructure.Data.DBContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230905211252_AddFieldsToEmpresaTable")]
+    partial class AddFieldsToEmpresaTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -56,88 +58,6 @@ namespace Infrastructure.Migrations
                     b.HasIndex("PlanPagoId");
 
                     b.ToTable("AbonoPlanes");
-                });
-
-            modelBuilder.Entity("Core.Entities.ArchivoPrestamo", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("Descripcion")
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
-
-                    b.Property<int>("DocumentoSidId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("FechaCreacion")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("FechaModificacion")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("Habilitado")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("NombreDocumentoSid")
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
-
-                    b.Property<int>("PrestamoId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PrestamoId");
-
-                    b.ToTable("ArchivosPrestamo");
-                });
-
-            modelBuilder.Entity("Core.Entities.Area", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<DateTime>("FechaCreacion")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("FechaModificacion")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("Habilitado")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Nombre")
-                        .HasMaxLength(75)
-                        .HasColumnType("nvarchar(75)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Areas");
-                });
-
-            modelBuilder.Entity("Core.Entities.AreaPersonas", b =>
-                {
-                    b.Property<int>("AreaId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PersonaId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("FechaCreacion")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("AreaId", "PersonaId");
-
-                    b.HasIndex("PersonaId");
-
-                    b.ToTable("AreaPersonas");
                 });
 
             modelBuilder.Entity("Core.Entities.Banco", b =>
@@ -851,9 +771,6 @@ namespace Infrastructure.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int?>("ExpedienteSidId")
-                        .HasColumnType("int");
 
                     b.Property<DateTime>("FechaCreacion")
                         .HasColumnType("datetime2");
@@ -1657,9 +1574,6 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<int?>("AreaId")
-                        .HasColumnType("int");
-
                     b.Property<int?>("ClientesHabitualesId")
                         .HasColumnType("int");
 
@@ -1820,8 +1734,6 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AreaId");
-
                     b.HasIndex("ClientesHabitualesId");
 
                     b.HasIndex("DepartamentoId");
@@ -1970,9 +1882,6 @@ namespace Infrastructure.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<int?>("CanalIngresoId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("CarpetaSidId")
                         .HasColumnType("int");
 
                     b.Property<int?>("DestinoPrestamoId")
@@ -4007,36 +3916,6 @@ namespace Infrastructure.Migrations
                     b.Navigation("PlanPago");
                 });
 
-            modelBuilder.Entity("Core.Entities.ArchivoPrestamo", b =>
-                {
-                    b.HasOne("Core.Entities.Prestamo", "Prestamo")
-                        .WithMany()
-                        .HasForeignKey("PrestamoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Prestamo");
-                });
-
-            modelBuilder.Entity("Core.Entities.AreaPersonas", b =>
-                {
-                    b.HasOne("Core.Entities.Area", "Area")
-                        .WithMany("AreaPersonas")
-                        .HasForeignKey("AreaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Core.Entities.Persona", "Persona")
-                        .WithMany("AreaPersonas")
-                        .HasForeignKey("PersonaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Area");
-
-                    b.Navigation("Persona");
-                });
-
             modelBuilder.Entity("Core.Entities.BitacoraFicha", b =>
                 {
                     b.HasOne("Core.Entities.Identity.AppUser", "AppUserAuthorized")
@@ -4357,10 +4236,6 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Entities.Persona", b =>
                 {
-                    b.HasOne("Core.Entities.Area", "Area")
-                        .WithMany()
-                        .HasForeignKey("AreaId");
-
                     b.HasOne("Core.Entities.ClienteHabitual", "ClientesHabituales")
                         .WithMany()
                         .HasForeignKey("ClientesHabitualesId");
@@ -4428,8 +4303,6 @@ namespace Infrastructure.Migrations
                     b.HasOne("Core.Entities.UbicacionNegocio", "UbicacionNegocio")
                         .WithMany()
                         .HasForeignKey("UbicacionNegocioId");
-
-                    b.Navigation("Area");
 
                     b.Navigation("ClientesHabituales");
 
@@ -4774,11 +4647,6 @@ namespace Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Core.Entities.Area", b =>
-                {
-                    b.Navigation("AreaPersonas");
-                });
-
             modelBuilder.Entity("Core.Entities.Departamento", b =>
                 {
                     b.Navigation("DepartamentoNegocios");
@@ -4853,8 +4721,6 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Core.Entities.Persona", b =>
                 {
                     b.Navigation("AppUser");
-
-                    b.Navigation("AreaPersonas");
 
                     b.Navigation("BitacoraPrestamos");
                 });

@@ -193,6 +193,8 @@ namespace API.Controllers
         {
             var tipoPrestamo = await _unitOfWork.Repository<TipoPrestamo>().ListAllAsync();
 
+            tipoPrestamo = tipoPrestamo.Where(x => x.Habilitado == true).ToList();
+
             return Ok(_mapper.Map<IReadOnlyList<TipoPrestamoDto>>(tipoPrestamo));
         }
 
