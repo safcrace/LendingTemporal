@@ -7,5 +7,6 @@
         public string? Descripcion { get; set; }
         public int DocumentoSidId { get; set; }
         public string? NombreDocumentoSid { get; set; }
+        public bool Requerido { get; set; }
     }
 }
