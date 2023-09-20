@@ -35,7 +35,7 @@ namespace Core.Entities
         public MotivoRechazo? MotivoRechazo { get; set; }
         public int? MotivoRechazoId { get; set; }
         public DateTime? FechaAprobacion { get; set; }
-        public DateTime? FechaDesembolso { get; set; }               
+        public DateTime? FechaDesembolso { get; set; }
         public decimal MontoRealSolicitado { get; set; }        
         public decimal MontoOtorgado { get; set; }
         public decimal InteresProyectado { get; set; }

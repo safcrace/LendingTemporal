@@ -94,7 +94,7 @@ namespace API.Controllers
 
                         entidad.ExpedienteSidId = personaDto.ExpedienteSidId;
 
-                        _dbContext.Entidades.Update(entidad);                        
+                        _dbContext.Entidades.Update(entidad);
 
                         if (createLendingDto.AppUserAutorizoId is not null)
                         {
@@ -194,12 +194,12 @@ namespace API.Controllers
         public async Task<ActionResult<object>> UpdateEntidades(int entidadId, UpdateEntidadDto updateEntidadDto)
         {
             var entidad = await _unitOfWork.Repository<Entidad>().GetByIdAsync(entidadId);
-            
+
             entidad.ExpedienteSidId = updateEntidadDto.ExpedienteSidId;
 
             await _unitOfWork.Complete();
 
-            return Ok(new {mensaje = "Actualización realizada satisfactoriamente!"});
+            return Ok(new { mensaje = "Actualización realizada satisfactoriamente!" });
         }
 
         [HttpGet("listado_prospectos/{appUserId}")]
@@ -442,6 +442,11 @@ namespace API.Controllers
             int? departamentoId;
             var tipoEntidadId = await _dbContext.Entidades.Where(x => x.Id == entidadId).Select(x => x.TipoEntidadId).FirstOrDefaultAsync();
 
+            if (tipoEntidadId <= 0)
+            {
+                return BadRequest("No existe el # de Entidad Proporcionado");
+            }
+
             if (tipoEntidadId == 1)
             {
                 departamentoId = await _dbContext.Personas.Where(x => x.EntidadId == entidadId).Select(x => x.DepartamentoId).FirstOrDefaultAsync();
@@ -465,6 +470,9 @@ namespace API.Controllers
 
             var montoMinimo = await _dbContext.ParametrosDepartamentos.Where(x => x.TipoPrestamoId == tipoPrestamoId).MinAsync(x => x.MontoMinimo);
             var montoMaximo = await _dbContext.ParametrosDepartamentos.Where(x => x.TipoPrestamoId == tipoPrestamoId).MaxAsync(x => x.MontoMaximo);
+            var diaInicioMes = await _dbContext.ParametrosDepartamentos.Where(x => x.TipoPrestamoId == tipoPrestamoId).MaxAsync(x => x.DiaInicioMes);
+            var diaQuincena = await _dbContext.ParametrosDepartamentos.Where(x => x.TipoPrestamoId == tipoPrestamoId).MaxAsync(x => x.DiaQuincena);
+            var diaFinMes = await _dbContext.ParametrosDepartamentos.Where(x => x.TipoPrestamoId == tipoPrestamoId).MaxAsync(x => x.DiaFinMes);
 
 
             //datosPrestamo.TasaIvaAsignada = await _dbContext.TipoPrestamos.Where(x => x.Id == datosPrestamo.TipoPrestamoId).Select(x => x.TasaIva).FirstOrDefaultAsync();
@@ -489,6 +497,9 @@ namespace API.Controllers
                 TipoCuotaId = tipo.Id,
                 TipoCuota = nombreTipoCuota,
                 tipo.TasaIva,
+                DiaInicioMes = diaInicioMes,
+                DiaQuincenaMes = diaQuincena,
+                DiaFinMes = diaFinMes,
                 tipo.PermisosJefeCreditos,
                 tipo.PermisosComiteDirectores,
                 tipo.PermisosComiteGerencia,
@@ -503,6 +514,17 @@ namespace API.Controllers
         public async Task<ActionResult<object>> UpdateLendingStatus(UpdateEstadoDto updateEstadoDto)
         {
             var desembolso = await _dbContext.Desembolsos.Where(x => x.PrestamoId == updateEstadoDto.PrestamoId).FirstOrDefaultAsync();
+
+            if (updateEstadoDto.NuevoEstadoId == 14)
+            {
+                var tipoPrestamoId = await _dbContext.Prestamos.Where(x => x.Id == updateEstadoDto.PrestamoId).Select(x => x.TipoPrestamoId).FirstOrDefaultAsync();
+
+                if (tipoPrestamoId is null)
+                {
+                    return BadRequest("Datos de la Solicitud Incompletos, no puede trasladar a Evaluación, por favor revise la información");
+                }
+
+            }
 
             if (updateEstadoDto.NuevoEstadoId > 14)
             {
@@ -2464,8 +2486,9 @@ namespace API.Controllers
         public async Task<ActionResult<object>> GetDistribucionDesembolsos()
         {
             var distribucion = from des in _dbContext.Desembolsos
+                               join pre in _dbContext.Prestamos on des.PrestamoId equals pre.Id
                                join tip in _dbContext.MediosDesembolso on des.MedioDesembolsoId equals tip.Id
-                               where des.TieneLote == false
+                               where des.TieneLote == false && pre.EstadoPrestamoId == 19
                                group tip by tip.Nombre into g
                                select new
                                {
@@ -2609,6 +2632,19 @@ namespace API.Controllers
 
             var detalleLote = _mapper.Map<List<DetalleLoteDto>>(detalle);
 
+
+            foreach (var item in detalleLote)
+            {
+                var appUserId = await _dbContext.Lotes.Where(x => x.Id == item.LoteId).Select(x => x.AppUserId).FirstOrDefaultAsync();
+
+                var personId = await _dbContext.Users.Where(x => x.Id == appUserId).Select(x => x.PersonaId).FirstOrDefaultAsync();
+
+                var aprobadoPor = await _dbContext.Personas.Where(x => x.Id == personId).Select(x => new { nombre = x.PrimerNombre, apellido = x.PrimerApellido }).FirstOrDefaultAsync();
+
+                item.AprobadoPor = $"{aprobadoPor.nombre} {aprobadoPor.apellido}";              
+
+            }
+
             return Ok(detalleLote);
         }
 
@@ -2619,7 +2655,6 @@ namespace API.Controllers
             var detalleLote = await _unitOfWork.Repository<DetalleLote>().GetByIdAsync(detalleLoteId);
 
             _mapper.Map(detalleLoteDto, detalleLote);
-
 
             await _unitOfWork.Complete();
 

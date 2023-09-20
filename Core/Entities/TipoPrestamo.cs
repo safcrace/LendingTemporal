@@ -24,6 +24,9 @@ namespace Core.Entities
         public bool ParametrosGeneral { get; set; }
         public bool ParametrosDepartamental { get; set; }
         public string TPA { get; set; }
+        public bool PermisosAnalista { get; set; }
+        public decimal MontoMinimoAnalista { get; set; }
+        public decimal MontoMaximoAnalista { get; set; }
         public bool PermisosJefeCreditos { get; set; }
         public decimal MontoMinimoJefeCreditos { get; set; }
         public decimal MontoMaximoJefeCreditos { get; set; }

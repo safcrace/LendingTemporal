@@ -14,6 +14,7 @@ namespace Core.Entities.Views
         public string? Nit { get; set; }
         public string? Telefono { get; set; }
         public string? NumeroCelular { get; set; }
+        public string? NumeroCuenta { get; set; }
         public string? AprobacionCreditos { get; set; }
         public string? AprobacionDireccion { get; set; }
         public string? AprobacionGerencia { get; set; }

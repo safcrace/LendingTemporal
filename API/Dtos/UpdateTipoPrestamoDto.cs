@@ -21,7 +21,7 @@ namespace API.Dtos
         public bool TasaMoraFija { get; set; } = false;
         public List<CreateMoraDepartamentosDto>? MoraDepartamentos { get; set; }
         public decimal TasaIva { get; set; }
-        public string Tpa { get; set; } = "Hola";
+        public string Tpa { get; set; } 
         public bool ParametrosGeneral { get; set; } = false;
         public bool ParametrosDepartamental { get; set; } = false;
         public bool PermisosJefeCreditos { get; set; } = false;

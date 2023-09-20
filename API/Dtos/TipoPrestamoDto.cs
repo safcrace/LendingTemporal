@@ -21,6 +21,9 @@ public class TipoPrestamoDto
     public string TPA { get; set; }
     public bool ParametrosGeneral { get; set; } = false;
     public bool ParametrosDepartamental { get; set; } = false;
+    public bool PermisosAnalista { get; set; } = false;
+    public decimal MontoMinimoAnalista { get; set; }
+    public decimal MontoMaximoAnalista { get; set; }
     public bool PermisosJefeCreditos { get; set; } = false;
     public decimal MontoMinimoJefeCreditos { get; set; }
     public decimal MontoMaximoJefeCreditos { get; set; }

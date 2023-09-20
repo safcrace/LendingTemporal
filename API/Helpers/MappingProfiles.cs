@@ -26,6 +26,7 @@ namespace API.Helpers
             CreateMap<CreateEmpresaReferenceDto, ReferenciaEmpresa>();
             CreateMap<CreateDesembolsoDto, Desembolso>();
             CreateMap<CreateArchivoPrestamoDto, ArchivoPrestamo>();
+            CreateMap<CreateDocumentoPrestamoDto, DocumentosPrestamo>();
             CreateMap<CreaterBitacoraPrestamoDto, BitacoraPrestamo>();
             CreateMap<BitacoraPrestamo, BitacoraPrestamoDto>();
             CreateMap<ArchivoPrestamo, ArchivoPrestamoDto>();
