@@ -28,6 +28,7 @@ namespace API.Helpers
             CreateMap<CreateArchivoPrestamoDto, ArchivoPrestamo>();
             CreateMap<CreateDocumentoPrestamoDto, DocumentosPrestamo>();
             CreateMap<CreaterBitacoraPrestamoDto, BitacoraPrestamo>();
+            CreateMap<DetallePlanPagoTemporal, ProjectionDto>();
             CreateMap<BitacoraPrestamo, BitacoraPrestamoDto>();
             CreateMap<ArchivoPrestamo, ArchivoPrestamoDto>();
             CreateMap<Pais, PaisDto>();

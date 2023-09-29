@@ -49,5 +49,6 @@
         public DateTime? FechaPlan { get; set; }       
         public string? ObjetivoCredito { get; set; }
         public string? TipoCuota { get; set; }
+        public int DesembolsoId { get; set; }
     }
 }

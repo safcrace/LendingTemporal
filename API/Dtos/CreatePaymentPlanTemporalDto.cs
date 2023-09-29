@@ -7,6 +7,8 @@ namespace API.Dtos
         [Required]
         public int TipoCuota { get; set; }
         [Required]
+        public int PrestamoId { get; set; }
+        [Required]
         public decimal PrincipalAmount { get; set; }
         [Required]
         public decimal InterestRate { get; set; }
