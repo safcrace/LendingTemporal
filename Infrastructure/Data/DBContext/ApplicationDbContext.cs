@@ -13,6 +13,7 @@ namespace Infrastructure.Data.DBContext
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
+            Database.SetCommandTimeout(300);
         }
 
         public DbSet<AbonoPlan>? AbonoPlanes { get; set; }
@@ -147,7 +148,7 @@ declare @i int, @n int;
 		, acum.SaldoMora
 		, acum.SaldoIvaMora		
 		, estados.Nombre as Estado
-		,(Select Top 1 TotalCuota from PlanPagos where PrestamoId = pre.Id and Aplicado = 0) as CuotaCalculada --Ajuste relizado por SAFC el 17/02/2023		
+		, IsNull((Select Top 1 TotalCuota from PlanPagos where PrestamoId = pre.Id and Aplicado = 0), 0) as CuotaCalculada --Ajuste relizado por SAFC el 17/02/2023	:: 29/09/2023	
 		, convert(date, pre.FechaAprobacion) as FechaAprobacion
 		, IsNull(convert(date, pre.FechaAprobacion), convert(date, pre.FechaDesembolso)) as FechaDesembolso
 		, IsNull(ppl.PROXIMO_PAGO, '0001-01-01') as ProximoPago
