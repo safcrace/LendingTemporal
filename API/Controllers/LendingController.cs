@@ -621,6 +621,7 @@ namespace API.Controllers
 
                     //capitalVencido += plan.SaldoCapital; //* tasaMora;                
                     cargoMontoMora = plan.SaldoCapital * tasaMora / 365 * daysInMonth;
+                    //cargoMontoMora = capitalVencido * tasaMora / 365 * daysInMonth;
                     cargoMontoIvaMora = cargoMontoMora * 0.12m;
                     if (!aplicaMora) { plan.CuotaMora = 0; } else { plan.CuotaMora += cargoMontoMora; }
                     if (!aplicaMora) { plan.SaldoMora = 0; } else { plan.SaldoMora += cargoMontoMora; }
@@ -641,7 +642,8 @@ namespace API.Controllers
             {
                 diasMora = (int)(fechaPago - ultimaCuotaEnMora.FechaPago).TotalDays;
 
-                cargoMontoMora = ultimaCuotaEnMora.SaldoCapital * tasaMora / 365 * diasMora;
+                //cargoMontoMora = ultimaCuotaEnMora.SaldoCapital * tasaMora / 365 * diasMora;
+                cargoMontoMora = capitalVencido * tasaMora / 365 * diasMora;
                 cargoMontoIvaMora = cargoMontoMora * 0.12m;
                 if (!aplicaMora) { ultimaCuotaEnMora.CuotaMora = 0; } else { ultimaCuotaEnMora.CuotaMora = cargoMontoMora; }
                 if (!aplicaMora) { ultimaCuotaEnMora.SaldoMora = 0; } else { ultimaCuotaEnMora.SaldoMora = cargoMontoMora; }
@@ -783,8 +785,8 @@ namespace API.Controllers
             }
             else
             {
-                montoIntereses = (montoExcedente * 100) / 112;
-                montoIvaIntereses += montoIntereses * 0.12m;
+                montoIntereses += (montoExcedente * 100) / 112;
+                montoIvaIntereses += ((montoExcedente * 100) / 112) * 0.12m;
                 montoExcedente = 0;
             }
 

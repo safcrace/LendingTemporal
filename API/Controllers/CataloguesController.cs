@@ -250,6 +250,14 @@ namespace API.Controllers
             return Ok(reporte);
         }
 
+        [HttpGet("reporte_pagos_aplicados")]
+        public async Task<ActionResult<AplicacionPagos>> GetReportePagosAplicados(DateTime fechaInicio, DateTime fechaFinal)
+        {
+            var reporte = await _dbContext.AplicacionPagos.FromSqlInterpolated($"Exec ReporteContabilidad {fechaInicio}, {fechaFinal}").ToListAsync();
+
+            return Ok(reporte);
+        }
+
         [HttpGet("generacion_archivo_batch")]
         public async Task<ActionResult<object>> GetBatchFile()
         {
