@@ -439,7 +439,7 @@ namespace API.Controllers
         }
 
         [HttpGet("parametros_prestamo/{tipoPrestamoId:int}")]
-        public async Task<ActionResult<object>> GetComplentoPrestamos(int tipoPrestamoId, int entidadId)
+        public async Task<ActionResult<object>> GetComplentoPrestamos(int tipoPrestamoId, int entidadId, int prestamoId)
         {
             int? departamentoId;
             var tipoEntidadId = await _dbContext.Entidades.Where(x => x.Id == entidadId).Select(x => x.TipoEntidadId).FirstOrDefaultAsync();
@@ -484,6 +484,12 @@ namespace API.Controllers
 
             var documentosRequeridos = await _dbContext.DocumentosPrestamos.Where(x => x.TipoPrestamoId == tipo.Id).Select(x => new { x.Id, x.Nombre }).ToListAsync();
 
+            var montoOtorgado = _dbContext.Prestamos.Where(x => x.Id == prestamoId).Select(x => x.MontoOtorgado).FirstOrDefault();
+
+            if (montoOtorgado >= tipo.MontoMaximoAnalista) tipo.PermisosAnalista = true;
+            if (montoOtorgado >= tipo.MontoMaximoJefeCreditos) tipo.PermisosJefeCreditos = true;
+            if (montoOtorgado >= tipo.MontoMaximoComiteDirectores) tipo.PermisosComiteDirectores = true;
+            if (montoOtorgado >= tipo.MontoMaximoComiteGerencia) tipo.PermisosComiteGerencia = true;
 
 
             var parametrosComplementoPrestamo = new
@@ -502,6 +508,7 @@ namespace API.Controllers
                 DiaInicioMes = diaInicioMes,
                 DiaQuincenaMes = diaQuincena,
                 DiaFinMes = diaFinMes,
+                tipo.PermisosAnalista,
                 tipo.PermisosJefeCreditos,
                 tipo.PermisosComiteDirectores,
                 tipo.PermisosComiteGerencia,

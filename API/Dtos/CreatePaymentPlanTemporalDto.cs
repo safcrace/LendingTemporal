@@ -5,9 +5,7 @@ namespace API.Dtos
     public class CreatePaymentPlanTemporalDto
     {
         [Required]
-        public int TipoCuota { get; set; }
-        [Required]
-        public int PrestamoId { get; set; }
+        public int TipoCuota { get; set; }       
         [Required]
         public decimal PrincipalAmount { get; set; }
         [Required]
@@ -20,6 +18,7 @@ namespace API.Dtos
         public DateTime StartDate { get; set; } = DateTime.Now;
         [Required]
         public DateTime PayDate { get; set; }
+        [Required]
         public int SolicitudId { get; set; }
         public string? NombreProspecto { get; set; }
         public string? ProductoInteresado { get; set; }       
