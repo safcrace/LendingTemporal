@@ -9,6 +9,7 @@ namespace Infrastructure.Data.Config
         public void Configure(EntityTypeBuilder<ReferenciaEmpresa> builder)
         {
             builder.Property(x => x.NombreCompleto).HasMaxLength(100);
+            builder.Property(x => x.Comentario).HasMaxLength(6000);
         }
     }
 }

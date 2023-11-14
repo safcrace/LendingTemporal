@@ -27,5 +27,6 @@ namespace Core.Entities.Views
         public int? AnalistaAsignadoId { get; set; }
         public string? NombreAnalista { get; set; }
         public int TipoPrestamoId { get; set; }
+        public decimal MontoSolicitado { get; set; }
     }
 }
