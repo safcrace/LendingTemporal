@@ -27,5 +27,6 @@ namespace Core.Entities.Views
         public decimal Mora { get; set; }
         public decimal IvaMora { get; set; }
         public string? ArchivoBatch { get; set; }
+        public int IdentificadorDeRelacion { get; set; }
     }
 }
