@@ -31,10 +31,12 @@ namespace Infrastructure.Data.DBContext
         public DbSet<Departamento>? Departamentos { get; set; }
         public DbSet<Desembolso>? Desembolsos { get; set; }
         public DbSet<DestinoPrestamo>? DestinoPrestamos { get; set; }        
+        public DbSet<DetalleDesembolso>? DetalleDesembolsos { get; set; }
         public DbSet<DetalleLote>? DetalleLotes { get; set; }
         public DbSet<DetallePlanPagoTemporal>? DetallePlanPagoTemporales { get; set; }
         public DbSet<DocumentosPrestamo>? DocumentosPrestamos { get; set; }
         public DbSet<Entidad>? Entidades { get; set; }
+        public DbSet<Entrevista>? Entrevistas { get; set; }
         public DbSet<Empresa>? Empresas { get; set; }
         public DbSet<EmpresaCelular>? EmpresasCelulares { get; set; }
         public DbSet<Escolaridad>? Escolaridad { get; set; }

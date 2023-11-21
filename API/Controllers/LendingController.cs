@@ -2564,22 +2564,22 @@ namespace API.Controllers
             }
         }
 
-        [HttpGet("distribucion-desembolsos")]
-        public async Task<ActionResult<object>> GetDistribucionDesembolsos()
-        {
-            var distribucion = from des in _dbContext.Desembolsos
-                               join pre in _dbContext.Prestamos on des.PrestamoId equals pre.Id
-                               join tip in _dbContext.MediosDesembolso on des.MedioDesembolsoId equals tip.Id
-                               where des.TieneLote == false && pre.EstadoPrestamoId == 20
-                               group tip by tip.Nombre into g
-                               select new
-                               {
-                                   Nombre = g.Key,
-                                   Total = g.Count()
-                               };
+        //[HttpGet("distribucion-desembolsos")]
+        //public async Task<ActionResult<object>> GetDistribucionDesembolsos()
+        //{
+        //    var distribucion = from des in _dbContext.Desembolsos
+        //                       join pre in _dbContext.Prestamos on des.PrestamoId equals pre.Id
+        //                       join tip in _dbContext.MediosDesembolso on des.MedioDesembolsoId equals tip.Id
+        //                       where des.TieneLote == false && pre.EstadoPrestamoId == 20
+        //                       group tip by tip.Nombre into g
+        //                       select new
+        //                       {
+        //                           Nombre = g.Key,
+        //                           Total = g.Count()
+        //                       };
 
-            return Ok(distribucion);
-        }
+        //    return Ok(distribucion);
+        //}
 
         [HttpGet("desembolsos/{desembolsoId}")]
         public async Task<ActionResult<DesembolsoDto>> GetDesembolsoPorId(int? desembolsoId)
@@ -2656,8 +2656,8 @@ namespace API.Controllers
                 {
                     var desembolso = await _dbContext.Desembolsos.Where(x => x.Id == item.DesembolsoId).FirstOrDefaultAsync();
 
-                    desembolso.LoteId = lote.Id;
-                    desembolso.TieneLote = true;
+                    //desembolso.LoteId = lote.Id;  Corregir con nueva estructura
+                    //desembolso.TieneLote = true;
                 }
 
                 _dbContext.SaveChanges();
@@ -2730,7 +2730,7 @@ namespace API.Controllers
 
                 //var aprobadoPor = await _dbContext.Personas.Where(x => x.Id == personId).Select(x => new { nombre = x.PrimerNombre, apellido = x.PrimerApellido }).FirstOrDefaultAsync();
 
-                item.NumeroCuenta = await _dbContext.Desembolsos.Where(x => x.PrestamoId == item.SolicitudId).Select(x => x.NumeroCuenta).FirstOrDefaultAsync();
+                // Corregir por nueva estructuraitem.NumeroCuenta = await _dbContext.Desembolsos.Where(x => x.PrestamoId == item.SolicitudId).Select(x => x.NumeroCuenta).FirstOrDefaultAsync();
 
             }
 
@@ -2754,8 +2754,8 @@ namespace API.Controllers
             if (detalleLoteDto.Habilitado == false)
             {
                 var desembolso = await _dbContext.Desembolsos.Where(x => x.PrestamoId == detalleLote.SolicitudId).FirstOrDefaultAsync();
-                desembolso.LoteId = null;
-                desembolso.TieneLote = false;
+                //desembolso.LoteId = null; Corregir por nueva estructura
+                //desembolso.TieneLote = false;
 
                 await _dbContext.SaveChangesAsync();
             }
@@ -2776,13 +2776,13 @@ namespace API.Controllers
 
             await _unitOfWork.Complete();
 
-            var desembolsos = await _dbContext.Desembolsos.Where(x => x.LoteId == loteId).ToListAsync();
+            //var desembolsos = await _dbContext.Desembolsos.Where(x => x.LoteId == loteId).ToListAsync(); Corregir por nueva estructura
 
-            foreach (var item in desembolsos)
-            {
-                item.LoteId = null;
-                item.TieneLote = false;
-            }
+            //foreach (var item in desembolsos)
+            //{
+            //    item.LoteId = null;
+            //    item.TieneLote = false;
+            //}
 
             var detalleLote = await _dbContext.DetalleLotes.Where(x => x.LoteId == loteId).ToListAsync();
 
