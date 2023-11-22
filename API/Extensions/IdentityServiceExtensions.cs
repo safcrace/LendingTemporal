@@ -19,6 +19,7 @@ namespace API.Extensions
             builder.AddSignInManager<SignInManager<AppUser>>();
             builder.AddRoleValidator<RoleValidator<AppRole>>();
             builder.AddRoleManager<RoleManager<AppRole>>();
+            builder.AddDefaultTokenProviders();
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
