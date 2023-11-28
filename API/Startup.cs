@@ -25,8 +25,8 @@ namespace API
                 //client.BaseAddress = new Uri("https://localhost:7050/");
                 //client.BaseAddress = new Uri("https://sinfin-test-backend.octtopro.com/");
                 //client.BaseAddress = new Uri("https://sinfin-test-backend.t4mapps.com/");
-                //client.BaseAddress = new Uri("https://sinfin-developer-backend.octtopro.com//");
-                client.BaseAddress = new Uri("https://sinfin-backend.octtopro.com/");
+                client.BaseAddress = new Uri("https://sinfin-developer-backend.octtopro.com//");
+                //client.BaseAddress = new Uri("https://sinfin-backend.octtopro.com/");
             });
 
             services.AddAutoMapper(typeof(MappingProfiles));
