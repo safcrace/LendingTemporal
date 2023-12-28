@@ -16,6 +16,6 @@
         public string? NombreEmisionCheque { get; set; }
         public decimal CantidadDesembolso { get; set; }
         public string? Comentario { get; set; }
-        public bool TieneLote { get; set; }
+        public bool TieneLote { get; set; }        
     }
 }

@@ -483,7 +483,7 @@ namespace API.Controllers
             {
                 tasaInteresPredeterminada = tasaInteresPrestamo;
             }
-            
+
             var diaInicioMes = await _dbContext.ParametrosDepartamentos.Where(x => x.TipoPrestamoId == tipoPrestamoId).MaxAsync(x => x.DiaInicioMes);
             var diaQuincena = await _dbContext.ParametrosDepartamentos.Where(x => x.TipoPrestamoId == tipoPrestamoId).MaxAsync(x => x.DiaQuincena);
             var diaFinMes = await _dbContext.ParametrosDepartamentos.Where(x => x.TipoPrestamoId == tipoPrestamoId).MaxAsync(x => x.DiaFinMes);
@@ -498,10 +498,10 @@ namespace API.Controllers
 
             var montoOtorgado = _dbContext.Prestamos.Where(x => x.Id == prestamoId).Select(x => x.MontoOtorgado).FirstOrDefault();
 
-            if (montoOtorgado <= tipo.MontoMaximoAnalista) tipo.PermisosAnalista = true;
-            if (montoOtorgado >= tipo.MontoMaximoJefeCreditos) tipo.PermisosJefeCreditos = true;
-            if (montoOtorgado >= tipo.MontoMaximoComiteDirectores) tipo.PermisosComiteDirectores = true;
-            if (montoOtorgado >= tipo.MontoMaximoComiteGerencia) tipo.PermisosComiteGerencia = true;
+            if (montoOtorgado <= tipo.MontoMaximoAnalista && montoMaximo <= tipo.MontoMaximoAnalista) tipo.PermisosAnalista = true;
+            if (montoOtorgado >= tipo.MontoMaximoJefeCreditos && montoMaximo <= tipo.MontoMaximoJefeCreditos) tipo.PermisosJefeCreditos = true;
+            if (montoOtorgado >= tipo.MontoMaximoComiteGerencia && montoMaximo <= tipo.MontoMaximoComiteGerencia) tipo.PermisosComiteGerencia = true;
+            if (montoOtorgado >= tipo.MontoMaximoComiteDirectores && montoMaximo <= tipo.MontoMaximoComiteDirectores) tipo.PermisosComiteDirectores = true;
 
 
             var parametrosComplementoPrestamo = new
@@ -944,7 +944,7 @@ namespace API.Controllers
                     _mapper.Map(prestamoDto, prestamo);
                 }
 
-                
+
                 await _unitOfWork.Complete();
                 //await UpdateComplements(id);
 
@@ -1486,6 +1486,13 @@ namespace API.Controllers
 
             var fechaPago = /*new DateTime(createPaymentPlanDto.StartDate.Year, createPaymentPlanDto.StartDate.Month, 2)*/createPaymentPlanDto.PayDate.AddMonths(1);//.AddDays(-1);
 
+            var diasDiferencia = fechaPago.Subtract(DateTime.Now).Days;
+
+            if (diasDiferencia < 30)
+            {
+                fechaPago = fechaPago.AddMonths(1);
+            }
+
             IEnumerable<DetallePlanPagoTemporal> projectionDb = new List<DetallePlanPagoTemporal>();
             var projection = new List<ProjectionDto>();
             var infoPrestamo = new InfoPrestamoDto();
@@ -1661,7 +1668,7 @@ namespace API.Controllers
                     planPago.SaldoGastos = planPago.CuotaGastos;
                     planPago.SaldoTotal = totalProyectado;
                     _unitOfWork.Repository<PlanPago>().Add(planPago);
-                }                
+                }
 
             }
 
@@ -1714,7 +1721,7 @@ namespace API.Controllers
             _unitOfWork.Repository<Prestamo>().Update(prestamo);
 
             result = await _unitOfWork.Complete();
-            
+
             if (result < 0) return null!;
 
             var ultimoPagoPlan = await _unitOfWork.Repository<PlanPago>().GetByIdAsync(planPago.Id);
@@ -1732,7 +1739,7 @@ namespace API.Controllers
                 ultimoPagoPlan.SaldoCapital -= ultimoPagoPlan.SaldoTotal;
                 ultimoPagoPlan.TotalCuota = ultimoPagoPlan.CuotaCapital + ultimoPagoPlan.CuotaIntereses + ultimoPagoPlan.CuotaIvaIntereses;
                 ultimoPagoPlan.SaldoTotal = 0;
-            }            
+            }
 
             result = await _unitOfWork.Complete();
 
@@ -2392,7 +2399,7 @@ namespace API.Controllers
 
             var referenciaPersona = await _unitOfWork.Repository<ReferenciaPersona>().GetByIdAsync(id);
 
-            referenciaPersona.Comentario = updateReferenciasPersona.Comentario;            
+            referenciaPersona.Comentario = updateReferenciasPersona.Comentario;
 
             await _unitOfWork.Complete();
 
@@ -2564,27 +2571,28 @@ namespace API.Controllers
             }
         }
 
-        //[HttpGet("distribucion-desembolsos")]
-        //public async Task<ActionResult<object>> GetDistribucionDesembolsos()
-        //{
-        //    var distribucion = from des in _dbContext.Desembolsos
-        //                       join pre in _dbContext.Prestamos on des.PrestamoId equals pre.Id
-        //                       join tip in _dbContext.MediosDesembolso on des.MedioDesembolsoId equals tip.Id
-        //                       where des.TieneLote == false && pre.EstadoPrestamoId == 20
-        //                       group tip by tip.Nombre into g
-        //                       select new
-        //                       {
-        //                           Nombre = g.Key,
-        //                           Total = g.Count()
-        //                       };
+        [HttpGet("distribucion-desembolsos")]
+        public async Task<ActionResult<object>> GetDistribucionDesembolsos()
+        {
+            var distribucion = from det in _dbContext.DetalleDesembolsos
+                               join des in _dbContext.Desembolsos on det.DesembolsoId equals des.Id
+                               join pre in _dbContext.Prestamos on des.PrestamoId equals pre.Id
+                               join tip in _dbContext.MediosDesembolso on det.MedioDesembolsoId equals tip.Id
+                               where det.TieneLote == false && pre.EstadoPrestamoId == 20 && det.MedioDesembolsoId != 3
+                               group tip by tip.Nombre into g
+                               select new
+                               {
+                                   Nombre = g.Key,
+                                   Total = g.Count()
+                               };
 
-        //    return Ok(distribucion);
-        //}
+            return Ok(distribucion);
+        }
 
         [HttpGet("desembolsos/{desembolsoId}")]
         public async Task<ActionResult<DesembolsoDto>> GetDesembolsoPorId(int? desembolsoId)
         {
-            var desembolso = await _unitOfWork.Repository<Desembolso>().GetByIdAsync(desembolsoId);
+            var desembolso = await _dbContext.Desembolsos.Include(x => x.DetalleDesembolsos).FirstOrDefaultAsync(x => x.Id == desembolsoId);
 
             return Ok(_mapper.Map<DesembolsoDto>(desembolso));
         }
@@ -2652,12 +2660,15 @@ namespace API.Controllers
 
                 if (result < 0) return null!;
 
-                foreach (var item in createLoteDto.DetalleLotes)
-                {
-                    var desembolso = await _dbContext.Desembolsos.Where(x => x.Id == item.DesembolsoId).FirstOrDefaultAsync();
+                var loteId = lote.Id;
 
-                    //desembolso.LoteId = lote.Id;  Corregir con nueva estructura
-                    //desembolso.TieneLote = true;
+                foreach (var item in lote.DetalleLotes)
+                {
+                    //var desembolso = await _dbContext.Desembolsos.Where(x => x.PrestamoId == item.SolicitudId).FirstOrDefaultAsync();
+                    var detalleDesembolso = await _dbContext.DetalleDesembolsos.Where(x => x.Id == item.DetalleDesembolsoId).FirstOrDefaultAsync();
+
+                    detalleDesembolso.LoteId = loteId;
+                    detalleDesembolso.TieneLote = true;
                 }
 
                 _dbContext.SaveChanges();
@@ -2729,8 +2740,9 @@ namespace API.Controllers
                 //var personId = await _dbContext.Users.Where(x => x.Id == appUserId).Select(x => x.PersonaId).FirstOrDefaultAsync();
 
                 //var aprobadoPor = await _dbContext.Personas.Where(x => x.Id == personId).Select(x => new { nombre = x.PrimerNombre, apellido = x.PrimerApellido }).FirstOrDefaultAsync();
-
-                // Corregir por nueva estructuraitem.NumeroCuenta = await _dbContext.Desembolsos.Where(x => x.PrestamoId == item.SolicitudId).Select(x => x.NumeroCuenta).FirstOrDefaultAsync();
+                /** Pendiente **/
+                var desembolsoId = await _dbContext.Desembolsos.Where(x => x.PrestamoId == item.SolicitudId).Select(x => x.Id).FirstOrDefaultAsync();
+                item.NumeroCuenta = await _dbContext.DetalleDesembolsos.Where(x => x.Id == item.DetalleDesembolsoId).Select(x => x.NumeroCuenta).FirstOrDefaultAsync();
 
             }
 
@@ -2753,9 +2765,9 @@ namespace API.Controllers
 
             if (detalleLoteDto.Habilitado == false)
             {
-                var desembolso = await _dbContext.Desembolsos.Where(x => x.PrestamoId == detalleLote.SolicitudId).FirstOrDefaultAsync();
-                //desembolso.LoteId = null; Corregir por nueva estructura
-                //desembolso.TieneLote = false;
+                var detalleDesembolso = await _dbContext.DetalleDesembolsos.Where(x => x.Id == detalleLote.DetalleDesembolsoId).FirstOrDefaultAsync();
+                detalleDesembolso.LoteId = null;
+                detalleDesembolso.TieneLote = false;
 
                 await _dbContext.SaveChangesAsync();
             }
@@ -2776,13 +2788,13 @@ namespace API.Controllers
 
             await _unitOfWork.Complete();
 
-            //var desembolsos = await _dbContext.Desembolsos.Where(x => x.LoteId == loteId).ToListAsync(); Corregir por nueva estructura
+            var detalleDesembolsos = await _dbContext.DetalleDesembolsos.Where(x => x.LoteId == loteId).ToListAsync();
 
-            //foreach (var item in desembolsos)
-            //{
-            //    item.LoteId = null;
-            //    item.TieneLote = false;
-            //}
+            foreach (var item in detalleDesembolsos)
+            {
+                item.LoteId = null;
+                item.TieneLote = false;
+            }
 
             var detalleLote = await _dbContext.DetalleLotes.Where(x => x.LoteId == loteId).ToListAsync();
 
@@ -2803,83 +2815,24 @@ namespace API.Controllers
             int solicitudesAprobadas = 0,
                 solicitudesNoAprobadas = 0;
 
-            List<CreatePaymentPlanDetailsDto> detallePlan = new List<CreatePaymentPlanDetailsDto>();
             var detalleLote = await _dbContext.DetalleLotes.Where(x => x.LoteId == loteId).ToListAsync();
 
             foreach (var item in detalleLote)
             {
-                detallePlan = new List<CreatePaymentPlanDetailsDto>();
-                
+
                 if (item.Documento is not null && item.Habilitado == true)
                 {
                     solicitudesAprobadas++;
                     item.Aprobado = true;
-
-                    var prestamo = await _unitOfWork.Repository<Prestamo>().GetByIdAsync(item.SolicitudId);
-
-                    var tipoPrestamo = await _unitOfWork.Repository<TipoPrestamo>().GetByIdAsync(prestamo.TipoPrestamoId);
-
-                    prestamo.EstadoPrestamoId = 1;
-                    prestamo.FechaDesembolso = DateTime.Now;
-                    prestamo.TasaIva = tipoPrestamo.TasaIva;
-
-                    /** Creación Plan de Pago **/
-                    var datosPrestamo = new CreatePaymentPlanTemporalDto
-                    {
-                        TipoCuota = (int)await _dbContext.TipoPrestamos.Where(x => x.Id == tipoPrestamo.TipoCuotaId).Select(x => x.TipoCuotaId).FirstOrDefaultAsync(),
-                        PrincipalAmount = prestamo.MontoOtorgado,
-                        InterestRate = prestamo.TasaInteres,
-                        TaxRate = prestamo.TasaIva,
-                        Term = prestamo.Plazo,
-                        StartDate = (DateTime)prestamo.FechaPlan,
-                        PayDate = (DateTime)prestamo.FechaPlan
-                    };
-
-                    var projection = _dbContext.DetallePlanPagoTemporales.Where(x => x.PrestamoId == prestamo.Id).OrderByDescending(x => x.Id).Take(prestamo.Plazo).ToList();
-
-                    var payDate = (DateTime)prestamo.FechaPlan;
-                    var periodo = 1;
-
-                    foreach (var plan in projection)
-                    {                        
-                        var planPagoEvaluacion = new CreatePaymentPlanDetailsDto
-                        {
-                            PrestamoId = prestamo.Id,
-                            Periodo = periodo,
-                            CuotaCapital = plan.CuotaCapital,
-                            CuotaIntereses = plan.CuotaIntereses,
-                            CuotaIvaIntereses = plan.CuotaIvaIntereses,
-                            TotalCuota = plan.TotalCuota,
-                            FechaPago = payDate
-                        };
-
-                        detallePlan.Add(planPagoEvaluacion);
-                        payDate = payDate.AddMonths(1);
-                        periodo++;
-                    }
-
-                    var planPago = new CreatePaymentPlanDto
-                    {
-                        PrestamoId = prestamo.Id,
-                        FechaPlan = (DateTime)prestamo.FechaPlan,
-                        Plazo = prestamo.Plazo,
-                        TasaInteres = prestamo.TasaInteres,
-                        TasaMora = prestamo.TasaMora,
-                        TasaGastos = prestamo.TasaGastos,
-                        PlanPagos = detallePlan
-                    };
-
-                    await CreatePaymentPlan(planPago);
                 }
                 else
                 {
                     solicitudesNoAprobadas++;
                 }
 
-
-                //_unitOfWork.Repository<P>
-
             }
+
+            await _dbContext.SaveChangesAsync();           
 
             //var listadoLotes = listadoLotes.Where(x => x.Habilitado == true && x.Aprobado == false).ToList();
             var lotes = _dbContext.DetalleLotes.Where(x => x.LoteId == loteId && x.Habilitado == true && x.Aprobado == false).Count();
@@ -2891,9 +2844,95 @@ namespace API.Controllers
             }
 
             await _dbContext.SaveChangesAsync();
-            await _unitOfWork.Complete();
+
+            foreach (var item in detalleLote)
+            {
+                /**Creación de Crédito **/
+                await CreateNewCredit(item);
+            }
 
             return Ok(new { message = "Acción Realizada Satisfactoriamente. Las solicitudes No Aprobadas, están pendientes de Documento!", solicitudesAprobadas, solicitudesNoAprobadas });
+        }
+
+        private async Task CreateNewCredit(DetalleLote? item)
+        {
+            var prestamo = await _unitOfWork.Repository<Prestamo>().GetByIdAsync(item.SolicitudId);
+            var detalleDesembolsoPendiente = await _dbContext.DetalleLotes.Where(x => x.SolicitudId == item.SolicitudId && x.Aprobado == true).CountAsync();
+
+            if (detalleDesembolsoPendiente < 1 && prestamo.EstadoPrestamoId != 1)
+            {
+                List<CreatePaymentPlanDetailsDto> detallePlan = new List<CreatePaymentPlanDetailsDto>();
+                detallePlan = new List<CreatePaymentPlanDetailsDto>();
+
+                var tipoPrestamo = await _unitOfWork.Repository<TipoPrestamo>().GetByIdAsync(prestamo.TipoPrestamoId);
+
+                prestamo.EstadoPrestamoId = 1;
+                prestamo.FechaDesembolso = DateTime.Now;
+                prestamo.TasaIva = tipoPrestamo.TasaIva;
+
+                /** Asignación Mora **/
+                if (tipoPrestamo.TasaMoraGeneral && tipoPrestamo.TasaMoraFija)
+                {
+                    var moraGeneral = await _dbContext.MoraDepartamentos.Where(x => x.TipoPrestamoId == tipoPrestamo.Id).Select(x => x.TasaPredeterminada).FirstOrDefaultAsync();
+                    prestamo.TasaMora = moraGeneral;
+                }
+                else
+                {
+
+                }
+
+                /** Creación Plan de Pago **/
+                var datosPrestamo = new CreatePaymentPlanTemporalDto
+                {
+                    TipoCuota = (int)await _dbContext.TipoPrestamos.Where(x => x.Id == tipoPrestamo.TipoCuotaId).Select(x => x.TipoCuotaId).FirstOrDefaultAsync(),
+                    PrincipalAmount = prestamo.MontoOtorgado,
+                    InterestRate = prestamo.TasaInteres,
+                    TaxRate = prestamo.TasaIva,
+                    Term = prestamo.Plazo,
+                    StartDate = (DateTime)prestamo.FechaPlan,
+                    PayDate = (DateTime)prestamo.FechaPlan
+                };
+
+                var projection = _dbContext.DetallePlanPagoTemporales.Where(x => x.PrestamoId == prestamo.Id).OrderByDescending(x => x.Id).Take(prestamo.Plazo).ToList();
+
+                var payDate = (DateTime)prestamo.FechaPlan;
+                var periodo = 1;
+
+                foreach (var plan in projection)
+                {
+                    var planPagoEvaluacion = new CreatePaymentPlanDetailsDto
+                    {
+                        PrestamoId = prestamo.Id,
+                        Periodo = periodo,
+                        CuotaCapital = plan.CuotaCapital,
+                        CuotaIntereses = plan.CuotaIntereses,
+                        CuotaIvaIntereses = plan.CuotaIvaIntereses,
+                        TotalCuota = plan.TotalCuota,
+                        FechaPago = payDate
+                    };
+
+                    detallePlan.Add(planPagoEvaluacion);
+                    payDate = payDate.AddMonths(1);
+                    periodo++;
+                }
+
+                var planPago = new CreatePaymentPlanDto
+                {
+                    PrestamoId = prestamo.Id,
+                    FechaPlan = (DateTime)prestamo.FechaPlan,
+                    Plazo = prestamo.Plazo,
+                    TasaInteres = prestamo.TasaInteres,
+                    TasaMora = prestamo.TasaMora,
+                    TasaGastos = prestamo.TasaGastos,
+                    PlanPagos = detallePlan
+                };
+
+                await CreatePaymentPlan(planPago);
+
+                await _dbContext.SaveChangesAsync();
+                await _unitOfWork.Complete();
+
+            }
         }
 
         [HttpPost("archivos-prestamos")]
@@ -2937,6 +2976,57 @@ namespace API.Controllers
             await _unitOfWork.Complete();
 
             return Ok(new { message = "Acción realizada Satisfactoriamente" });
+        }
+
+        [HttpGet("entrevistas/{prestamoId}")]
+        public async Task<ActionResult<object>> GetInterview(int prestamoId)
+        {
+
+            var entrevista = await _dbContext.Entrevistas.Where(x => x.PrestamoId == prestamoId).FirstOrDefaultAsync();
+
+            if (entrevista is null)
+            {
+                return Ok(new { entrevista = "No existe entrevista" });
+            }
+
+            return Ok(entrevista.Texto);
+        }
+
+        [HttpPost("entrevistas")]
+        public async Task<ActionResult<object>> CreateInterview(CreateEntrevistaDto entrevistaDto)
+        {
+
+            try
+            {
+                var entrevista = _mapper.Map<Entrevista>(entrevistaDto);
+
+                _unitOfWork.Repository<Entrevista>().Add(entrevista);
+
+                var result = await _unitOfWork.Complete();
+
+                if (result < 0) return null!;
+
+                return Ok(new { message = "Acción realizada Satisfactoriamente" });
+            }
+            catch (Exception e)
+            {
+
+                return e.InnerException != null
+                ? new BadRequestObjectResult(e.InnerException.Message)
+                : new BadRequestObjectResult(e.Message);
+            }
+        }
+
+        [HttpPut("entrevistas")]
+        public async Task<ActionResult<object>> UpdateEntrevista(CreateEntrevistaDto entrevistaDto)
+        {
+            var entrevista = await _dbContext.Entrevistas.Where(x => x.PrestamoId == entrevistaDto.PrestamoId).FirstOrDefaultAsync();
+
+            entrevista.Texto = entrevistaDto.Texto;
+
+            await _dbContext.SaveChangesAsync();
+
+            return Ok(new { message = "Actualizacion realizada Satisfactoriamente" });
         }
 
     }

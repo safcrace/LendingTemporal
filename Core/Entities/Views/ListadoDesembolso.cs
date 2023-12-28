@@ -6,7 +6,7 @@ namespace Core.Entities.Views
     public class ListadoDesembolso
     {
         public int SolicitudId { get; set; }
-        public int DesembolsoId { get; set; }
+        public int DetalleDesembolsoId { get; set; }
         public DateTime FechaIngreso { get; set; }
         public int TiempoSolicitud { get; set; }
         public string? NombreProspecto { get; set; }

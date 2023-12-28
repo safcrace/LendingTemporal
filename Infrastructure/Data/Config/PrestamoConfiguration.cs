@@ -14,7 +14,7 @@ namespace Infrastructure.Data.Config
             builder.Property(x => x.IvaProyectado).HasColumnType("decimal(18,2)");
             builder.Property(x => x.GastosProyectados).HasColumnType("decimal(18,2)");                        
             builder.Property(x => x.MontoTotalProyectado).HasColumnType("decimal(18,2)");                        
-            builder.Property(x => x.TasaInteres).HasColumnType("decimal(18,4)");                        
+            builder.Property(x => x.TasaInteres).HasColumnType("decimal(18,7)");                        
             builder.Property(x => x.TasaIva).HasColumnType("decimal(18,2)");                        
             builder.Property(x => x.TasaMora).HasColumnType("decimal(18,2)");                        
             builder.Property(x => x.TasaGastos).HasColumnType("decimal(18,2)");
