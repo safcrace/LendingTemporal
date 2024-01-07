@@ -133,24 +133,27 @@ namespace API.Controllers
         }
 
 
-        [HttpPost("user/resetPassword")]
+        [HttpPost("user/resetPassword")] //$inFin@2024
         public async Task<ActionResult> ResetPassword(ResetPasswordDto resetPassword)
         {
-            var user = await _userManager.FindByIdAsync(resetPassword.appUserId);
+            var user = await _userManager.FindByEmailAsync(resetPassword.Email);
+            //var user = await _userManager.FindByIdAsync("f07c7f0c-83f8-4a3f-b5dc-42a35f645076");
 
             if (user == null)
             {
                 return BadRequest("An error has occurred. Please redo the process.");
             }
 
-            var result = await _userManager.ResetPasswordAsync(user, resetPassword.Code, resetPassword.Password);
+            var code = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+            var result = await _userManager.ResetPasswordAsync(user, code, resetPassword.Password);
 
             if (result.Succeeded)
             {
-                return Ok(new { message = "Your password has been changed successfully!!!" });
+                return Ok(new { message = "Su Password se ha cambiado satisfactoriamente!!" });
             }
 
-            return BadRequest("An error has occurred. Please redo the process.");
+            return BadRequest("Ha ocurrido un error por favor contacte al administrador del Sistema.");
         }
 
         [HttpGet("user/confirmMail")]
