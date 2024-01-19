@@ -1495,6 +1495,7 @@ namespace API.Controllers
                 };
             }
 
+            
 
             /** Se Aplica de nuevo al Plan de Pago los Pagos Revertidos **/
             var totalAbonoCapital = 0.0m;
@@ -1565,6 +1566,11 @@ namespace API.Controllers
 
             registroCaja.MotivoAnulacion = "Pago Revertido";
             registroCaja.Habilitado = false;
+
+            if (credito.EstadoPrestamoId == 4)
+            {
+                credito.EstadoPrestamoId = 1;
+            }
 
             _dbContext.RegistroCajas.Update(registroCaja);
 
