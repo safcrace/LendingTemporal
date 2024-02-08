@@ -772,8 +772,8 @@ namespace API.Controllers
             }
             else
             {
-                montoMora = (montoExcedente * 100) / 112;
-                montoIvaMora += montoMora * 0.12m;
+                montoMora += (montoExcedente * 100) / 112;
+                montoIvaMora += ((montoExcedente * 100) / 112) * 0.12m;
                 montoExcedente = 0;
             }
 
