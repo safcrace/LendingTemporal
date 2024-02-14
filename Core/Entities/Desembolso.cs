@@ -12,6 +12,7 @@ namespace Core.Entities
         public string? AprobacionCreditos { get; set; }
         public string? AprobacionDireccion { get; set; }
         public string? AprobacionGerencia { get; set; }
+        public bool Desembolsado { get; set; }
         public List<DetalleDesembolso>? DetalleDesembolsos { get; set; } = new List<DetalleDesembolso>();
     }
 }
