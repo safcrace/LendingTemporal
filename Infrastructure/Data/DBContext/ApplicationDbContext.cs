@@ -49,6 +49,7 @@ namespace Infrastructure.Data.DBContext
         public DbSet<Genero> Generos { get; set; } = null!;                
         public DbSet<GrupoFamiliar> GrupoFamiliar { get; set; } = null!;                
         public DbSet<InteresesDepartamentos> InteresesDepartamentos { get; set; } = null!;                
+        public DbSet<ListadoEntidades> ListadoEntidades { get; set; } = null!;                
         public DbSet<ListadoGeneral> ListadoGeneral { get; set; } = null!;                
         public DbSet<ListadoDeudores> ListadoDeudores { get; set; } = null!;                                    
         public DbSet<Lote> Lotes { get; set; } = null!;                                    

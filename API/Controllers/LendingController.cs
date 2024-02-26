@@ -55,7 +55,7 @@ namespace API.Controllers
                     result = await _unitOfWork.Complete();
                     if (result < 0) return null!;
 
-                    createLendingDto.GestorPrestamoId = entidad.Id;
+                    createLendingDto.GestorPrestamoId = createLendingDto.GestorPrestamoId;
 
                     if (createLendingDto.CreatePersonDto is not null)
                     {
@@ -551,12 +551,15 @@ namespace API.Controllers
         public async Task<ActionResult<object>> UpdateLendingStatus(UpdateEstadoDto updateEstadoDto)
         {
             var desembolso = await _dbContext.Desembolsos.Where(x => x.PrestamoId == updateEstadoDto.PrestamoId).FirstOrDefaultAsync();
+            var entrevista = await _dbContext.Entrevistas.Where(x => x.PrestamoId == updateEstadoDto.PrestamoId).FirstOrDefaultAsync();
 
             if (updateEstadoDto.NuevoEstadoId == 14)
             {
                 var tipoPrestamoId = await _dbContext.Prestamos.Where(x => x.Id == updateEstadoDto.PrestamoId).Select(x => x.TipoPrestamoId).FirstOrDefaultAsync();
 
-                if (tipoPrestamoId is null)
+                var detallePlanPagos = await _dbContext.DetallePlanPagoTemporales.FirstOrDefaultAsync(x => x.PrestamoId == updateEstadoDto.PrestamoId);
+
+                if (tipoPrestamoId is null || detallePlanPagos is null)
                 {
                     return BadRequest("Datos de la Solicitud Incompletos, no puede trasladar a Evaluación, por favor revise la información");
                 }
@@ -565,6 +568,10 @@ namespace API.Controllers
 
             if (updateEstadoDto.NuevoEstadoId > 15)
             {
+                if (entrevista is null)
+                {
+                    return BadRequest("Alerta! La solicitud aún no cuenta con Entrevista!");
+                }
 
                 if (desembolso is null)
                 {
@@ -897,6 +904,10 @@ namespace API.Controllers
 
                 if (personaDto is not null)
                 {
+                    //if (!personaDto.PoseeNegocio)
+                    //{
+                    //    return BadRequest("No se puede Grabar, porque selecciono la Opción No Posee Negocio");
+                    //}
                     var persona = await _unitOfWork.Repository<Persona>().GetByIdAsync(personaDto.Id);
 
                     if (persona == null) return NotFound();
@@ -936,8 +947,28 @@ namespace API.Controllers
 
                 var prestamoDto = updateProspectoDto.DatosPrestamo;
 
+
                 if (prestamoDto is not null)
                 {
+                    if (prestamoDto.EstadoPrestamoId == 13 || prestamoDto.EstadoPrestamoId == 15)
+                    {
+                        var detalleplanPago = await _dbContext.DetallePlanPagoTemporales.Where(x => x.PrestamoId == prestamoDto.Id).ToListAsync();
+
+                        _dbContext.DetallePlanPagoTemporales.RemoveRange(detalleplanPago);
+                        await _dbContext.SaveChangesAsync();
+                    }
+
+                    if (prestamoDto.ObjetivoCredito is not null || prestamoDto.OtrosIngresos > 0)
+                    {
+                        var empresa = await _dbContext.Empresas.FirstOrDefaultAsync(x => x.EntidadId == prestamoDto.EntidadPrestamoId);
+                        if (empresa is not null)
+                        {
+                            empresa.OtrosIngresos = prestamoDto.OtrosIngresos;
+                            empresa.OrigenOtrosIngresos = prestamoDto.OrigenIngresos;
+                            //await SaveChanges();
+                        }
+                    }
+
                     var prestamo = await _unitOfWork.Repository<Prestamo>().GetByIdAsync(prestamoDto.Id);
 
                     if (prestamo == null) return NotFound();
@@ -2568,6 +2599,13 @@ namespace API.Controllers
         {
             try
             {
+                var tieneDesembolso = await _dbContext.Desembolsos.FirstOrDefaultAsync(x => x.PrestamoId == createDesembolsoDto.PrestamoId);
+
+                if (tieneDesembolso is not null)
+                {
+                    return BadRequest("Error la solicitud ya cuenta con Desembolso");
+                }
+
                 var desembolso = _mapper.Map<Desembolso>(createDesembolsoDto);
 
                 _unitOfWork.Repository<Desembolso>().Add(desembolso);
@@ -2592,12 +2630,12 @@ namespace API.Controllers
         {
             var listado = from des in _dbContext.Desembolsos
                           join pre in _dbContext.Prestamos on des.PrestamoId equals pre.Id
-                          join per in _dbContext.Personas on pre.EntidadPrestamoId equals per.EntidadId
+                          join ent in _dbContext.ListadoEntidades on pre.EntidadPrestamoId equals ent.EntidadId
                           where pre.EstadoPrestamoId == 20
                           select new
                           {
                               SolicitudId = pre.Id,
-                              Nombre = $"{per.PrimerNombre} {per.SegundoNombre} {per.TercerNombre} {per.PrimerApellido} {per.SegundoApellido}"
+                              Nombre = ent.NombreEntidad //$"{per.PrimerNombre} {per.SegundoNombre} {per.TercerNombre} {per.PrimerApellido} {per.SegundoApellido}"
                           };
 
             return Ok(listado);
@@ -2882,7 +2920,7 @@ namespace API.Controllers
 
                 if (desembolso is not null)
                 {
-                    var desembolsosPendientes = await _dbContext.DetalleDesembolsos.Where(x => x.DesembolsoId == desembolso.Id && x.MedioDesembolsoId !=3 && x.Desembolsado == false).CountAsync();
+                    var desembolsosPendientes = await _dbContext.DetalleDesembolsos.Where(x => x.DesembolsoId == desembolso.Id && x.MedioDesembolsoId != 3 && x.Desembolsado == false).CountAsync();
 
                     if (desembolsosPendientes < 1)
                     {
@@ -2894,11 +2932,11 @@ namespace API.Controllers
                     }
                 }
             }
-            
+
 
             return Ok(new { message = "Acción Realizada Satisfactoriamente. Las solicitudes No Aprobadas, están pendientes de Documento!", solicitudesAprobadas, solicitudesNoAprobadas });
         }
-      
+
 
         private async Task CreateNewCredit(int prestamoId)
         {

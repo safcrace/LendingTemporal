@@ -46,7 +46,7 @@
         public string? NumeroDocumento { get; set; }
         public DateTime FechaInicioNegocio { get; set; }
         public decimal VentasMensuales { get; set; }
-        public decimal GanaciasMensuales { get; set; }
+        public decimal GananciasMensuales { get; set; }
         public decimal OtrosIngresos { get; set; }
         public string? OrigenOtrosIngresos { get; set; }
         //public string? Comentarios { get; set; }

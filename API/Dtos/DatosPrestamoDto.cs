@@ -50,5 +50,7 @@
         public string? ObjetivoCredito { get; set; }
         public string? TipoCuota { get; set; }
         public int DesembolsoId { get; set; }
+        public decimal OtrosIngresos { get; set; } = 0;
+        public string? OrigenIngresos { get; set; }       
     }
 }
