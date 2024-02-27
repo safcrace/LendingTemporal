@@ -1322,13 +1322,13 @@ namespace API.Controllers
             //        billingMessage = "Atención!!! Hubo un error en el Proceso de Facturación, La Factura no se emitió!";
             //    }
 
-                //return Ok(resultado);
+            //    //return Ok(resultado);
             //}
 
 
 
 
-            await _dbContext.Database.ExecuteSqlRawAsync($"sp_job_calcularMoraPrestamo {createRegistroCajaDto.PrestamoId}, 0, 1");
+            //await _dbContext.Database.ExecuteSqlRawAsync($"sp_job_calcularMoraPrestamo {createRegistroCajaDto.PrestamoId}, 0, 1");
 
 
             return Ok(new { Mensaje = "Pago realizado Satisfactoriamente", RegistroCajaId = registroPago.Id /*, billingMessage */});
