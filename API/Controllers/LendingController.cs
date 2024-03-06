@@ -673,7 +673,9 @@ namespace API.Controllers
         {
             var tipoEntidadId = await _dbContext.Entidades.Where(e => e.Id == entidadId).Select(e => e.TipoEntidadId).FirstOrDefaultAsync();
 
-            if (tipoEntidadId == 1)
+			var estadosPermitidos = new List<int?> { 1, 3, 4, 6, 7, 8 };
+
+			if (tipoEntidadId == 1)
             {
                 var persona = await _dbContext.Personas.Where(x => x.EntidadId == entidadId)
                                             .Select(x => new
@@ -709,7 +711,7 @@ namespace API.Controllers
 
                 //decimal Cargos = await _dbContext.EstadoCuentas.Where(x => x.PrestamoId == ).SumAsync(x => x.Cargo);
 
-                var estadosPermitidos = new List<int?> { 1, 3, 4, 6, 7, 8 };
+                
 
                 var prestamosPer = await (from pre in _dbContext.Prestamos
                                           join ase in _dbContext.Personas on pre.GestorPrestamoId equals ase.EntidadId
@@ -744,22 +746,24 @@ namespace API.Controllers
                                                 x.Telefono
                                             }).FirstOrDefaultAsync();
 
-            //var agenteE = await (from pre in _dbContext.Prestamos
-            //                     join ent in _dbContext.Entidades on pre.GestorPrestamoId equals ent.Id
-            //                     join per in _dbContext.Personas on ent.Id equals per.EntidadId
-            //                     where pre.Id == id
-            //                     select new
-            //                     {
-            //                         Nombre = per.PrimerNombre + " " + per.SegundoApellido,
+			//var agenteE = await (from pre in _dbContext.Prestamos
+			//                     join ent in _dbContext.Entidades on pre.GestorPrestamoId equals ent.Id
+			//                     join per in _dbContext.Personas on ent.Id equals per.EntidadId
+			//                     where pre.Id == id
+			//                     select new
+			//                     {
+			//                         Nombre = per.PrimerNombre + " " + per.SegundoApellido,
 
-            //                     }).FirstOrDefaultAsync();
+			//                     }).FirstOrDefaultAsync();
 
-            var prestamosEmp = await (from pre in _dbContext.Prestamos
+			
+
+			var prestamosEmp = await (from pre in _dbContext.Prestamos
                                       join ase in _dbContext.Personas on pre.GestorPrestamoId equals ase.EntidadId
                                       //join emp in _dbContext.Empresas on pre.EmpresaPrestamoId equals emp.EntidadId
                                       join tc in _dbContext.TipoPrestamos on pre.TipoPrestamoId equals tc.Id
                                       join est in _dbContext.EstadoPrestamos on pre.EstadoPrestamoId equals est.Id
-                                      where pre.EntidadPrestamoId == entidadId
+									  where pre.EntidadPrestamoId == entidadId && estadosPermitidos.Contains(pre.EstadoPrestamoId)									  
                                       select new
                                       {
                                           PrestamoId = pre.Id,
@@ -1705,7 +1709,7 @@ namespace API.Controllers
                 var totalProyectado = (prestamo.MontoOtorgado) + (fila.CuotaIntereses * prestamo.Plazo) + (fila.CuotaIvaIntereses * prestamo.Plazo);
                 foreach (var plan in createPaymentPlanDto.PlanPagos)
                 {
-                    totalProyectado -= fila.TotalCuota;
+                    totalProyectado -= plan.TotalCuota;
                     planPago = _mapper.Map<PlanPago>(plan);
                     planPago.PrestamoId = prestamo.Id;
                     planPago.SaldoCapital = planPago.CuotaCapital;
@@ -2952,18 +2956,18 @@ namespace API.Controllers
             prestamo.TasaIva = tipoPrestamo.TasaIva;
 
             /** Creación Plan de Pago **/
-            var datosPrestamo = new CreatePaymentPlanTemporalDto
-            {
-                TipoCuota = (int)await _dbContext.TipoPrestamos.Where(x => x.Id == tipoPrestamo.TipoCuotaId).Select(x => x.TipoCuotaId).FirstOrDefaultAsync(),
-                PrincipalAmount = prestamo.MontoOtorgado,
-                InterestRate = prestamo.TasaInteres,
-                TaxRate = prestamo.TasaIva,
-                Term = prestamo.Plazo,
-                StartDate = (DateTime)prestamo.FechaPlan,
-                PayDate = (DateTime)prestamo.FechaPlan
-            };
+            //var datosPrestamo = new CreatePaymentPlanTemporalDto
+            //{
+            //    TipoCuota = (int)await _dbContext.TipoPrestamos.Where(x => x.Id == tipoPrestamo.TipoCuotaId).Select(x => x.TipoCuotaId).FirstOrDefaultAsync(),
+            //    PrincipalAmount = prestamo.MontoOtorgado,
+            //    InterestRate = prestamo.TasaInteres,
+            //    TaxRate = prestamo.TasaIva,
+            //    Term = prestamo.Plazo,
+            //    StartDate = (DateTime)prestamo.FechaPlan,
+            //    PayDate = (DateTime)prestamo.FechaPlan
+            //};
 
-            var projection = _dbContext.DetallePlanPagoTemporales.Where(x => x.PrestamoId == prestamo.Id).OrderByDescending(x => x.Id).Take(prestamo.Plazo).ToList();
+            var projection = await _dbContext.DetallePlanPagoTemporales.Where(x => x.PrestamoId == prestamo.Id).ToListAsync();
 
             var payDate = (DateTime)prestamo.FechaPlan;
             var periodo = 1;

@@ -15,7 +15,7 @@ namespace API.Dtos
         [Required]
         public decimal TasaInteres { get; set; }
         [Required]
-        public decimal TasaIva { get; set; }
+        public decimal TasaIva { get; set; } = 0.12m;
         public decimal TasaMora { get; set; } = 0.0m;
         public decimal TasaGastos { get; set; } = 0.0m;
         public ICollection<CreatePaymentPlanDetailsDto> PlanPagos { get; set; } = new List<CreatePaymentPlanDetailsDto>();
